@@ -1,0 +1,55 @@
+This is a redesigned exporter I have modified
+because I both, couldn't get the standard one to work
+due to incompatible coding with the newer Maya programs,
+nor, would the thing even fit in the boundary's of
+my monitor resolution of 1360x768 once I got a hacked version
+able to run.
+
+This script should work on the following:
+Maya 2012 through Maya2017
+Though I 'think' there was some issue with Maya 2013.
+At present time, it will NOT function on Maya 2018,
+since currently, the MayaPanda plugins can not be built
+do to coding issues.
+
+Copy the two ".mel" files. "MayaPandaUI.mel" & "eggImportOptions.mel" to:
+C:\Users\{YOURACCOUNT}\Documents\maya\scripts\
+
+In the above folder, may be a Maya MEL file named "userSetup.mel".
+If the userSetup.mel file is NOT present, simply use any text
+editor and manually create the file with the entry below,
+and make sure to save-as "userSetup.mel".
+If the file is present, open it up for editing in something like notepad.
+Add the following line entry into it and save it.
+source MayaPandaUI.mel;
+
+This file above is used to load scripts on starting up Maya
+and can be used for any script the user wishes to load at started time.
+
+"MayaPandaUI.mel" is the main script file of this exporter.
+On Maya start-up, the script will place a new menu item on the main menu
+inside of Maya, at the top of the Maya GUI.
+
+The file "eggImportOptions.mel" is for a sub menu,
+which is used/called when a user runs File>Import.
+It creates an option menu inside that GUI window.
+
+Finally, you must copy the two ".mll" from your Panda3d>plugins directory,
+that reflect the version of Maya your running, to your
+"\Program Files\Autodesk\[MayaVersion]\bin\plug-ins" directory
+File to copy to Maya installation:
+"mayaeggimport[mayaVersion].mll"
+"libmayapview[mayaVersion].mll"
+
+After the above has been done, start up Maya.
+Go to "Window>Settings>Preferences>Plug-In Manager"
+When the Plug-In Manager GUI opens, find and "Check" the following:
+Under "mayaeggimport[mayaVersion].mll"    Check both "Loaded" & "Auto load"
+Under "libmayapview[mayaVersion].mll"    Check both "Loaded" & "Auto load"
+
+That's it!  You should now be able to import and export egg and bam files,
+along with adding egg-object-types and taking advantage of many export options.
+
+Final Note:
+If you just installed the Panda3d SDK and have yet to reboot your computer,
+a restart is highly recommended so your computer can find the Panda3d installation!
