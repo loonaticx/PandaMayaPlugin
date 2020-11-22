@@ -243,6 +243,9 @@
 // - Added the "shadow-cast" egg-type-attribute to the "Add Egg Tags" GUI.
 // - Added the "smooth-floors" egg-type-attribute to the "Add Egg Tags" GUI.
 // -
+// - 11/22/2020 : Mods by Benjamin Frisby
+// - Added the "camera-collide" egg-type-attribute to the "Add Egg Tags" GUI.
+// -
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 // Process: MP_PandaVersion                              //
@@ -2163,6 +2166,12 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\n<Scalar> into-collide-mask { 0x00000002 }"
 						    +"\n\nMakes floors smooth for the \"Avatars\" to walk and stand on.");
 		break;
+        
+        case "camera-collide":
+		    $annotation = ("<Scalar> collide-mask { 0x04 }"
+			                +"\n<Collide> { Polyset descend }"
+						    +"\n\nAllows only the camera to collide with the geometry.");
+		break;
 						  
         
         case "sphere":
@@ -3242,7 +3251,7 @@ global proc MP_Globals()
         //The following is Panda3D's default egg-object-types
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
-    $gMP_EggObjectTypeArray = {"barrier","floor","shadow-cast","dupefloor","smooth-floors","sphere","tube",
+    $gMP_EggObjectTypeArray = {"barrier","floor","shadow-cast","dupefloor","smooth-floors","camera-collide","sphere","tube",
                                 "trigger","trigger-sphere","invsphere","bubble","polylight",
                                 "portal","dual","ghost","glass","glow",
                                 "binary","indexed","model","dcs","notouch",

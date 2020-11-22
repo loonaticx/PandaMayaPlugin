@@ -243,4 +243,7 @@
 // - Added the "shadow-cast" egg-type-attribute to the "Add Egg Tags" GUI.
 // - Added the "smooth-floors" egg-type-attribute to the "Add Egg Tags" GUI.
 // -
+// - 11/22/2020 : Mods by Benjamin Frisby
+// - Added the "camera-collide" egg-type-attribute to the "Add Egg Tags" GUI.
+// -
 /////////////////////////////////////////////////////////////////////////////////////////////
