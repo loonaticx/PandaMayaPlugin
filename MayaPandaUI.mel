@@ -178,7 +178,7 @@
 // - Adjusted coding of the 'MP_TexPathOptionsUI' process for new text box and corrected options
 // - Modified code in 'MP_ArgsBuilder' and 'MP_Export2Bam' process to add to and correct for errors
 // - --from a previous update involving texture referencing:
-// - 
+// -
 // - When using 'Reference textures relative to specified path':
 // - If exporting to ONLY an egg file:
 // - --The egg file textures will be referenced to the specified path.
@@ -190,7 +190,7 @@
 // - If calling an egg file to bam up, the referencing and/or copying options will also
 // - --function as they should. Referencing options in this case change based on the
 // - --setting of 'Output File Type' prior to browsing for egg file.
-// - 
+// -
 // - When using 'Copy textures and make relative to specified path':
 // - If exporting to ONLY an egg file:
 // - --The textures will be copied-to the specified path.
@@ -210,7 +210,7 @@
 // - ----The original textures will be copied-to the specified path in the 'Egg file Texture Ref Path' text box.
 // - ----The bam file textures will be relative to the path specified in the 'Bam file Texture Ref Path' text box.
 // - ----NOTE: The reference path MUST start with the path to the copied-to path being utilized.
-// - 
+// -
 // - 07/11/2017 : Mods by Sean /a.k.a. "Sweet" (primary coding was done 07/06/2016)
 // - Added support to the following processes to handle converting multiple files at one time.
 // - --MP_BrowseForFile, MP_GetEggFile2Bam, MP_GetMayaFile2Egg, MP_GetBamFile2Egg, MP_ImportPandaFile
@@ -228,7 +228,7 @@
 // - Added GUI checkBox and needed function(s) to remove the "groundPlane_transform" tuple from exported egg MESH files.
 // - --While this Maya node is normally empty, care should be taken to ensure it is empty when exporting.
 // - --Otherwise there runs the risk of data loss in the egg/bam file(s).
-// - 
+// -
 // - 10/01/2017 : Mods by Sean /a.k.a. "Sweet"
 // - Added the ability to add UVScroll values to nodes via the "Add Egg Tags" GUI.
 // - Recoded the way confirmDialogs pull their menu and annotation values.
@@ -246,6 +246,10 @@
 // - 11/22/2020 : Mods by Benjamin Frisby
 // - Added the "camera-collide" egg-type-attribute to the "Add Egg Tags" GUI.
 // -
+// - 2/28/2020 : Mods by Erica Miller, aka "Loonatic"
+// - Removed unnecessary egg object-types from the "Add Egg Tags" GUI for Toontown use.
+// - Added custom egg-type attributes for Toontown use in the "Add Egg Tags" GUI.
+// -
 /////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////
 // Process: MP_PandaVersion                              //
@@ -255,7 +259,7 @@ global proc string MP_PandaVersion(string $option)
     global string $gMP_PandaFileVersions[];
     string $executableToUse = "";
     string $selectedBamVersion = `optionMenu -query -value MP_BamVersionOptionMenu`;
-    
+
         //Scan each loop for the value of the selected bam file version
         //bam2egg executable file name should be the next value (+1) after version in the array
         //egg2bam executable should be the second value (+2) after version in the array
@@ -296,9 +300,9 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
         to the user.
         The return value will be the value of the button that was pressed by user.
     */
-    
+
     string $confirmValue = "";
-    
+
     switch($type)
     {
         case "ok":
@@ -310,7 +314,7 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
                                             -cancelButton "CANCEL"
                                             -dismissString "CANCEL"`;
         break;
-        
+
         case "okcancel":
                 //Displays an 'OK' and 'CANCEL' button to user
             $confirmValue = `confirmDialog -title $title
@@ -321,7 +325,7 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
                                             -cancelButton "CANCEL"
                                             -dismissString "CANCEL"`;
         break;
-        
+
         case "selectcancel":
                 //Displays an 'SELECT' and 'CANCEL' button to user
             $confirmValue = `confirmDialog -title $title
@@ -332,7 +336,7 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
                                             -cancelButton "CANCEL"
                                             -dismissString "CANCEL"`;
         break;
-        
+
         case "yesno":
                 //Displays a 'YES' and 'NO' button to user
             $confirmValue = `confirmDialog -title $title
@@ -343,7 +347,7 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
                                             -cancelButton "NO"
                                             -dismissString "NO"`;
         break;
-        
+
         case "downloadcancel":
                 //Displays a 'Download' and 'Cancel' button to user
             $confirmValue = `confirmDialog -title $title
@@ -355,7 +359,7 @@ global proc string MP_ConfirmationDialog(string $title, string $message, string 
                                             -dismissString "CANCEL"`;
         break;
     }
-        
+
         //Return the value
     return $confirmValue;
 }
@@ -367,7 +371,7 @@ global proc MP_AddEggObjectFlags(string $eggObjectType)
 {
         //global egg-object-type array
     global string $gMP_EggObjectTypeArray[];
-    
+
         //generate attribute enumeration list from the array
     string $enumerationList = stringArrayToString($gMP_EggObjectTypeArray, ":");
 
@@ -378,7 +382,7 @@ global proc MP_AddEggObjectFlags(string $eggObjectType)
             //String version of array index number.
             //This is necessary so we can verify the index number is not null/empty
         int $indexNumber = -1;
-        
+
             //Get the array index number of the $eggObjectType passed to this process
             //by iterating through each array item and compare them to the $eggObjectType
         for($n=0;$n<size($gMP_EggObjectTypeArray);$n++){
@@ -386,10 +390,10 @@ global proc MP_AddEggObjectFlags(string $eggObjectType)
                 $indexNumber = $n;
             }
         }
-        
+
             //Varible to hold all currently selected nodes
         string $selectedNodes[] =`ls -sl`;
-        
+
             //Iterate through each selected node one-by-one
         if( size($selectedNodes) == 0)
         {
@@ -424,7 +428,7 @@ global proc MP_AddEggObjectFlags(string $eggObjectType)
                                                     + "\nIf you modify the $gMP_EggObjectTypeArray DO NOT forget to update your PRC files."
                                                     + "\nto include a reference of the egg-object-type you are adding.", "ok");
     }
-    
+
         //Method to update the MP_DeleteEggObjectTypesWindow window if it is currently being shown
     if (`window -exists MP_DeleteEggObjectTypesWindow`){
         MP_GetEggObjectTypes();
@@ -439,7 +443,7 @@ global proc MP_SetEggObjectTypeAttribute(string $enumerationList, string $eggObj
 {
         //Determining variable on whether we can add egg-object-type attribute to node
     int $addeggObjectTypeAttribute = 0;
-    
+
         //Check for any currently attached egg-object-type attribute values on the node.
         //If a current attribute matches passed egg-object-type,
         //  we skip adding it again and notify user it already exists.
@@ -455,13 +459,13 @@ global proc MP_SetEggObjectTypeAttribute(string $enumerationList, string $eggObj
                                                                 + "\nAlready attached on node attribute:  "
                                                                 + "\n"
                                                                 + ($node + ".eggObjectTypes" + $i), "ok");
-                    
+
                     //Since attribute already exists on node, set our determining variable to 0 to skip adding it again
                 $addeggObjectTypeAttribute = 1;
             }
         }
-    }    
-        
+    }
+
         //Adds the egg-object-type attribute to node if it was not already attached
     if($addeggObjectTypeAttribute == 0){
         addAttr -ln ("eggObjectTypes" + $attributeNumber) -keyable 1 -attributeType "enum" -enumName ($enumerationList) $node;
@@ -476,21 +480,21 @@ global proc MP_AddEggObjectTypesGUI()
 {
     /*
         Constructs and displays a GUI for adding egg-object-type tags to nodes.
-        It is designed to read the contents in teh global $eggObjectTypeArray and 
+        It is designed to read the contents in the global $eggObjectTypeArray and
         automatically create rows of 5 buttons each row in a separate window.
         The array can be modified in the MP_Globals process to the users liking.
         User must verify that any object types added to the array are also present
         in at least one of their PRC files, otherwise egg2bam will error complaining
         about an unknown object-type.
     */
-    
+
     global string $gMP_EggObjectTypeArray[];
-    
+
         //Delete any current instances of the MP_AddEggObjectTypesWindow window
     if (`window -exists MP_AddEggObjectTypesWindow`){
         deleteUI -window MP_AddEggObjectTypesWindow;
     }
-    
+
     window -retain -title "Panda Exporter - Add Egg-Object-Types" -resizeToFitChildren true -sizeable 0 -visible 1 MP_AddEggObjectTypesWindow;
         columnLayout -columnAttach "left" 0 -adjustableColumn true -rowSpacing 0;
             frameLayout -backgroundColor 0.50 0.60 0.20    //Add Egg-Type Tags
@@ -500,14 +504,14 @@ global proc MP_AddEggObjectTypesGUI()
                     for($n=0;$n<(size($gMP_EggObjectTypeArray)+1)/4;$n++){
                         rowLayout -nc 6;
                             for($i=0;$i<5;$i++){
-                                
+
                                 string $eggObjectType = $gMP_EggObjectTypeArray[$count];
-                                
+
                                 if($eggObjectType != ""){
-                                        
+
                                         //Get the defined annotation for egg-object-type
                                         string $annotation = MP_GetObjectTypeAnnotation($eggObjectType);
-                                        
+
                                         button -label $eggObjectType
                                             -width 100 -height 17
                                             -annotation $annotation
@@ -524,7 +528,7 @@ global proc MP_AddEggObjectTypesGUI()
                     setParent -u;
                 setParent -u;
             setParent -u;
-            
+
             int $UVScrollFrameHeight = 125;
             frameLayout -backgroundColor 0.50 0.60 0.20 -height $UVScrollFrameHeight
                         -collapsable false -font "obliqueLabelFont" -label "Set Texture UV Scrolling";
@@ -583,8 +587,8 @@ global proc MP_UVScrolling(string $Option)
     string $item, $buff[] ;
     int $numTokens ;
     float $scrollU, $scrollV, $scrollR;
-    
-    
+
+
     if (`floatField -query -value scrollUFF` == 0)
     {
         $scrollU = 0;
@@ -609,7 +613,7 @@ global proc MP_UVScrolling(string $Option)
     {
         $scrollR = `floatField -query -value scrollRFF`;
     }
-    
+
     string $nodeName[] =`ls -l -sl`;
     if( size($nodeName) == 0)
     {
@@ -622,7 +626,7 @@ global proc MP_UVScrolling(string $Option)
         {
             $numTokens = `tokenize $node "|" $buff`;
             $item = $buff[$numTokens - 1];
-            
+
             switch($Option)
             {
               case "set":
@@ -636,7 +640,7 @@ global proc MP_UVScrolling(string $Option)
                         }else{
                             MP_UVScrolling("set");
                         }
-                        
+
                         if (`attributeExists "scrollV" $node`){
                             if ( $scrollV != 0 ){
                                 setAttr ($node + ".scrollV") $scrollV;
@@ -646,7 +650,7 @@ global proc MP_UVScrolling(string $Option)
                         }else{
                             MP_UVScrolling("set");
                         }
-                        
+
                         if (`attributeExists "scrollR" $node`){
                             if ( $scrollR != 0 ){
                                 setAttr ($node + ".scrollR") $scrollR;
@@ -658,19 +662,19 @@ global proc MP_UVScrolling(string $Option)
                         }
                     }else{
                         addAttr -longName "scrollUV" -attributeType double3;
-                        
+
                         if ( $scrollU != 0 ){
                             addAttr -longName "scrollU" -k true -defaultValue $scrollU -attributeType double -parent scrollUV;
                         }else{
                             addAttr -longName "scrollU" -k true -defaultValue 0 -attributeType double -parent scrollUV;
                         }
-                        
+
                         if ( $scrollV != 0 ){
                             addAttr -longName "scrollV" -k true -defaultValue $scrollV -attributeType double -parent scrollUV;
                         }else{
                             addAttr -longName "scrollV" -k true -defaultValue 0 -attributeType double -parent scrollUV;
                         }
-                        
+
                         if ( $scrollR != 0 ){
                             addAttr -longName "scrollR" -k true -defaultValue $scrollR -attributeType double -parent scrollUV;
                         }else{
@@ -678,7 +682,7 @@ global proc MP_UVScrolling(string $Option)
                         }
                     }
               break;
-              
+
               case "get":
                     if (`attributeExists "scrollUV" $node`){
                         if (`attributeExists "scrollU" $node`){
@@ -692,7 +696,7 @@ global proc MP_UVScrolling(string $Option)
                         }
                     }
               break;
-              
+
               case "delete":
                     if (`attributeExists "scrollUV" $node`){
                         deleteAttr -attribute "scrollUV" -n $node;
@@ -717,13 +721,13 @@ global proc MP_GetEggObjectTypes()
         to which it then displays them in button style in a separate window
         making it easier for a user to delete them from the selected node.
     */
-    
+
     string $currentObjectTypesArray[];
     clear $currentObjectTypesArray;
-    
+
         //Record the currently selected nodes
     string $selected[] =`ls -l -sl`;
-    
+
         //Verify user has selected at least one node.
     if(size($selected) < 1){
             //Throw a message if at least one node has not been selected.
@@ -734,10 +738,10 @@ global proc MP_GetEggObjectTypes()
         for ($selection in $selected){
                 //Attribute name we are checking for
             string $attributeName = "eggObjectTypes";
-            
+
                 //Insert current selected node hierarchy into array
             stringArrayInsertAtIndex(size($currentObjectTypesArray), $currentObjectTypesArray, $selection);
-            
+
             for($i=1;$i<4;$i++){
                     //Check for attributes. If present, insert contents into array
                     //If not, insert dummy placeholder values
@@ -753,7 +757,7 @@ global proc MP_GetEggObjectTypes()
                 }
             }
         }
-            
+
             //Send array of egg-object-types to MP_DeleteEggObjectTypesGUI
         MP_DeleteEggObjectTypesGUI($currentObjectTypesArray);
     }
@@ -769,12 +773,12 @@ global proc MP_DeleteEggObjectTypesGUI(string $currentObjectTypesArray[])
         Each object-type a node has will be shown as a button.
         If a button is clicked, it will delete that object-type from the selected node and update the window.
     */
-    
+
         //Delete any current instances of the MP_DeleteEggObjectTypesWindow window
     if (`window -exists MP_DeleteEggObjectTypesWindow`){
         deleteUI -window MP_DeleteEggObjectTypesWindow;
     }
-    
+
         //Create the window layout
     window -retain -title "Delete Current Egg-Object-Types" -resizeToFitChildren true -sizeable 0 -visible 1 MP_DeleteEggObjectTypesWindow;
         frameLayout -backgroundColor 0.50 0.60 0.20
@@ -807,29 +811,29 @@ global proc MP_DeleteEggObjectTypesGUI(string $currentObjectTypesArray[])
             setParent -u;
         setParent -u;
     showWindow MP_DeleteEggObjectTypesWindow;
-    
-    
+
+
     int $count = 0;
     for($n=0;$n<(size($currentObjectTypesArray))/4;$n++){
             //Parse out just the short node name as it is all we want for node labeling
         string $nodeHierarchy = $currentObjectTypesArray[$count];
-            
+
             //Array variable to hold the split up tokens
         string $hierarchyTokens[];
         clear $hierarchyTokens;
-        
+
             //Split node hierarchy into token segments
         tokenize($nodeHierarchy, "|", $hierarchyTokens);
-        
+
             //Define $node name from the last token segment
         string $node = $hierarchyTokens[size($hierarchyTokens)-1];
-        
+
             //Generate the node name label
         text -parent nodeColumn -font "boldLabelFont" -height 22 -label $node;
-        
+
             //Increase our count
         $count++;
-        
+
             //Create new row of buttons per node selected
             //One row will consist of node name label and up to three buttons.
             //Each button will depict an egg-object-type assigned to node.
@@ -841,7 +845,7 @@ global proc MP_DeleteEggObjectTypesGUI(string $currentObjectTypesArray[])
                 button -parent ("rowLine" + $n) -label $currentObjectTypesArray[$count]
                         -width 110
                         -height 20
-                        -annotation ("Deletes the " + $currentObjectTypesArray[$count] 
+                        -annotation ("Deletes the " + $currentObjectTypesArray[$count]
                                         + " egg-object-type tag from the node")
                         -command ("MP_DeleteEggObjectType(\"" + $nodeHierarchy + "\", \"" + ($i+1) + "\")")
                         ($nodeHierarchy + ".eggObjectTypes" + ($i+1));
@@ -856,13 +860,13 @@ global proc MP_DeleteEggObjectTypesGUI(string $currentObjectTypesArray[])
                         -command ("")
                         ($nodeHierarchy + ".eggObjectTypes" + ($i+1));
             }
-                    
+
                 //Increase our count
             $count++;
         }
         setParent -u;
     }
-    
+
         //Set window height: base height 51 + 20 per button row
     int $height = 51 + (($n * 2) + (($n + 1) * 20));
     window -edit -width 500 -height $height MP_DeleteEggObjectTypesWindow;
@@ -876,9 +880,9 @@ global proc MP_DeleteEggObjectType(string $nodeHierarchy, int $eggTypeAttributeN
     /*
         Delete the clicked object-type from the selected node and update the window.
     */
-    
+
     deleteAttr -attribute ("eggObjectTypes" + $eggTypeAttributeNumber) $nodeHierarchy;
-    
+
         //Update the current egg-object-types window
     MP_GetEggObjectTypes();
 }
@@ -889,17 +893,17 @@ global proc MP_DeleteEggObjectType(string $nodeHierarchy, int $eggTypeAttributeN
 global proc string MP_ArgsBuilder(string $FileName)
 {
     string $ARGS = "maya2egg";
-    
+
     global string $gMP_MayaVersionShort;
     $ARGS += $gMP_MayaVersionShort;
     $ARGS += " ";
 
         //Increase output verbosity.  More v's means more verbose.
     $ARGS += "-v ";
-    
+
         //We always want polygons, never nurbs.
     $ARGS += "-p ";
-    
+
         //check back face culling i.e. 'double-sided faces'
     if(`checkBox -query -value MP_ExportBfaceCB`){
         $ARGS += "-bface ";
@@ -939,7 +943,7 @@ global proc string MP_ArgsBuilder(string $FileName)
         break;
         case "MP_ChooseAnimationRB":
             $ARGS += "-a chan ";
-            
+
                 //set the start frames
                 //  **Does not check if start frame < end frame
                 //  **Does not support negative values
@@ -947,7 +951,7 @@ global proc string MP_ArgsBuilder(string $FileName)
             if(`radioCollection -query -select MP_AnimationOptionsRC` == "MP_chooseCustomAnimationRangeRB"){
                 string $startFrameARGS = `intField -query -value MP_AnimationStartFrameIF`;
                 string $endFrameARGS = `intField -query -value MP_AnimationEndFrameIF`;
-                
+
                     //start frame
                 if(`match "[0-9]+" $startFrameARGS` == $startFrameARGS && $startFrameARGS != ""){
                     $ARGS += ("-sf " + `match "[0-9]+" $startFrameARGS` + " ");
@@ -955,7 +959,7 @@ global proc string MP_ArgsBuilder(string $FileName)
                     error "Start Frame entered data is the wrong format.  Should be an integer.\n";
                     return "failed";
                 }
-                
+
                     //end frame
                 if(`match "[0-9]+" $endFrameARGS` == $endFrameARGS && $endFrameARGS != ""){
                     $ARGS += ("-ef " + `match "[0-9]+" $endFrameARGS` + " ");
@@ -967,7 +971,7 @@ global proc string MP_ArgsBuilder(string $FileName)
         break;
         case "MP_ChooseBothRB":
             $ARGS += "-a both ";
-            
+
               //set the start frames
               //  **Does not check if start frame < end frame
               //  **Does not support negative values
@@ -975,7 +979,7 @@ global proc string MP_ArgsBuilder(string $FileName)
             if(`radioCollection -query -select MP_AnimationOptionsRC` == "MP_chooseCustomAnimationRangeRB"){
                 string $startFrameARGS = `intField -query -value MP_AnimationStartFrameIF`;
                 string $endFrameARGS = `intField -query -value MP_AnimationEndFrameIF`;
-                
+
                     //start frame
                 if(`match "[0-9]+" $startFrameARGS` == $startFrameARGS && $startFrameARGS != ""){
                     $ARGS += ("-sf " + `match "[0-9]+" $startFrameARGS` + " ");
@@ -983,7 +987,7 @@ global proc string MP_ArgsBuilder(string $FileName)
                     error "Start Frame entered data is the wrong format.  Should be an integer.\n";
                     return "failed";
                 }
-                
+
                     //end frame
                 if(`match "[0-9]+" $endFrameARGS` == $endFrameARGS && $endFrameARGS != ""){
                     $ARGS += ("-ef " + `match "[0-9]+" $endFrameARGS` + " ");
@@ -999,7 +1003,7 @@ global proc string MP_ArgsBuilder(string $FileName)
                 //set the pose frame for animation
                 //  **Does not support negative values
             string $startFrameARGS = `intField -query -value MP_AnimationStartFrameIF`;
-            
+
             if(`match "[0-9]+" $startFrameARGS` == $startFrameARGS && $startFrameARGS != ""){
                 $ARGS += ("-sf " + `match "[0-9]+" $startFrameARGS` + " ");
             }else{
@@ -1031,11 +1035,11 @@ global proc string MP_ArgsBuilder(string $FileName)
         //get scene up axis and append to $ARGS string
     string $up=`upAxis -q -axis`;
     $ARGS += "-cs " + $up + "-up ";
-    
+
         //get units from option menu and append to $ARGS string
     string $unit=`optionMenu -q -value MP_UnitMenu`;
     $ARGS += "-uo " + $unit + " ";
-      
+
         /*  -cn name
             Specifies the name of the animation character.  This
             should match between all of the model files and all of
@@ -1057,7 +1061,7 @@ global proc string MP_ArgsBuilder(string $FileName)
 
         /*  -force-joint name
             Specifies the name(s) of a DAG node that maya2egg should
-            treat as a joint, even if it does not appear to be a 
+            treat as a joint, even if it does not appear to be a
             Maya joint and does not appear to be animated.
             The specified DAGs have to be tagged as a DCS egg-type.
             Routine checks for this and if it doesn't exist, it adds the DCS tag to it.
@@ -1066,7 +1070,7 @@ global proc string MP_ArgsBuilder(string $FileName)
     string $joints[];
     string $JointNames = `textField -query -text MP_ForceJointTF`;
     int $numberEntries = `tokenize $JointNames " " $joints`;
-    
+
     if(`textField -query -text MP_ForceJointTF` != ""){
             //iterate through each named joint and verify they have the required 'DCS' object-type flag set
             //If not, we add the attribute and request restarting the export process
@@ -1077,15 +1081,15 @@ global proc string MP_ArgsBuilder(string $FileName)
             if(`attributeExists "eggObjectTypes1" $joints[$i]` == 1){
                 $eggObjectTypes1 = `getAttr -asString ($joints[$i] + ".eggObjectTypes1")`;
             }
-            
+
             if(`attributeExists "eggObjectTypes2" $joints[$i]` == 1){
                 $eggObjectTypes2 = `getAttr -asString ($joints[$i] + ".eggObjectTypes2")`;
             }
-            
+
             if(`attributeExists "eggObjectTypes3" $joints[$i]` == 1){
                 $eggObjectTypes3 = `getAttr -asString ($joints[$i] + ".eggObjectTypes3")`;
             }
-            
+
                 //If any of the current object-type attributes are DCS, append to $ARGS
                 //If there is no DCS attribute, add it to the node
             if(($eggObjectTypes1 == "dcs") || ($eggObjectTypes2 == "dcs") || ($eggObjectTypes3 == "dcs")){
@@ -1095,7 +1099,7 @@ global proc string MP_ArgsBuilder(string $FileName)
                 $mustRestart += 1;
             }
         }
-          
+
           //If $mustRestart variable is greater than 0, we had to add a DCS tag.
           //If we had to add a DCS tag to any nodes, we must restart exporting so it's recognized.
           //Otherwise, the force-joint for that node will not export properly.
@@ -1113,26 +1117,26 @@ global proc string MP_ArgsBuilder(string $FileName)
             }
         }
     }
-    
+
         //Check custom reference path and output path; append to $ARGS string
         //-ps   The option may be one of: rel, abs, rel_abs, strip, or keep. If either rel or rel_abs is specified,
         //      the files are made relative to the directory specified by -pd.  The default is rel.
-        
+
         //Check if we are referencing textures to a path OTHER than the Maya file
     if(`radioCollection -query -select MP_TexPathOptionsRC` != "MP_ChooseDefaultTexPathRB"){
         $ARGS += ("-ps rel" + " ");
     }
-        
+
         //-pd   Specifies the name of a directory to make paths relative to, if '-ps rel' or '-ps rel_abs' is specified.
         //      If this is omitted, the directory name is taken from the name of the output file.
-        
+
         //-pp   Adds the indicated directory name to the list of directories to search for filenames referenced by the source file.
         //      We always want to add the file path to the search
-    
+
         //-pc   Copies textures and other dependent files into the indicated directory.
         //      If a relative pathname is specified, it is relative to the directory specified with -pd, above.
-        
-        
+
+
         //Check if we are referencing textures to a Custom path
     string $customTexPath = `textField -query -text MP_CustomEggTexPathTF`;
     if(`radioCollection -query -select MP_TexPathOptionsRC` == "MP_ChooseCustomRefPathRB"){
@@ -1150,7 +1154,7 @@ global proc string MP_ArgsBuilder(string $FileName)
             }
         }
     }
-    
+
         //Check if we are copying and referencing textures to a Custom path
     string $customOutputPath = `textField -query -text MP_CustomOutputPathTF`;
     if(`radioCollection -query -select MP_TexPathOptionsRC` == "MP_ChooseCustomTexPathRB"){
@@ -1158,12 +1162,12 @@ global proc string MP_ArgsBuilder(string $FileName)
             $ARGS += ("-pc " + "\"" + $customTexPath + "\"" + " ");
             $ARGS += ("-pp " + "\"" + $customTexPath + "\"" + " ");
         }
-        
+
         if($customOutputPath != ""){
             $ARGS += ("-pd " + "\"" + $customOutputPath + "\"" + " ");
         }
     }
-    
+
     print ("Using these arguments: " + $ARGS + "[END]\n");
     return $ARGS;
 }
@@ -1201,10 +1205,10 @@ global proc int MP_StartSceneExport()
             Get the custom arguments
         */
     string $eggFile = MP_ExportPrep($tempMBFile, $origFileName);
-    
+
         //Delete the temporary Maya binary file
     //sysFile -del $tempMBFile;
-    
+
         //Check if the eggFile passed return, else return it failed as an integer
     if($eggFile == "failed"){
         return 0;
@@ -1221,9 +1225,9 @@ global proc string MP_ExportScene(string $selection)
     string $scenePath = dirname(`file -q -sceneName`);  //gets the current scene filename and path if present.
     string $fileName = basenameEx(`file -q -sceneName`);  //cut off the file extension
     string $fileExtension = fileExtension(`file -q -sceneName`); //Returns file extension
-    
+
     string $tempScenePath = "";
-    
+
         //Processes if exporting file with original file name and default output path
     if((`radioCollection -query -select MP_OutputFilenameOptionsRC` == "MP_ChooseOriginalFilenameRB") &&
         (`radioCollection -query -select MP_OutputPathOptionsRC` == "MP_ChooseDefaultOutputPathRB")){
@@ -1235,7 +1239,7 @@ global proc string MP_ExportScene(string $selection)
             $tempScenePath = ($scenePath + "/" + $fileName + "_temp.mb");
         }
     }
-      
+
         //Processes if exporting file with original file name and custom output path
     if((`radioCollection -query -select MP_OutputFilenameOptionsRC` == "MP_ChooseOriginalFilenameRB") &&
         (`radioCollection -query -select MP_OutputPathOptionsRC` == "MP_ChooseCustomOutputPathRB")){
@@ -1254,7 +1258,7 @@ global proc string MP_ExportScene(string $selection)
             }
         }
     }
-    
+
       //Processes if exporting file with custom file name and default output path
     if((`radioCollection -query -select MP_OutputFilenameOptionsRC` == "MP_ChooseCustomFilenameRB") &&
         (`radioCollection -query -select MP_OutputPathOptionsRC` == "MP_ChooseDefaultOutputPathRB")){
@@ -1273,7 +1277,7 @@ global proc string MP_ExportScene(string $selection)
             }
         }
     }
-    
+
       //Processes if exporting file with custom file name and custom output path
     if((`radioCollection -query -select MP_OutputFilenameOptionsRC` == "MP_ChooseCustomFilenameRB") &&
         (`radioCollection -query -select MP_OutputPathOptionsRC` == "MP_ChooseCustomOutputPathRB")){
@@ -1293,7 +1297,7 @@ global proc string MP_ExportScene(string $selection)
             }
         }
     }
-    
+
         //Export entire scene contents
     if($selection == "all"){
         print "Exporting scene...\n";
@@ -1314,16 +1318,16 @@ global proc string MP_ExportScene(string $selection)
 global proc string MP_ExportPrep(string $workFile, string $fileName)
 {
     //Received variables: $workFile("full file path and name"), $fileName("base file name")
-    
+
         //Get the destination path
     string $destPath = dirname($workFile) + "/";
-        
+
         //Custom File Name Option
     string $customFilename = `textField -query -text MP_CustomFilenameTF`;
     if($customFilename != ""){
         $fileName = $customFilename;
     }
-        
+
         //Get the custom arguments
     string $ARGS = MP_ArgsBuilder($fileName);
 
@@ -1346,7 +1350,7 @@ global proc string MP_ExportPrep(string $workFile, string $fileName)
             MP_Send2Pview ($eggFile);
         }
     }
-    
+
     return $eggFile;
 }
 ///////////////////////////////////////////////////////////
@@ -1362,7 +1366,7 @@ global proc string MP_Export2Egg(string $mbfile, string $destPath, string $destF
         //Start export process
             //make the final egg path
         string $eggFile = ($destPath + $destFilename);
-        
+
         print ("Your scene will be saved as this egg file: " + $destFilename + "\n");
         print ("In this directory: " + $destPath + "\n");
 
@@ -1393,7 +1397,7 @@ global proc string MP_Export2Egg(string $mbfile, string $destPath, string $destF
                 );
             print ($result + "\n");
         }
-            
+
         print ("Finished exporting (.mb -> .egg), unit : " + `optionMenu -q -value MP_UnitMenu` + "\n");
         return $eggFile;
     }
@@ -1408,7 +1412,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
             Check if there is a valid egg file to operate on
             Cannot operate without an egg first and we throw
             an error if the scene has no associated egg file
-            
+
             $exportMode options:
                 0 = normal scene exporting
                 1 = User has chosen a specific egg file to bam up
@@ -1451,13 +1455,13 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
             if($customFilename != ""){
                 $fileName = $customFilename;
             }
-                
+
                 //Custom Output Path Option
             string $customOutputPath = `textField -query -text MP_CustomOutputPathTF`;
             if($customOutputPath != ""){
                 $filePath = $customOutputPath;
             }
-        }    
+        }
             //Custom Texture Referencing Options
         if(`radioCollection -query -select MP_TexPathOptionsRC` == "MP_ChooseCustomRefPathRB"){
                 //Get the setting for the file type as it changes which textFields we will use
@@ -1465,7 +1469,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
             string $customBamTexPath = `textField -query -text MP_CustomBamTexPathTF`;
             string $customEggTexPath = `textField -query -text MP_CustomEggTexPathTF`;
             $pathStore = ("-ps rel ");
-            
+
             switch($outputPandaFileType){
                 case "MP_ChooseEggRB":
                         //Make exception if user failed to enter in a path
@@ -1474,7 +1478,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
                     }else{
                         $pathDirectory += ("-pd " + "\"" + $filePath + "\"" + " ");
                     }
-                    
+
                     $dirname += ("-pp " + "\"" + $filePath + "\"" + " ");
                 break;
                 case "MP_ChooseEggBamRB":
@@ -1484,7 +1488,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
                     }else{
                         $pathDirectory += ("-pd " + "\"" + $filePath + "\"" + " ");
                     }
-                    
+
                     $dirname += ("-pp " + "\"" + $filePath + "\"" + " ");
                 break;
             }
@@ -1496,7 +1500,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
             string $customBamTexPath = `textField -query -text MP_CustomBamTexPathTF`;
             string $customEggTexPath = `textField -query -text MP_CustomEggTexPathTF`;
             $pathStore = ("-ps rel ");
-            
+
             switch($outputPandaFileType){
                 case "MP_ChooseEggRB":
                             //Define path to make relative to
@@ -1561,7 +1565,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
                                     + " "
                                     + "\"" + $eggFile + "\""
                 );
-            
+
                 //Do some formatting only for the printing of selected options so they better fit into the script editor window
             if($pathStore != ""){
                 $pathStore = ("\n" + $pathStore);
@@ -1575,7 +1579,7 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
             if($dirname != ""){
                 $dirname = ("\n" + $dirname);
             }
-            
+
             print ("Using these options:\n" + $egg2bam + " " + $rawTex + $flatten
                                             + $pathStore
                                             + $pathDirectory
@@ -1596,24 +1600,24 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
                                     + " "
                                     + "\"" + $bamFile + "\""
                 );
-                
+
                 //Do some formatting only for the printing of selected options so they better fit into the script editor window
             if($pathStore != ""){
                 $pathStore = ("\n" + $pathStore);
             }
-            
+
             if($pathDirectory != ""){
                 $pathDirectory = ("\n" + $pathDirectory);
             }
-            
+
             if($targetDirectory != ""){
                 $targetDirectory = ("\n" + $targetDirectory);
             }
-            
+
             if($dirname != ""){
                 $dirname = ("\n" + $dirname);
             }
-            
+
             print ("Using these options:\n" + $egg2bam + " " + $rawTex + $flatten
                                             + $pathStore
                                             + $pathDirectory
@@ -1622,13 +1626,13 @@ global proc MP_Export2Bam(string $eggFile, int $exportMode)
                                             + "\n" + $eggFile
                                             + "\n" + $bamFile + "\n");
         }
-            
+
             //run pview if option is selected
         if(`checkBox -query -value MP_ExportPviewCB`){
             MP_Send2Pview($bamFile);
         }
     }
-    
+
     print ("Finished converting (.egg -> .bam), unit : " + `optionMenu -q -value MP_UnitMenu` + "\n");
 }
 ///////////////////////////////////////////////////////////
@@ -1644,18 +1648,18 @@ global proc MP_ExportNodesToPandaFiles()
             The user may pre-select the output folder by using the "Export to other directory:" in the 'Output File Path' GUI section
             before clicking the the 'Convert Nodes To Panda' button, otherwise, the user will be prompted for the output folder.
             A custom output folder path MUST be used for this process.
-            
+
             The default is to export the Maya binary file and to generate an egg file,
             however, if 'EGG(ASCII) and BAM(Binary)' is currently selected
             the process will generate all three files in the chosen output directory."
             The process of generating a bam file, if chosen, will utilize the current bam export options, including the bam version chosen.
         */
-        
+
         //Get the export directory path
     string $destPath = `textField -query -text MP_CustomOutputPathTF`;
     string $selectedNodes[] =`ls -l -sl`;
     sort($selectedNodes);
-    
+
     if(size($selectedNodes) < 1){
         MP_ConfirmationDialog("Selection Error!", "You must select at least one(1) node to export.", "ok");
     }else{
@@ -1679,13 +1683,13 @@ global proc MP_ExportNodesToPandaFiles()
                 //  which will be displayed to the user once all the node exporting has completed.
             string $nodesToPandaFiles[];
             clear $nodesToPandaFiles;
-            
+
                 //Variable defining how many nodes were selected
             int $numberOfSelectedNodes = size($selectedNodes);
-            
+
                 //This variable is defined on maya startup
             global string $gMainProgressBar;
-                
+
                 //Create and initialize the main GUI progress bar
             progressBar -edit
                         -beginProgress
@@ -1693,10 +1697,10 @@ global proc MP_ExportNodesToPandaFiles()
                         -minValue 0
                         -maxValue $numberOfSelectedNodes
                         $gMainProgressBar;
-            
+
                 //Variable used for loop counting
             int $thisFileNumber = 1;
-            
+
             for ($node in $selectedNodes){
                     //Define process break method if escape is depressed during processing
                 if(`progressBar -query -isCancelled $gMainProgressBar`){
@@ -1708,7 +1712,7 @@ global proc MP_ExportNodesToPandaFiles()
                                 -step 1
                                 -status ("Exporting selected node... " + $thisFileNumber + " of Nodes: " + $numberOfSelectedNodes)
                                 $gMainProgressBar;
-                    
+
                     int $Tokens = `tokenize $node "|" $buffer`;
                     int $number = ($Tokens - 1);
                         // make the temp files
@@ -1760,10 +1764,10 @@ global proc MP_ExportNodesToPandaFiles()
                     //Increase loop counter
                 $thisFileNumber++;
             }
-            
+
                 //Destroy the progress bar
             progressBar -edit -endProgress $gMainProgressBar;
-            
+
             if(($filesExported > 0) && (size($nodesToPandaFiles) > 0)){
                 MP_NodesExportedAsPandaFilesGUI($nodesToPandaFiles);
             }
@@ -1781,28 +1785,28 @@ global proc MP_NodesExportedAsPandaFilesGUI(string $nodesToPandaFiles[])
             The process is run automatically after exporting Maya nodes to Panda files.
             It displays the file names and the location they were exported to as a reference to the user.
         */
-    
+
         // Delete list window if it's currently open, to reset it.
     if (`window -exists MP_NodesExportedToPandaFilesGUI` == 1){
         deleteUI -window MP_NodesExportedToPandaFilesGUI;
     }
-    
+
     if(size($nodesToPandaFiles) == 0){
         MP_ConfirmationDialog("Data Error!", "There is currently no exported files in the array.", "ok");
     }else{
         window -sizeable false -width 600 -height 200
                 -title "...Listing of Exported nodes to Panda Files..."
                 -toolbox true -titleBarMenu true MP_NodesExportedToPandaFilesGUI;
-            
+
             columnLayout -columnAttach "left" 0 -adjustableColumn true -rowSpacing 0;
                 scrollField -width 600 -height 200 -wordWrap false -editable false MP_ExportedPandaFilesScrollField;
             setParent -u;
-        
+
         showWindow MP_NodesExportedToPandaFilesGUI;
-        
+
         window -edit -width 600 -height 200 MP_NodesExportedToPandaFilesGUI;
         int $count = 0;
-        
+
         for($i=0;$i<(size($nodesToPandaFiles)/2);$i++){
             scrollField -edit -insertionPosition 0 -insertText ($nodesToPandaFiles[$count] + " : "
                                                                 + $nodesToPandaFiles[$count+1]
@@ -1845,7 +1849,7 @@ global proc MP_Bam2Egg(string $bamFile)
         string $bam2egg = MP_PandaVersion("getBam2Egg");  //returns versioned bam2egg executable
         print ("Your file is: " + $fileName + "." + $fileExtension + "\nFound in path: " + $filePath + "/" + "\n\n");
         print ("Your file will be saved as this egg file: " + $eggFile + "\n");
-        
+
             //Verify our eggFile has been set
         if($eggFile != ""){
                 //Check if overwriting is enabled or not
@@ -1885,7 +1889,7 @@ global proc MP_BrowseForFilePreProcess(string $option)
             We subsequently update specific textFields in the process.
             This process is currenlty only utilized when the button is clicked,
             otherwise, we call MP_BrowseForFile directly from other processes.
-            
+
             filemode return values.
             0 Any file, whether it exists or not.
             1 A single existing file.
@@ -1893,7 +1897,7 @@ global proc MP_BrowseForFilePreProcess(string $option)
             3 The name of a directory. Only directories are displayed in the dialog.
             4 The names of one or more existing files.
         */
-    
+
     switch($option){
         case "customFilename":
                 int $fileMode = 0;
@@ -1923,7 +1927,7 @@ global proc string[] MP_BrowseForFile(int $fileMode, string $caption, string $st
             3 The name of a directory. Only directories are displayed in the dialog.
             4 Then names of one or more existing files.
         */
-    
+
         //Uses variable settings passed from MP_BrowseForFilePreProcess, or directly from other processes
         //  to setup the specific data sent to the fileDialog2 box function.
         //Returns selected file(s) as a string array
@@ -1934,8 +1938,8 @@ global proc string[] MP_BrowseForFile(int $fileMode, string $caption, string $st
                                     -cancelCaption "Cancel"
                                     -fileFilter $fileFilter
                                     -dialogStyle 2`;
-        
-    
+
+
     return $selectedFiles;
 }
 ///////////////////////////////////////////////////////////
@@ -1952,13 +1956,13 @@ global proc MP_GetEggFile2Bam()
             3 The name of a directory. Only directories are displayed in the dialog.
             4 Then names of one or more existing files.
         */
-    
+
     int $fileMode = 4;
     string $caption = "Select a Panda Egg file to compile to a Panda Bam file...";
     string $startingDirectory = dirname(`file -q -sn`);
     string $fileFilter = "Panda Egg (*.egg)";
     string $pandaFile[] = MP_BrowseForFile($fileMode, $caption, $startingDirectory, $fileFilter);
-    
+
         //Process files selected
     if(size($pandaFile) > 0){
         for($i=0;$i<size($pandaFile);$i++){
@@ -1976,7 +1980,7 @@ global proc MP_GetMayaFile2Egg()
 {
     /*
         Convert one or more Maya binary files into Panda Egg files
-    
+
       fileMode option
         Indicate what the dialog is to return.
         0 Any file, whether it exists or not.
@@ -1985,13 +1989,13 @@ global proc MP_GetMayaFile2Egg()
         3 The name of a directory. Only directories are displayed in the dialog.
         4 Then names of one or more existing files.
     */
-    
+
     int $fileMode = 4;
     string $caption = "Select Maya Binary file(s) to compile into a Panda Egg file...";
     string $startingDirectory = dirname(`file -q -sn`);
     string $fileFilter = "Maya Binary (*.mb)";
     string $mayaFiles[] = MP_BrowseForFile($fileMode, $caption, $startingDirectory, $fileFilter);
-    
+
     if(size($mayaFiles) > 0){
         for($i=0;$i<size($mayaFiles);$i++){
             MP_ExportPrep($mayaFiles[$i], basenameEx($mayaFiles[$i]));
@@ -2014,13 +2018,13 @@ global proc MP_GetBamFile2Egg()
         3 The name of a directory. Only directories are displayed in the dialog.
         4 Then names of one or more existing files.
     */
-    
+
     int $fileMode = 4;
     string $caption = "Select a Panda Bam to decompile to an Egg file...";
     string $startingDirectory = dirname(`file -q -sn`);
     string $fileFilter = "Panda Bam (*.bam)";
     string $pandaFile[] = MP_BrowseForFile($fileMode, $caption, $startingDirectory, $fileFilter);
-    
+
     if(size($pandaFile) > 0){
         for($i=0;$i<size($pandaFile);$i++){
             MP_Bam2Egg($pandaFile[$i]);
@@ -2043,14 +2047,14 @@ global proc MP_GetFile2Pview()
             3 The name of a directory. Only directories are displayed in the dialog.
             4 Then names of one or more existing files.
         */
-    
+
     string $pviewExecutable = MP_PandaVersion("getPview");
     string $startingDirectory = dirname(`file -q -sn`);
     int $fileMode = 1;
     string $caption = "Select Panda file to Pview...";
     string $fileFilter = ("Panda Egg (*.egg);;Panda Bam (*.bam)");
     string $pviewFile[] = MP_BrowseForFile($fileMode, $caption, $startingDirectory, $fileFilter);
-    
+
         //Send the file to pview process
     if(size($pviewFile) == 1){
         MP_Send2Pview($pviewFile[0]);
@@ -2072,16 +2076,16 @@ global proc MP_BrowseForFolderPreProcess(string $option)
         3 The name of a directory. Only directories are displayed in the dialog.
         4 The names of one or more existing files.
     */
-    
+
     string $outputPandaFileType = `radioCollection -query -select MP_OutputPandaFileTypeRC`;
-    
+
     switch($option){
         case "customRelativeEggTexturePath":
             int $fileMode = 3;
             string $caption = "Choose Texture Relative Directory For Egg File";
             string $folderPath = MP_BrowseForFolder($fileMode, $caption);
             textField -edit -enable 1 -text $folderPath MP_CustomEggTexPathTF;
-            
+
                 //If exporting both file type, use same data for Bam file Texture referencing as default
             if($outputPandaFileType == "MP_ChooseEggBamRB"){
                 textField -edit -enable 1 -text $folderPath MP_CustomBamTexPathTF;
@@ -2114,7 +2118,7 @@ global proc string MP_BrowseForFolder(int $fileMode, string $caption)
         to setup the specific data in the fileDialog2 box
         Returns selected folder as a string
     */
-    
+
     string $result[] = `fileDialog2 -fileMode $fileMode -caption $caption -okCaption "Select" -ds 2`;
     return $result[0];
 }
@@ -2127,7 +2131,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
     /*
         Returns the egg-object-type button annotation text of defined types as a string for GUI.
     */
-    
+
     string $annotation = "";
     switch($objectType)
     {
@@ -2136,22 +2140,35 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\n\nCreates a barrier that other objects cannot pass through."
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
-        
+
         case "floor":
-            $annotation = ("Creates a collision from the object(s) that \"Avatars\" can walk on."
+            $annotation = ("<Scalar> collide-mask { 0x02 }"
+                            +"\n<Collide> { Polyset descend level }"
+                            +"\n\nCreates a collision from the object(s) that \"Avatars\" can walk on."
                             +"\nIf the surface is angled, the Avatar will not slide down it."
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
-		
-		case "shadow-cast":
-		    $annotation = ("<Tag> cam { shground }"
+
+        case "floor-collide":
+            $annotation = ("<Scalar> collide-mask { 0x06 }");
+        break;
+
+        case "shadow":
+            $annotation = ("<Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }"
+                            +"\n\nDefine a \"shadow\" object type, so we can render all shadows in their"
+                            +"\nown bin and have them not fight with each other (or with other"
+                            +"\ntransparent geometry).");
+        break;
+
+        case "shadow-cast":
+            $annotation = ("<Tag> cam { shground }"
                             +"\n<Scalar> draw-order { 0 }"
                             +"\n<Scalar> bin { ground }"
-			                +"\n\nGives the selected object(s) the required attributes so that an"
-			                +"\n\"Avatar's\" shadow can be cast over it. Commonly used for casting"
-							+"\nan \"Avatar's\" shadow onto floors.");
-		break;
-        
+                            +"\n\nGives the selected object(s) the required attributes so that an"
+                            +"\n\"Avatar's\" shadow can be cast over it. Commonly used for casting"
+                            +"\nan \"Avatar's\" shadow onto floors.");
+        break;
+
         case "dupefloor":
             $annotation = ("<Collide> { Polyset keep descend level }"
                             +"\n\nThis type first creates a duplicate of the selected object(s)."
@@ -2159,63 +2176,62 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nIf the surface is angled, the Avatar will not slide down it."
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
-		
-		case "smooth-floors":
-		    $annotation = ("<Collide> { Polyset descend }"
-			                +"\n<Scalar> from-collide-mask { 0x000fffff }"
+
+        case "smooth-floors":
+            $annotation = ("<Collide> { Polyset descend }"
+                            +"\n<Scalar> from-collide-mask { 0x000fffff }"
                             +"\n<Scalar> into-collide-mask { 0x00000002 }"
-						    +"\n\nMakes floors smooth for the \"Avatars\" to walk and stand on.");
-		break;
-        
+                            +"\n\nMakes floors smooth for the \"Avatars\" to walk and stand on.");
+        break;
+
         case "camera-collide":
-		    $annotation = ("<Scalar> collide-mask { 0x04 }"
-			                +"\n<Collide> { Polyset descend }"
-						    +"\n\nAllows only the camera to collide with the geometry.");
-		break;
-						  
-        
+            $annotation = ("<Scalar> collide-mask { 0x04 }"
+                            +"\n<Collide> { Polyset descend }"
+                            +"\n\nAllows only the camera to collide with the geometry.");
+        break;
+
         case "sphere":
             $annotation = ("<Collide> { Sphere descend }"
                             +"\n\nCreates a \"minimum-sized\" sphere collision around the selected object(s),"
                             +"\nthat other objects cannot enter into.");
         break;
-        
+
         case "tube":
             $annotation = ("<Collide> { Tube descend }"
                             +"\n\nCreates a \"minimum-sized\" tube collision around the selected object(s),"
                             +"\nthat other objects cannot enter into.");
         break;
-        
+
         case "trigger":
             $annotation = ("<Collide> { Polyset descend intangible }"
                             +"\n\nCreates a collision that can be used as a \"Trigger\","
                             +"\nwhich can be used to activate, or deactivate, specific processes."
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
-        
+
         case "trigger-sphere":
             $annotation = ("<Collide> { Sphere descend intangible }"
                             +"\n\nCreates a \"minimum-sized\" sphere collision that can be used as a \"Trigger\","
                             +"\nwhich can be used to activate, or deactivate, specific processes"
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
-        
+
         case "invsphere":
             $annotation = ("<Collide> { InvSphere descend }"
                             +"\n\nCreates a \"minimum-sized\" inverse-sphere collision around the selected object(s)."
                             +"\nAny object inside the sphere will be prevented from exiting the sphere.");
         break;
-        
+
         case "bubble":
             $annotation = ("<Collide> { Sphere keep descend }"
                             +"\n\n\"bubble\" puts a Sphere collision around the geometry,"
                             +"\nbut does not otherwise remove the geometry.");
         break;
-        
+/*
         case "polylight":
             $annotation = ("<Scalar> polylight { 1 }");
         break;
-        
+
         case "portal":
             $annotation = ("<Scalar> portal { 1 }"
                             +"\n\nUsed on a rectangular polygon to set it as a \"PortalNode\"."
@@ -2235,14 +2251,26 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nof the \"in\" cell (the current cell) and the \"out\" cell"
                             +"\n(the cell you are looking at), respectively.");
         break;
-        
+*/
         case "dual":
             $annotation = ("<Scalar> alpha { dual }"
                             +"\n\nNormally attached to polygons that have transparency,"
                             +"\nthat are in the scene by themselves."
                             +"\nSuch as a Tree, or Flower.");
         break;
-        
+
+        case "multisample":
+            $annotation = ("<Scalar> alpha { ms }");
+        break;
+
+        case "blend":
+            $annotation = ("<Scalar> alpha { blend }");
+        break;
+
+        case "decal":
+            $annotation = ("<Scalar> decal { 1 }");
+        break;
+
         case "ghost":
             $annotation = ("<Scalar> collide-mask { 0 }"
                             +"\n\n\"ghost\" turns off the normal collide bit that is set on visible"
@@ -2252,61 +2280,69 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nIt means that the geometry beginning at this node and below"
                             +"\nshould never be collided with--characters will pass through it.");
         break;
-        
+
         case "glass":
             $annotation = ("<Scalar> alpha { blend_no_occlude }");
         break;
-        
+
         case "glow":
             $annotation = ("<Scalar> blend { add }"
                             +"\n\n\"glow\" is useful for halo effects and things of that ilk."
                             +"\nIt renders the object in add mode instead of the normal opaque mode.");
         break;
-        
+
         case "binary":
             $annotation = ("<Scalar> alpha { binary }"
                             +"\nThis mode of alpha sets transparency pixels"
                             +"\nto either on, or off. No blending is used.");
         break;
-        
+
         case "indexed":
             $annotation = ("<Scalar> indexed { 1 }");
         break;
-        
+
         case "model":
             $annotation = ("<Model> { 1 }"
                             +"\n\nThis creates a ModelNode at the corresponding level"
                             +"\nwhich is guaranteed not to be removed by any flatten operation."
                             +"\nHowever, its transform might still be changed");
         break;
-        
+
         case "dcs":
             $annotation = ("<DCS> { 1 }"
                             +"\n\nIndicates the node should not be flattened out of the hierarchy during conversion."
                             +"\nAlso indicates that the node's transform is important and should be preserved."
                             +"\nHowever, nodes under the node \"might be flattened out\".");
         break;
-        
+
+        case "netdcs":
+            $annotation = ("<DCS> { Net }");
+        break;
+
+        case "netdcs":
+            $annotation = ("<DCS> { Local }");
+        break;
+
         case "notouch":
-            $annotation = ("<DCS> { no_touch }"
+            $annotation = ("<DCS> { no-touch }"
                             +"\n\nIndicates the node, and below, should not be flattened"
                             +"\nout of the hierarchy during the conversion process.");
         break;
-        
+
         case "double-sided":
             $annotation = ("<BFace> { 1 }"
                             +"\n\nThis defines whether the polygon will be rendered double-sided"
                             +"\n(i.e. its back face will be visible)."
                             +"\n\nThis is a builtin type of Panda and no PRC setting is required");
         break;
-        
+
         case "billboard":
             $annotation = ("<Billboard> { axis }"
                             +"\n\nRotates the geometry to always face the camera."
                             +"\nGeometry will rotate on its local axis."
                             +"\n\nThis is a builtin type of Panda and no PRC setting is required");
         break;
-        
+/*
         case "seq2":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 2 }"
@@ -2316,7 +2352,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq4":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 4 }"
@@ -2326,7 +2362,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq6":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 6 }"
@@ -2336,7 +2372,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq8":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 8 }"
@@ -2346,7 +2382,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq10":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 10 }"
@@ -2356,7 +2392,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq12":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 12 }"
@@ -2366,7 +2402,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+
         case "seq24":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 24 }"
@@ -2376,12 +2412,12 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-        
+*/
         default:
                 $annotation = ("Adds the " + $objectType + " egg-object-type to selected geometry.");
         break;
     }
-    
+
         //Return the string
     return $annotation;
 }
@@ -2400,7 +2436,7 @@ global proc MP_ImportPandaFile()
             Deletes the copied file from phase root,
         If selected file is an EGG File:
             Imports the egg file into current scene
-        
+
         fileMode options
             Indicate what the dialog is to return.
             0 Any file, whether it exists or not.
@@ -2409,24 +2445,24 @@ global proc MP_ImportPandaFile()
             3 The name of a directory. Only directories are displayed in the dialog.
             4 Then names of one or more existing files.
     */
-    
+
         //Process Variables
     global string $gMP_PhaseRootDir[];
     global string $gMP_MayaVersionShort;
     global int $gMP_ChoosePandaFileNotice;
     int $exists = 0;
-    
+
         //Verify we have the egg importer plugin loaded
         //If it is not, we assume it is not installed,
         //so, we notify user and ask them to download the Panda3D-SDK
     if(`pluginInfo -query -loaded -name ("mayaeggimport" + $gMP_MayaVersionShort)` == 0){
-		string $pluginLoadedConfirm = MP_ConfirmationDialog("mayaeggimport" + $gMP_MayaVersionShort + " Plugin ERROR!"
+        string $pluginLoadedConfirm = MP_ConfirmationDialog("mayaeggimport" + $gMP_MayaVersionShort + " Plugin ERROR!"
                                                             , "Panda Egg Import plugin is either not currently loaded,"
                                                                 + "\nor not currently installed."
                                                                 + "\nIf you do not have the Panda3D SDK egg importer installed,"
                                                                 + "\nWould you like to download the Panda3D SDK now?"
                                                             , "downloadcancel");
-                                    
+
         if($pluginLoadedConfirm == "DOWNLOAD"){
             MP_GotoPanda3DSDKDownload();
         }
@@ -2441,12 +2477,12 @@ global proc MP_ImportPandaFile()
                                                                 + "\n\nI.E. your phase root folder."
                                                                 + "\n\nPress \"Select\" to continue, press \"Cancel\" to exit."
                                                             , "selectcancel");
-            
+
             if($choosePhaseRoot == "SELECT"){
                 $gMP_PhaseRootDir = `fileDialog2 -fileMode 3 -dialogStyle 2 -caption "Select Phase Root Directory" -okCaption "Select"`;
             }
         }
-        
+
             //Proceed if phase root directory has been selected
         if($gMP_PhaseRootDir[0] != ""){
                 //Show importing notification message if the user has not seen it yet this session.
@@ -2458,14 +2494,14 @@ global proc MP_ImportPandaFile()
                                                                     + "\nPress \"Cancel\" to exit this process."
                                                                     + "\n\nThis is the only time you will see this message this Maya session."
                                                                 , "selectcancel");
-                
+
                 if(($choosePandaFile == "SELECT") && ($gMP_PhaseRootDir[0] != "")){
                         //Since user is continuing and has now seen the importing notification,
                         //we register this in the global variable so future imports in the same session will be skipped.
                     $gMP_ChoosePandaFileNotice = 1;
                 }
             }
-            
+
             if($gMP_ChoosePandaFileNotice == 1){
                     //Select Panda file(s) to import
                 int $fileMode = 4;
@@ -2473,7 +2509,7 @@ global proc MP_ImportPandaFile()
                 string $startingDirectory = dirname(`file -q -sn`);
                 string $fileFilter = "Panda bam file (*.bam);;Panda egg file (*.egg)";
                 string $pandaFile[] = MP_BrowseForFile($fileMode, $caption, $startingDirectory, $fileFilter);
-                    
+
                     //Verify we have selected at least one file to import into scene
                 if((size($pandaFile) > 0) && ($gMP_PhaseRootDir[0] != "")){
                     for($i=0;$i<size($pandaFile);$i++){
@@ -2481,14 +2517,14 @@ global proc MP_ImportPandaFile()
                         string $filePath = dirname($pandaFile[$i]);
                         string $baseFileName = basenameEx($pandaFile[$i]);
                         string $fileExtension = fileExtension($pandaFile[$i]);
-                            
+
                             //Verify we have information in all the variables
                         if(($filePath == "") || ($baseFileName == "") || ($fileExtension == "")){
                                 //Cannot operate without a Panda file. Throw a message if it appears one has not been selected.
                             MP_ConfirmationDialog("No File Selected"
                                                     , "No Panda File is currently selected"
                                                     , "ok");
-                        }else{   
+                        }else{
                                 //if selected file is a Panda BAM file, process here
                             if($fileExtension == "bam"){
                                     //If the selected file path does not start with the phaseRoot,
@@ -2502,19 +2538,19 @@ global proc MP_ImportPandaFile()
                                                                                         + "\n\nI.E. the root folder that all the Phase_* folders are in."
                                                                                         + "\n\nPress \"Select\" to continue, press \"Cancel\" to exit."
                                                                                     , "selectcancel");
-                                    
+
                                     if($choosePhaseRoot == "SELECT"){
                                         $gMP_PhaseRootDir = `fileDialog2 -fileMode 3 -dialogStyle 2 -caption "Select Phase Root Directory" -okCaption "Select"`;
                                     }
                                 }
-                                        
+
                                 if($gMP_PhaseRootDir[0] != ""){
                                             //Define bam file name full path.
                                     string $bamFile = ($gMP_PhaseRootDir[0] + "/" + $baseFileName + ".bam");
-                                        
+
                                         //Define egg file name full path.
                                     string $eggFile = ($gMP_PhaseRootDir[0] + "/" + $baseFileName + ".egg");
-                                      
+
                                         //Check to see if the selected Bam file originated from the Phase Root Folder.
                                         //We do this by comparing full file paths of selected file and generated $bamFile file path.
                                         //If it did, then we skip BOTH, the copy process and the source bam file deleting process.
@@ -2530,7 +2566,7 @@ global proc MP_ImportPandaFile()
 
                                         //Convert the bam file to an egg file (which will use the currently selected bam version)
                                     MP_Bam2Egg($bamFile);
-                                    
+
                                         //We loop to check for when the egg file has been created and appears in the folder.
                                         //Once it has been converted and appears, we can proceed with file importing.
                                         //We also will exit if a loopCount has reached the specified amount.
@@ -2538,14 +2574,14 @@ global proc MP_ImportPandaFile()
                                         //      we don't want the script to hang up.
                                     int $loopCount = 0;
                                     int $eggError = 0;
-                                    
+
                                     do{
                                             //Check if egg file has been created each loop cycle
                                         if(`file -query -exists $eggFile` == 1){
                                                 //File exists now, so we import it into the scene
                                             print ("Importing Panda File: " + $eggFile + "\n");
                                             file -import $eggFile;
-                                                
+
                                                 //If the selected original Bam file did NOT originate from the Phase Root Folder,
                                                 //  we delete the bam file from the phase root folder, since it is only a copy that we have made.
                                             if($bamFile != $pandaFile[$i]){
@@ -2565,7 +2601,7 @@ global proc MP_ImportPandaFile()
                                     while (($exists == 0) && ($loopCount < 11));
                                 }
                             }
-                            
+
                                 //if selected file is a Panda EGG file, process here
                                 //We do not really care if the egg file is not in the phase root,
                                 //  since its texture paths are probably already correct from where it is located,
@@ -2593,14 +2629,14 @@ global proc MP_Send2Pview(string $file)
             If a file is passed to this process, it will call the pview
             version that is defined in the gMP_PandaFileVersions array,
             and run that pview against the chosen file.
-            
+
             If $file is empty, the process will call pview inside of Maya,
             which then uses the plugin version libmayapview[version]
             and sends the full scene, or selected nodes, to the pview process.
         */
         //Process Variables
     global string $gMP_MayaVersionShort;
-    
+
         //Check if a file was passed to this process
         //If not, we will run pview plugin the scene itself
     if($file == ""){
@@ -2618,7 +2654,7 @@ global proc MP_Send2Pview(string $file)
                 print("End pview\n");
             }
         }
-        
+
         if(`pluginInfo -query -loaded -name ("libmayasavepview" + $gMP_MayaVersionShort)` == 1){
                 //Seems this plugin requires a scene to have been saved, i.e. has a scene name first
                 //It does not view against current scene, so lets prompt user to choose a file
@@ -2630,7 +2666,7 @@ global proc MP_Send2Pview(string $file)
         print "\nStarting pview ... \n";
         print $file;
         print "\n";
-        
+
         string $result =
         system(
             $pviewExecutable + " -l -c "
@@ -2646,7 +2682,7 @@ global proc MP_Send2Pview(string $file)
 global proc MP_LightsSelectedUI()
 {
     int $value = `checkBox -query -value MP_ExportLightsCB`;
-  
+
     switch($value){
         case 0:
             //
@@ -2662,7 +2698,7 @@ global proc MP_LightsSelectedUI()
 global proc MP_CamerasSelectedUI()
 {
     int $value = `checkBox -query -value MP_ExportCamerasCB`;
-  
+
     switch($value){
         case 0:
             //
@@ -2681,9 +2717,9 @@ global proc MP_RemoveGroundPlaneUI()
         This currently only removes the groundPlane_transform entry from Mesh exports.
         If any other export option is chosen, the tuple will be written to the egg file.
     */
-    
+
     int $value = `checkBox -query -value MP_RemoveGroundPlaneCB`;
-  
+
     switch($value){
         case 0:
             //
@@ -2691,7 +2727,7 @@ global proc MP_RemoveGroundPlaneUI()
         case 1:
             print("The \"groundPlane_transform\" node will be excluded from the exported file(s)\n");
         break;
-        
+
     }
 }
 ///////////////////////////////////////////////////////////
@@ -2701,7 +2737,7 @@ global proc MP_RemoveGroundPlaneUI()
 global proc MP_ExportOptionsUI()
 {
     string $selectedRB = `radioCollection -query -select MP_ExportOptionsRC`;
-    
+
     switch($selectedRB)
     {
         case "MP_ChooseActorRB":
@@ -2810,7 +2846,7 @@ global proc MP_AnimationOptionsUI(string $option, string $toUpdate)
     /*
         Updates the Animation scroll bar and integer fields based on selection
     */
-    
+
     switch($option)
     {
         case "animationMode":
@@ -2876,7 +2912,7 @@ global proc MP_GetSelectedAnimationLayerLengthUI()
             Process which determines the last key frame of the currently selected animation layer
             & updates the 'Start Frame' & 'End Frame' integer fields of the GUI.
             It uses a default of '0' for the start frame & the last key frame as the end frame.
-            
+
             Process Operation:
                 Process is called whenever user toggles the 'MP_AnimationOptionsRC' radio buttons.
                 It uses the currently selected animation layer. In order to determine the
@@ -2890,25 +2926,25 @@ global proc MP_GetSelectedAnimationLayerLengthUI()
                 If we find no kay frames, we default to end time of '48'.
                 We lastly set the start & end animation times back to what they originally were.
         */
-    
+
         //Record any currently selected nodes
         //so we can revert the selections after processing
     string $currentSelection[] = `ls -sl`;
-        
+
         //Variable to hold any now selected nodes in the selected animation layer, if any
     string $nodesSelected[];
     clear $nodesSelected;
-    
+
         //Record the current values so we can revert thnm once we finish processing
     int $currentMin = `playbackOptions -query -min`;
     int $currentMax = `playbackOptions -query -max`;
     int $currentStartTime = `playbackOptions -query -animationStartTime`;
     int $currentEndTime = `playbackOptions -query -animationEndTime`;
-    
+
     if(`objExists "BaseAnimation"` == 1){
             //Generate an array conataining all children layers of the default 'BaseAnimation' layers
         string $childLayersList[] = `animLayer -query -children "BaseAnimation"`;
-        
+
             //Check if we have layers other than the default 'BaseAnimation' layer,
             //or if the 'BaseAnimation' layer is the currently selected layer.
         if(size($childLayersList) == 0){
@@ -2925,12 +2961,12 @@ global proc MP_GetSelectedAnimationLayerLengthUI()
                 }
             }
         }
-            
+
             //Set animation start to '0' and end time to an extreme '10000'
         playbackOptions -edit -min 0 -max 10000 -animationStartTime 0 -animationEndTime 10000;
             //Get last key frame
         int $lastKeyFrame = `findKeyframe -which last`;
-            
+
             //Update the frame times only if the current animation layer has key frames in it
         if($lastKeyFrame > 1){
                 //Update the startFrame integer field
@@ -2947,7 +2983,7 @@ global proc MP_GetSelectedAnimationLayerLengthUI()
                 //Update the playback options
             playbackOptions -edit -min 0 -max 24 -animationStartTime 0 -animationEndTime 48;
         }
-            
+
             //Check if we had previously selected nodes.
         if(size($currentSelection) != 0){
             select -clear;
@@ -2969,7 +3005,7 @@ global proc MP_OutputPandaFileTypeUI()
 {
     string $selectedRB = `radioCollection -query -select MP_OutputPandaFileTypeRC`;
     string $texPathOptions = `radioCollection -query -select MP_TexPathOptionsRC`;
-    
+
     switch($selectedRB){
         case "MP_ChooseEggRB":
             print("Exporting only an Egg file\n");
@@ -3025,7 +3061,7 @@ global proc MP_TexPathOptionsUI()
 {
     string $selectedRB = `radioCollection -query -select MP_TexPathOptionsRC`;
     string $outputPandaFileType = `radioCollection -query -select MP_OutputPandaFileTypeRC`;
-    
+
     switch($selectedRB){
         case "MP_ChooseDefaultTexPathRB":
             print("Default Texture Path Chosen\n");
@@ -3087,7 +3123,7 @@ global proc MP_TexPathOptionsUI()
 global proc MP_OutputPathOptionsUI()
 {
     string $selectedRB = `radioCollection -query -select MP_OutputPathOptionsRC`;
-    
+
     switch($selectedRB){
         case "MP_ChooseDefaultOutputPathRB":
             print("Default Export File Path Chosen\n");
@@ -3108,7 +3144,7 @@ global proc MP_OutputPathOptionsUI()
 global proc MP_OutputFilenameOptionsUI()
 {
     string $selectedRB = `radioCollection -query -select MP_OutputFilenameOptionsRC`;
-    
+
     switch($selectedRB){
         case "MP_ChooseOriginalFilenameRB":
             print("Default Export Filename Chosen\n");
@@ -3134,8 +3170,8 @@ global proc MP_TransformModeUI()
             be one of all, model, dcs, or none.  The Panda default is
             model, which means only transforms on nodes that have the
             model or dcs flag are preserved in the converted egg file.
-        */  
-  
+        */
+
     string $selectedRB = `radioCollection -query -select MP_TransformModeRC`;
     switch($selectedRB){
         case "MP_ChooseTransformNoneRB":
@@ -3167,7 +3203,7 @@ global proc MP_Globals()
     string $mayaVersionLong = getApplicationVersionAsFloat();
     global string $gMP_MayaVersionShort;
     $gMP_MayaVersionShort = substituteAllString($mayaVersionLong, ".", "");
-        
+
         //Strips the version zeroes if the version number length is less than 4
     if(`size($gMP_MayaVersionShort)`<4){
         $gMP_MayaVersionShort = substituteAllString($gMP_MayaVersionShort, "0", "");
@@ -3175,7 +3211,7 @@ global proc MP_Globals()
 
         //Global array containing all users versioned executable file names
     global string $gMP_PandaFileVersions[];
-    
+
       /*
         Panda bam writing and reading version listing
             Panda version 	Writes 	Reads
@@ -3200,7 +3236,7 @@ global proc MP_Globals()
 
             Note that Panda3D 1.10.x is able to write older .bam files.
             This can be done by putting this in Config.prc file: bam-version 6 21
-      
+
         NOTICE REGARDING THE PANDA3D/BIN FILES:
             This notice is only pertinent if you have more than one version of Panda3D installed.
             You MUST ensure that the files being used are named differently between the different Panda3D installations.
@@ -3213,7 +3249,7 @@ global proc MP_Globals()
                 egg2bam.exe file in version Panda3D-1.8.1.
                 Add anything to them that will make them easily differenciated by yourself, and of course
                 this script, even simply appending the panda version, i.e. 'egg2bam_181' is fine.
-            
+
         INFORMATIONAL WARNING:
             One final issue that should be resolved if more than one Panda3D version is installed:
             The 'egg2maya[version].exe', 'maya2egg[version].exe', 'maya2egg[version]_bin',
@@ -3224,41 +3260,45 @@ global proc MP_Globals()
             from the Panda3D installations you won't be using into a zip archive that is placed into
             the folder the files were originally located. Doing it this way, makes the files readily
             available if you need to restore them at some point in the future.
-        
+
         To add an entry into the array:
         EACH ARRAY SET INCLUDES THE FOLLOWING FOUR ITEMS:
             First entry: The name you want displayed in the option menu.
             Second entry: bam2egg file name with no file extension.
             Third entry: egg2bam file name with no file extension.
             Fourth entry: pview file name with no file extension.
-        
+
         Array Entry Example: To insert a bam version of 6.30(Panda3D-1.8.1),
             First, enter a comma at the end of the previous line of four items!
             Then, you would insert into the array the next line of four items:
                 (notice file extensions are NOT used!)
                 example: "6.30","egg2bam_630","bam2egg_630","pview_630"
-      */  
-        
+      */
+
         //NOTE: WHEN ENTERING IN OTHER VERSIONS, DO NOT INCLUDE THE FILE EXTENSIONS!!
         //Array Format: {"MenuDisplayText","bam2egg[version]","egg2bam[version]","pview[version]"}
         //Please leave the initial set of four entries as they are the fallback defaults used.
     $gMP_PandaFileVersions = { "Default","bam2egg","egg2bam","pview"
                              };
-        
+
         //User editable egg-object-type global array.
         //NOTICE: Each egg-object-type that is added into the array MUST ALSO be referenced in a user Panda3D PRC file!!!
         //        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
         //The following is Panda3D's default egg-object-types
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
-    $gMP_EggObjectTypeArray = {"barrier","floor","shadow-cast","dupefloor","smooth-floors","camera-collide","sphere","tube",
-                                "trigger","trigger-sphere","invsphere","bubble","polylight",
-                                "portal","dual","ghost","glass","glow",
-                                "binary","indexed","model","dcs","notouch",
-                                "billboard","double-sided","seq2","seq4","seq6",
-                                "seq8","seq10","seq12","seq24"
+    $gMP_EggObjectTypeArray = {"barrier","ground","floor","dupefloor","smooth-floors","floor-collide",
+                                "camera-collide","camera-collide-sphere","camera-barrier","camera-barrier-sphere","camtransparent","camtransbarrier",
+                                "sphere","tube","trigger","trigger-sphere","invsphere","bubble",
+                                "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
+                                "indexed","model","dcs","localdcs","netdcs","notouch",
+                                "billboard","double-sided"
                               };
-    
+
+        // Removed:
+        // seq2 seq4 seq6 seq8 seq10 seq12 seq24
+        // polylight portal
+
         //Global variable that keeps track of whether or not user has seen the import Panda file notification.
         //It is designed so that the user only sees the notification once during session.
     global int $gMP_ChoosePandaFileNotice = 0;
@@ -3273,9 +3313,9 @@ global proc MP_CreatePandaExporterWindow()
     global string $gMP_PandaFileVersions[];
     global string $gMP_MayaVersionShort;
     global string $gMP_ReleaseRevision;
-    
+
         //Exporter GUI Creation
-    window -retain -title ("Panda Exporter " + $gMP_ReleaseRevision + " - Modded by 'Sweet'") -width 400 -height 400 -sizeable 1 -visible 0 MP_PandaExporter;
+    window -retain -title ("Panda Exporter " + $gMP_ReleaseRevision) -width 400 -height 400 -sizeable 1 -visible 0 MP_PandaExporter;
         rowLayout -numberOfColumns 2 -rowAttach 1 "top" 0 -rowAttach 2 "top" 0 -rowAttach 3 "top" 0;
                 //Construct LEFT Column
             columnLayout -columnAttach "left" 0 -rowSpacing 0;
@@ -3500,7 +3540,7 @@ global proc MP_CreatePandaExporterWindow()
                                     MP_ChooseCustomTexPathRB;
                         text -label "Egg File Texture Ref Path:";
                         rowLayout -numberOfColumns 3 -rowAttach 1 "top" 0;
-                            textField -width 215 -enable 0 
+                            textField -width 215 -enable 0
                                     -annotation ("Egg File custom texture reference path"
                                                     + "\n"
                                                     + "\nNOTE: If using the copy-to for the textures,"
@@ -3511,7 +3551,7 @@ global proc MP_CreatePandaExporterWindow()
                                                 )
                                     MP_CustomEggTexPathTF;
                             button -label "Browse"
-                                    -enable 0 
+                                    -enable 0
                                     -annotation ("Browse for Egg File custom texture reference path"
                                                     + "\n"
                                                     + "\nNOTE: If using the copy-to for the textures,"
@@ -3775,7 +3815,7 @@ if (`window -exists MP_AddEggObjectTypesWindow`){
 if (`window -exists MP_DeleteEggObjectTypesWindow`){
     deleteUI -window MP_DeleteEggObjectTypesWindow;
 }
-    
+
     //Define main menu and menu items
 menu -label "Panda3D" MP_PandaMenu;
     //Set the MP_PandaMenu as the parent for the following menuItems
@@ -3787,7 +3827,7 @@ setParent -menu MP_PandaMenu;
     menuItem -label "Panda3D Manual" -command "MP_GotoPanda3DManual";
     menuItem -label "Panda3D Help Forums" -command "MP_GotoPanda3DForum";
     menuItem -label "Download Panda3D-SDK" -command "MP_GotoPanda3DSDKDownload";
-    
+
     //The following processes define the functions called by using the menu items
 global proc MP_GotoPanda3D()
 {

@@ -1,0 +1,141 @@
+# The following lines define some handy object types to use within the
+# egg syntax.  This remaps <ObjectType> { name } into whatever egg
+# syntax is given by egg-object-type-name, which makes a handy
+# abbreviation for modeling packages (like Maya) to insert
+# sophisticated egg syntax into the generated egg file, using a single
+# object type string.
+
+egg-object-type-portal          <Scalar> portal { 1 }
+egg-object-type-polylight       <Scalar> polylight { 1 }
+egg-object-type-seq24           <Switch> { 1 } <Scalar> fps { 24 }
+egg-object-type-seq12           <Switch> { 1 } <Scalar> fps { 12 }
+egg-object-type-indexed         <Scalar> indexed { 1 }
+egg-object-type-seq10           <Switch> { 1 } <Scalar> fps { 10 }
+egg-object-type-seq8            <Switch> { 1 } <Scalar> fps { 8 }
+egg-object-type-seq6            <Switch> { 1 } <Scalar>  fps { 6 }
+egg-object-type-seq4            <Switch> { 1 } <Scalar>  fps { 4 }
+egg-object-type-seq2            <Switch> { 1 } <Scalar>  fps { 2 }
+
+egg-object-type-binary          <Scalar> alpha { binary }
+egg-object-type-dual            <Scalar> alpha { dual }
+egg-object-type-glass           <Scalar> alpha { blend-no-occlude }
+
+# These are just shortcuts to define the Model and DCS flags, which
+# indicate nodes that should not be flattened out of the hierarchy
+# during the conversion process.  DCS goes one step further and
+# indicates that the node's transform is important and should be
+# preserved (DCS stands for Dynamic Coordinate System).  Notouch is
+# even stronger, and means not to do any flattening below the node at
+# all.
+egg-object-type-model           <Model> { 1 }
+egg-object-type-dcs             <DCS> { 1 }
+egg-object-type-notouch         <DCS> { no-touch }
+
+# The following define various kinds of collision geometry.  These
+# mark the geometry at this level and below as invisible collision
+# polygons, which can be used by Panda's collision system to detect
+# collisions more optimally than regular visible polygons.
+egg-object-type-barrier         <Scalar> collide-mask { 0x01 } <Collide> { Polyset descend }
+egg-object-type-trigger         <Scalar> collide-mask { 0x01 } <Collide> { Polyset descend intangible }
+egg-object-type-planebarrier    <Scalar> collide-mask { 0x01 } <Collide> { Plane descend }
+egg-object-type-planefloor      <Scalar> collide-mask { 0x02 } <Collide> { Plane descend }
+egg-object-type-sphere          <Scalar> collide-mask { 0x01 } <Collide> { Sphere descend }
+egg-object-type-tube            <Scalar> collide-mask { 0x01 } <Collide> { Tube descend }
+egg-object-type-camtransparent  <Scalar> collide-mask { 0x08 } <Collide> { Polyset descend }
+egg-object-type-camtransbarrier <Scalar> collide-mask { 0x09 } <Collide> { Polyset descend }
+egg-object-type-pet             <Scalar> collide-mask { 0x08 } <Collide> { Polyset descend }
+egg-object-type-ouch1           <Tag> ouch { 1 }
+egg-object-type-ouch2           <Tag> ouch { 2 }
+egg-object-type-ouch3           <Tag> ouch { 3 }
+egg-object-type-ouch4           <Tag> ouch { 4 }
+egg-object-type-ouch5           <Tag> ouch { 5 }
+
+egg-object-type-trigger-sphere  <Scalar> collide-mask { 0x01 } <Collide> { Sphere descend intangible }
+
+egg-object-type-camera-barrier-sphere  <Scalar> collide-mask { 0x05 } <Collide> { Sphere descend }
+egg-object-type-camera-collide-sphere  <Scalar> collide-mask { 0x04 } <Collide> { Sphere descend }
+
+# could also be cambarrier...
+egg-object-type-camera-barrier  <Scalar> collide-mask { 0x05 } <Collide> { Polyset descend }
+
+# could also be camcollide...
+egg-object-type-camera-collide  <Scalar> collide-mask { 0x04 } <Collide> { Polyset descend }
+
+# surface attributes
+egg-object-type-dirt-surface    <Tag> surface { dirt }
+egg-object-type-gravel-surface  <Tag> surface { gravel }
+egg-object-type-grass-surface   <Tag> surface { grass }
+egg-object-type-asphalt-surface <Tag> surface { asphalt }
+egg-object-type-wood-surface    <Tag> surface { wood }
+egg-object-type-water-surface   <Tag> surface { water }
+egg-object-type-snow-surface    <Tag> surface { snow }
+egg-object-type-ice-surface     <Tag> surface { ice }
+egg-object-type-sticky-surface  <Tag> surface { sticky }
+
+# "floor" and "dupefloor" define the nodes in question as floor
+# polygons.  dupefloor means to duplicate the geometry first so that
+# the same polygons serve both as visible geometry and as collision
+# polygons.
+egg-object-type-floor           <Scalar> collide-mask { 0x02 } <Collide> { Polyset descend level }
+egg-object-type-dupefloor       <Scalar> collide-mask { 0x02 } <Collide> { Polyset keep descend level }
+egg-object-type-floor-collide   <Scalar> collide-mask { 0x06 }
+
+
+# Define a "ground" type, for rendering ground surfaces immediately
+# behind the drop shadows.
+egg-object-type-ground          <Scalar> bin { ground }
+
+egg-object-type-localdcs        <DCS> { Local }
+egg-object-type-netdcs          <DCS> { Net }
+egg-object-type-blend           <Scalar> alpha { blend }
+egg-object-type-decal           <Scalar> decal { 1 }
+egg-object-type-smooth-floors   <Collide> { Polyset descend } <Scalar> from-collide-mask { 0x000fffff } <Scalar> into-collide-mask { 0x00000002 }
+
+# Panda3D specific
+egg-object-type-invsphere       <Collide> { InvSphere descend }
+egg-object-type-solidpoly       <Collide> { Polyset descend solid }
+egg-object-type-turnstile       <Collide> { Polyset descend turnstile }
+egg-object-type-eye-trigger     <Collide> { Polyset descend intangible center }
+egg-object-type-multisample     <Scalar> alpha { ms }
+
+# "bubble" puts an invisible bubble around an object, but does not
+# otherwise remove the geometry.
+egg-object-type-bubble          <Collide> { Sphere keep descend }
+
+# "glow" is useful for halo effects and things of that ilk.  It
+# renders the object in add mode instead of the normal opaque mode.
+egg-object-type-glow            <Scalar> blend { add }
+
+# Custom ObjectTypes for Toontown.
+# "barrier" means a vertical wall, with bitmask 0x01
+# "floor" means a horizontal floor, with bitmask 0x02
+# "camera-collide" means things that the camera should avoid, with bitmask 0x04
+
+# The modelers occasionally put <ObjectType> { model } instead of
+# <Model> { 1 }.  Let's be accommodating.
+
+# Define a "shadow" object type, so we can render all shadows in their
+# own bin and have them not fight with each other (or with other
+# transparent geometry).
+egg-object-type-shadow          <Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }
+
+# Collision polygons for moving platforms (normally these are not seen
+# by the player; this helps the collision system do the right thing;
+# toons that are not on the platform do not react to this bit mask):
+egg-object-type-safety-net     <Scalar> collide-mask { 0x200 }
+
+# Collision polygons for _near_ moving platforms (normally these are
+# not seen by the player; this helps the collision system do the
+# right thing; toons that _are_ on the platform do not react to
+# this bit mask):
+egg-object-type-safety-gate     <Scalar> collide-mask { 0x400 }
+
+
+# Things we can throw a pie at.  (Pies also react to CameraBitmask and
+# FloorBitmask, but not WallBitmask.):
+# Brought in from OTPGlobals
+egg-object-type-pie     <Scalar> collide-mask { 0x100 }
+
+# Things the magnet can pick up in the Cashbot CFO battle (same as
+# CatchGameBitmask):
+egg-object-catch-grab    <Scalar> collide-mask { 0x10 }
