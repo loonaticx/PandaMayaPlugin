@@ -53,6 +53,9 @@ egg-object-type-ouch5           <Tag> ouch { 5 }
 egg-object-type-trigger-sphere  <Scalar> collide-mask { 0x01 } <Collide> { Sphere descend intangible }
 
 egg-object-type-camera-barrier-sphere  <Scalar> collide-mask { 0x05 } <Collide> { Sphere descend }
+# aka for shortcut
+egg-object-type-cambarrier-sphere  <Scalar> collide-mask { 0x05 } <Collide> { Sphere descend }
+
 egg-object-type-camera-collide-sphere  <Scalar> collide-mask { 0x04 } <Collide> { Sphere descend }
 
 # could also be cambarrier...

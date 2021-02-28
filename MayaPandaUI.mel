@@ -3288,11 +3288,11 @@ global proc MP_Globals()
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
     $gMP_EggObjectTypeArray = {"barrier","ground","floor","dupefloor","smooth-floors","floor-collide",
-                                "camera-collide","camera-collide-sphere","camera-barrier","camera-barrier-sphere","camtransparent","camtransbarrier",
-                                "sphere","tube","trigger","trigger-sphere","invsphere","bubble",
+                                "camera-collide","camera-collide-sphere","camera-barrier","cambarrier-sphere","camtransparent","camtransbarrier",
+                                "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
                                 "indexed","model","dcs","localdcs","netdcs","notouch",
-                                "billboard","double-sided"
+                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab"
                               };
 
         // Removed:
