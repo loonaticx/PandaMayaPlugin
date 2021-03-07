@@ -495,7 +495,7 @@ global proc MP_AddEggObjectTypesGUI()
         deleteUI -window MP_AddEggObjectTypesWindow;
     }
 
-    window -retain -title "Panda Exporter - Add Egg-Object-Types" -resizeToFitChildren true -sizeable 0 -visible 1 MP_AddEggObjectTypesWindow;
+    window -retain -title "Panda Exporter - Add Egg-Object-Types" -resizeToFitChildren true -sizeable 1 -visible 1 MP_AddEggObjectTypesWindow;
         columnLayout -columnAttach "left" 0 -adjustableColumn true -rowSpacing 0;
             frameLayout -backgroundColor 0.50 0.60 0.20    //Add Egg-Type Tags
                         -collapsable false -font "obliqueLabelFont" -label "Add Egg-Object-Type Tags to Selected Nodes";
@@ -2141,6 +2141,10 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nThe collision is active on the \"Normals\" side of the object(s)");
         break;
 
+        case "barrier-no-mask":
+            $annotation = ("<Collide> { Polyset descend }");
+        break;
+
         case "floor":
             $annotation = ("<Scalar> collide-mask { 0x02 }"
                             +"\n<Collide> { Polyset descend level }"
@@ -3287,11 +3291,11 @@ global proc MP_Globals()
         //The following is Panda3D's default egg-object-types
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
-    $gMP_EggObjectTypeArray = {"barrier","ground","floor","dupefloor","smooth-floors","floor-collide",
+    $gMP_EggObjectTypeArray = {"barrier","barrier-no-mask","ground","floor","dupefloor","smooth-floors","floor-collide",
                                 "camera-collide","camera-collide-sphere","camera-barrier","cambarrier-sphere","camtransparent","camtransbarrier",
                                 "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
-                                "indexed","model","dcs","localdcs","netdcs","notouch",
+                                "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
                                 "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab"
                               };
 
