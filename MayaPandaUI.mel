@@ -503,7 +503,7 @@ global proc MP_AddEggObjectTypesGUI()
                     int $count = 0;
                     for($n=0;$n<(size($gMP_EggObjectTypeArray)+1)/4;$n++){
                         rowLayout -nc 6;
-                            for($i=0;$i<5;$i++){
+                            for($i=0;$i<5;$i++){ // 5 rows per col
 
                                 string $eggObjectType = $gMP_EggObjectTypeArray[$count];
 
@@ -3296,7 +3296,7 @@ global proc MP_Globals()
                                 "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
                                 "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
-                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab"
+                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible"
                               };
 
         // Removed:
