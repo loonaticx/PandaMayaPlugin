@@ -401,19 +401,19 @@ global proc MP_AddEggObjectFlags(string $eggObjectType)
                                                     + "\nPlease select at least one node, then try again.", "ok");
         }else{
             for ($node in $selectedNodes){
-                for($i=1;$i<4;$i++){
+                for($i=1;$i<11;$i++){
                     if(`objExists ($node + ".eggObjectTypes" + $i)` == 1){
                             //Notify user if the lmit of 3 tags are already assigned to node
-                        if($i == 3){
+                        if($i == 10){
                                 //Message to user that the egg-object-type limit has been reached
-                            MP_ConfirmationDialog("Egg-Object-Type Error!", "Limit of 3 egg-object-types has already been reached."
+                            MP_ConfirmationDialog("Egg-Object-Type Error!", "Limit of 10 egg-object-types has already been reached."
                                                                             + "\nNo More Egg Object Types Supported for this node.", "ok");
                         }
                     }else{
                             //Call subprocess to check/set attribute
                         MP_SetEggObjectTypeAttribute($enumerationList, $eggObjectType, $indexNumber, $i, $node);
                             //Set variable to exit loop
-                        $i = 4;
+                        $i = 11;
                     }
                 }
             }
@@ -447,7 +447,7 @@ global proc MP_SetEggObjectTypeAttribute(string $enumerationList, string $eggObj
         //Check for any currently attached egg-object-type attribute values on the node.
         //If a current attribute matches passed egg-object-type,
         //  we skip adding it again and notify user it already exists.
-    for($i=1;$i<4;$i++){
+    for($i=1;$i<11;$i++){
         if(`objExists ($node + ".eggObjectTypes" + $i)`){
                 //Attribute exists, check if attributes matches the passed egg-object-type
             if(`getAttr -asString ($node + ".eggObjectTypes" + $i)` == $eggObjectType){

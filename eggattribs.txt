@@ -206,8 +206,8 @@ egg-object-type-bin-opaque      <Scalar> bin { opaque }
 #   If the draw-order scalar is specified but no bin scalar is
 #   specified, the default is a bin named "fixed", which is a
 #   CullBinFixed object that always exists by default.
-egg-object-type-draw0           <Scalar> draw-order { 0 }
-egg-object-type-draw1           <Scalar> draw-order { 1 }
+#egg-object-type-draw0           <Scalar> draw-order { 0 }
+#egg-object-type-draw1           <Scalar> draw-order { 1 }
 
 ####################################################################################
 #   If this is present and boolean-value is non-zero, it indicates
@@ -246,7 +246,7 @@ egg-object-type-occlude         <Scalar> occluder { 1 }
 
 ####################################################################################
 egg-object-type-billboard       <Billboard> { axis }
-egg-object-type-billboard-axis  <Billboard> { axis }
+#egg-object-type-billboard-axis  <Billboard> { axis }
 egg-object-type billboard-point <Billboard> { point }
 
 ####################################################################################
@@ -269,22 +269,22 @@ egg-object-type billboard-point <Billboard> { point }
 
 ####################################################################################
 # surface attributes, not used in toontown so can be omitted
-egg-object-type-dirt-surface    <Tag> surface { dirt }
-egg-object-type-gravel-surface  <Tag> surface { gravel }
-egg-object-type-grass-surface   <Tag> surface { grass }
-egg-object-type-asphalt-surface <Tag> surface { asphalt }
-egg-object-type-wood-surface    <Tag> surface { wood }
-egg-object-type-water-surface   <Tag> surface { water }
-egg-object-type-snow-surface    <Tag> surface { snow }
-egg-object-type-ice-surface     <Tag> surface { ice }
-egg-object-type-sticky-surface  <Tag> surface { sticky }
+#egg-object-type-dirt-surface    <Tag> surface { dirt }
+#egg-object-type-gravel-surface  <Tag> surface { gravel }
+#egg-object-type-grass-surface   <Tag> surface { grass }
+#egg-object-type-asphalt-surface <Tag> surface { asphalt }
+#egg-object-type-wood-surface    <Tag> surface { wood }
+#egg-object-type-water-surface   <Tag> surface { water }
+#egg-object-type-snow-surface    <Tag> surface { snow }
+#egg-object-type-ice-surface     <Tag> surface { ice }
+#egg-object-type-sticky-surface  <Tag> surface { sticky }
 
 ####################################################################################
 # I don't know what these are used for, it's not listed anywhere in the egg syntax
 # though it is listed by default
-egg-object-type-portal          <Scalar> portal { 1 }
-egg-object-type-polylight       <Scalar> polylight { 1 }
-egg-object-type-indexed         <Scalar> indexed { 1 }
+#egg-object-type-portal          <Scalar> portal { 1 }
+#egg-object-type-polylight       <Scalar> polylight { 1 }
+#egg-object-type-indexed         <Scalar> indexed { 1 }
 
 # This isn't used in the egg loader, it controls a setting only within
 # maya2egg itself.  So if it appears in an egg file, it means nothing.
