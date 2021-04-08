@@ -3296,7 +3296,7 @@ global proc MP_Globals()
                                 "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
                                 "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
-                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible"
+                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart"
                               };
 
         // Removed:
