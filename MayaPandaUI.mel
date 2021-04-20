@@ -3288,7 +3288,6 @@ global proc MP_Globals()
         //User editable egg-object-type global array.
         //NOTICE: Each egg-object-type that is added into the array MUST ALSO be referenced in a user Panda3D PRC file!!!
         //        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
-        //The following is Panda3D's default egg-object-types
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
     $gMP_EggObjectTypeArray = {"barrier","barrier-no-mask","ground","floor","dupefloor","smooth-floors","floor-collide",
@@ -3296,12 +3295,15 @@ global proc MP_Globals()
                                 "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
                                 "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
-                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart"
+                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart",
+                                "seq2", "seq4", "seq6", "seq8", "seq10", "seq12", "seq24"
                               };
 
         // Removed:
-        // seq2 seq4 seq6 seq8 seq10 seq12 seq24
         // polylight portal
+        
+        // todo: maybe add option to type own number for seqX
+        
 
         //Global variable that keeps track of whether or not user has seen the import Panda file notification.
         //It is designed so that the user only sees the notification once during session.
