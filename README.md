@@ -51,3 +51,13 @@ along with adding egg-object-types and taking advantage of many export options.
 Final Note:
 If you just installed the Panda3d SDK and have yet to reboot your computer,
 a restart is highly recommended so your computer can find the Panda3d installation!
+
+# Custom Egg Object Types
+
+This plugin reads certain egg nodes (like Collide, Scalar alpha, etc.) and then applies a pre-defined object type in lieu of a bundle of nodes.
+
+So, for example, if a certain node in an egg file calls for both
+``<Scalar> collide-mask { 0x02 }`` and ``<Collide> { Polyset descend level }``
+then the plugin would replace the two with simply ``<ObjectType> { floor }``
+
+Refer to eggattribs.txt for a list of custom egg object types. In order for Panda to interpret the custom object types, paste the list from eggattribs.txt to your panda's Config.prc file.
