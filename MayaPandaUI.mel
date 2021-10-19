@@ -2346,7 +2346,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nGeometry will rotate on its local axis."
                             +"\n\nThis is a builtin type of Panda and no PRC setting is required");
         break;
-/*
+
         case "seq2":
             $annotation = ("<Switch> { 1 }"
                             +"\n<Scalar>  fps { 2 }"
@@ -2416,7 +2416,7 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
         break;
-*/
+
         default:
                 $annotation = ("Adds the " + $objectType + " egg-object-type to selected geometry.");
         break;
@@ -3296,11 +3296,11 @@ global proc MP_Globals()
                                 "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
                                 "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
                                 "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
-                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart"
+                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart",
+                                "seq2", "seq4", "seq6", "seq8", "seq10", "seq12", "seq24"
                               };
 
         // Removed:
-        // seq2 seq4 seq6 seq8 seq10 seq12 seq24
         // polylight portal
 
         //Global variable that keeps track of whether or not user has seen the import Panda file notification.
