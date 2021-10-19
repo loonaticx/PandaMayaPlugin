@@ -3288,7 +3288,6 @@ global proc MP_Globals()
         //User editable egg-object-type global array.
         //NOTICE: Each egg-object-type that is added into the array MUST ALSO be referenced in a user Panda3D PRC file!!!
         //        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
-        //The following is Panda3D's default egg-object-types
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
     $gMP_EggObjectTypeArray = {"barrier","barrier-no-mask","ground","floor","dupefloor","smooth-floors","floor-collide",
@@ -3302,6 +3301,9 @@ global proc MP_Globals()
 
         // Removed:
         // polylight portal
+        
+        // todo: maybe add option to type own number for seqX
+        
 
         //Global variable that keeps track of whether or not user has seen the import Panda file notification.
         //It is designed so that the user only sees the notification once during session.
