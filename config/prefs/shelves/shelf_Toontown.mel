@@ -1,0 +1,456 @@
+global proc shelf_Toontown () {
+    global string $gBuffStr;
+    global string $gBuffStr0;
+    global string $gBuffStr1;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Merge vertices / border edges based on selection." 
+        -enableBackground 1
+        -backgroundColor 0.115496 0.749996 0.115496 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Merge" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.816149 0.816149 0.816149 
+        -overlayLabelBackColor 0.0919255 0.0919255 0.0919255 0.5 
+        -image "polyMerge.png" 
+        -image1 "polyMerge.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyMerge 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "PolyMergeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Detach selected components" 
+        -enableBackground 1
+        -backgroundColor 0.8 0.0256046 0.0256046 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Detach" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polySplitVertex.png" 
+        -image1 "polySplitVertex.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "DetachComponent" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Combine the selected polygon objects into one single object to allow operations such as merges or face trims." 
+        -enableBackground 1
+        -backgroundColor 0.115496 0.749996 0.115496 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Combine" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polyUnite.png" 
+        -image1 "polyUnite.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyPerformAction polyUnite o 0" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Separate the selected polygon object shells or the shells of any selected faces from the object into distinct objects." 
+        -enableBackground 1
+        -backgroundColor 0.8 0.0256046 0.0256046 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Separate" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polySeparate.png" 
+        -image1 "polySeparate.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "SeparatePolygon" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Split selected edge ring." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Insert Edge Loop" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polySplitEdgeRing.png" 
+        -image1 "polySplitEdgeRing.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "SplitEdgeRingTool" 
+        -sourceType "mel" 
+        -doubleClickCommand "InsertEdgeLoopToolOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Merges two edges or vertices into a single component." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Target Weld" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "weld_NEX32.png" 
+        -image1 "weld_NEX32.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "MergeVertexTool" 
+        -sourceType "mel" 
+        -doubleClickCommand "MergeVertexToolOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a bridge between two sets of edges or faces" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Bridge" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polyBridge.png" 
+        -image1 "polyBridge.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyBridgeEdge 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "BridgeEdgeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Apply color options" 
+        -enableBackground 1
+        -backgroundColor 0.453285 0.484871 0.927108 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Apply Color Menu" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0.154 0.154 0.154 0.5 
+        -image "polyApplyColor.png" 
+        -image1 "polyApplyColor.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "PolygonApplyColorOptions" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 41
+        -enable 1
+        -width 44
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Panda Export GUI" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Panda Export GUI..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "C:/Users/Loonatic-IV/Documents/ShareX/Screenshots/2021-07/chrome_2021-07-10_02-04-44.png" 
+        -image1 "C:/Users/Loonatic-IV/Documents/ShareX/Screenshots/2021-07/chrome_2021-07-10_02-04-44.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "MP_PandaExporterUI" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 37
+        -enable 1
+        -width 40
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Add Egg-Type Attribute" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Add Egg-Type Attribute" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "C:/Users/Loonatic-IV/Downloads/594-5941543_instagram-egg-png-file-egg-world-record-transparent.png" 
+        -image1 "C:/Users/Loonatic-IV/Downloads/594-5941543_instagram-egg-png-file-egg-world-record-transparent.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "MP_AddEggObjectTypesGUI" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 43
+        -enable 1
+        -width 46
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "DeleteAttribsBulk" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "DeleteAttribsBulk" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "C:/Users/Loonatic-IV/Documents/maya/2019/prefs/icons/istockphoto-146876354-612x612.jpg" 
+        -image1 "C:/Users/Loonatic-IV/Documents/maya/2019/prefs/icons/istockphoto-146876354-612x612.jpg" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\nfrom functools import partial\n\nclass MassDeleteAttrWindow(object): \n    def __init__(self):\n            self.window = 'massDeleteAttrWin'\n            self.title = 'Mass Delete Attributes'\n            self.size = (600, 800)\n            \n    def create(self):\n        if cmds.window(self.window, exists=True):\n            cmds.deleteUI(self.window, window=True)\n        self.window = cmds.window(\n            self.window,\n            title = self.title,\n            widthHeight = self.size\n        )\n        self.mainForm = cmds.paneLayout(configuration='horizontal3', ps=((1,100,80), (2,100,10)))\n        self.uiList = cmds.textScrollList(allowMultiSelection=True)\n        self.btnDelete = cmds.button(label='Delete!', command=partial(self.doDelete))\n        self.btnRefresh = cmds.button(label='Refresh Selection', command=partial(self.doRefresh))\n    \n    def getSelection(self):\n        self.selection = cmds.ls(selection=True)\n        if self.selection == []:\n            self.selection = cmds.ls(transforms=True, shapes=True) \n    \n    def listCustomAttrs(self):\n        attrs = []\n        for node in self.selection:\n            customAttrs = cmds.listAttr(node, ud=True)\n            if customAttrs:\n                attrs.extend(customAttrs)\n        return sorted(list(set(attrs)))\n    \n    def doDelete(self, *args):\n        attrs = cmds.textScrollList(self.uiList, q=True, selectItem=True)\n        for node in self.selection:\n            for attr in attrs:\n                if cmds.objExists(node) and cmds.attributeQuery(attr, node=node, exists=True):\n                    cmds.deleteAttr(node + '.' + attr)\n        for attr in attrs:\n            cmds.textScrollList(self.uiList, e=True, removeItem=attr)\n    \n    def doRefresh(self, *args):\n        self.getSelection()\n        cmds.textScrollList(self.uiList, e=True, removeAll=True)\n        cmds.textScrollList(self.uiList, e=True, append=self.listCustomAttrs())\n    \n    def show(self):\n        cmds.showWindow(self.window)\n        self.doRefresh()\n\nwin = MassDeleteAttrWindow()\nwin.create()\nwin.show()\n\n" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Delete history on all objects" 
+        -enableBackground 1
+        -backgroundColor 0.8 0.0256046 0.0256046 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "History" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Hist" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "menuIconEdit.png" 
+        -image1 "menuIconEdit.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "DeleteAllHistory" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Custom polygon display options" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Custom polygon display options" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Cpdo" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "menuIconDisplay.png" 
+        -image1 "menuIconDisplay.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "CustomPolygonDisplayOptions" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+
+} 
