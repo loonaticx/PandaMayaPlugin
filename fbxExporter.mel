@@ -1,0 +1,122 @@
+/*
+Created by Alistair Braz (Haiddasalami)
+Version 1.01
+
+Installation:
+1. Download the .mel file.
+2. Place it in your My Documents/maya/scripts folder.
+3. Re-start Maya and type fbxExporter; in the MEL command line to launch the tool.
+4. Make shelf button or add to marking menu's for profit.
+
+TO DO:
+
+- Implement ASE batch export
+- Implement sets
+- Implement quick pivot changes as second tab.
+- Implement some sort of quick export options like recently used paths/last used options.
+- Write this in python :)
+
+Version Changes
+
+V1.01 - Option to keep original location while centering pivot has been implemented
+V1.0 - Initial release
+*/
+
+global proc fbxExporter() {
+
+    if (`window -exists fbxExporterWindow`)
+        {
+            // if Window exists delete, so you cant call multiple windows
+            deleteUI fbxExporterWindow;
+        }
+
+//Declaring window and naming it
+    window -resizeToFitChildren 1 -t "FBX Batch Exporter" -minimizeButton 1 -maximizeButton 1 -w 250 -h 50 fbxExporterWindow;
+    columnLayout -adjustableColumn 1 -rowSpacing 0 MainColumnLayout;
+        text -label "Source Directory:" -align "left";
+        textField -w 218 -fi "" sourcePath;
+        button -label "Set default output path" -h 20 -ann "Browse for source folder..." -c "fileBrowserDialog -m 4 -fc \"setSource\" -ft \"directory\" -an \"Select Source Folder\"";
+        checkBox -label "Center To Grid" centerPivot;
+        checkBox -label "Keep Original Location" originalLoc;
+        checkBox -label "Preserve Smoothing Groups"  smoothingGroup;
+        checkBox -label "Preserve Mesh Input Connections" meshConnections;
+        button -label "Export" -command "fbxExport";
+
+    setParent ..;
+    //Display the Window
+    showWindow fbxExporterWindow;
+    string $plugin = "fbxmaya";
+	if ( catch( `loadPlugin -quiet $plugin` ) ) {
+		warning( "Plug-in '" + $plugin + "' was not found. FBX Export features will not be available." );
+		return;
+	}
+}
+
+global proc setSource(string $filename, string $fileType){
+    $filename = $filename + "/";
+    textField -e -fi $filename sourcePath;
+}
+
+global proc centerPiv(string $objSelection){
+        select -r $objSelection;
+        makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;
+        $Pos = `xform -q -piv -ws`;
+        move -a  (-1 *  $Pos[0]) (-1*$Pos[1] ) (-1*$Pos[2]) ;
+        //makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;
+}
+
+global proc fbxExport() {
+    string $concatedtext;
+    string $array[] = {};
+    string $sel[] = `ls -sl`;
+    string $thisObj;
+    string $path = `textField -q -fi sourcePath`;
+    int $smoothingB = `checkBox -q -v smoothingGroup`;
+    int $meshConnectionsB = `checkBox -q -v meshConnections`;
+    int $originalLocB = `checkBox -q -v originalLoc`;
+    string $extension = ".fbx";
+    int $sizeSel = size($sel);
+    string $check = `checkBox -q -v centerPivot`;
+    if ($sizeSel == 0){
+        warning("Nothing is selected");
+        confirmDialog -title "Error" -message "Nothing is selected" -button "OK" -defaultButton "OK" -cancelButton "CANCEL";
+    }
+    else {
+    if ($check == true){
+        if ($originalLocB == true){
+            for ($thisObj in $sel){
+            select $thisObj;
+            $OriginalLoc = `xform -q -piv -ws`;
+            print($OriginalLoc);
+            $concatedtext = $path + "/" + $thisObj + $extension;
+            centerPiv($thisObj);
+            FBXExportSmoothingGroups -v $smoothingB;
+            FBXExportInputConnections -v $meshConnectionsB;
+            FBXExport -f $concatedtext -s;
+            move -r $OriginalLoc[0] $OriginalLoc[1] $OriginalLoc[2] $thisObj;
+            }
+        }
+        else {
+            for ($thisObj in $sel){
+            select $thisObj;
+            $concatedtext = $path + "/" + $thisObj + $extension;
+            centerPiv($thisObj);
+            FBXExportSmoothingGroups -v $smoothingB;
+            FBXExportInputConnections -v $meshConnectionsB;
+            FBXExport -f $concatedtext -s;
+            }
+        }
+
+    }
+    else {
+        for ($thisObj in $sel){
+            select $thisObj;
+            $concatedtext = $path + "/" + $thisObj + $extension;
+            FBXExportSmoothingGroups -v $smoothingB;
+            FBXExportInputConnections -v $meshConnectionsB;
+            FBXExport -f $concatedtext -s;
+        }
+    }
+  }
+
+}
