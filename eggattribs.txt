@@ -79,12 +79,12 @@ egg-object-type-camtransbarrier <Scalar> collide-mask { 0x09 } <Collide> { Polys
 egg-object-type-camera-barrier-sphere  <Scalar> collide-mask { 0x05 } <Collide> { Sphere descend }
 # shorthand for maya
 egg-object-type-cambarrier-sphere  <Scalar> collide-mask { 0x05 } <Collide> { Sphere descend }
-# could also be cambarrier...
+egg-object-type-cambarrier  <Scalar> collide-mask { 0x05 } <Collide> { Polyset descend }
 egg-object-type-camera-barrier  <Scalar> collide-mask { 0x05 } <Collide> { Polyset descend }
 
 # "camera-collide" means things that the camera should avoid, with bitmask 0x04
-# could also be camcollide...
 egg-object-type-camera-collide  <Scalar> collide-mask { 0x04 } <Collide> { Polyset descend }
+egg-object-type-camcollide  <Scalar> collide-mask { 0x04 } <Collide> { Polyset descend }
 egg-object-type-camera-collide-sphere  <Scalar> collide-mask { 0x04 } <Collide> { Sphere descend }
 
 egg-object-type-camtransparent  <Scalar> collide-mask { 0x08 } <Collide> { Polyset descend }
