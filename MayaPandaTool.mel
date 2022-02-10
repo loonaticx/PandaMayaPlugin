@@ -9,11 +9,6 @@
 // To run this mel script, drag and drop it (the .mel file) into your current    //
 // maya workspace.                                                               //
 ///////////////////////////////////////////////////////////////////////////////////
-//
-// EDIT HISTORY
-//
-// 06/26/06: ynjh_jo - Major edits; described in http://panda3d.net/phpbb2/viewtopic.php?t=2503
-// 07/03/06: Mark Tomczak (fixermark@gmail.com) - Added "Actor" option to export with -a model option
 
 global proc pandaExporterUI()
 {
