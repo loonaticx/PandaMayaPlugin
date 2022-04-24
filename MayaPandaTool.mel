@@ -18,7 +18,7 @@ global proc pandaExporterUI()
         string $unit=`currentUnit -q -linear`;
         string $unitFull=`currentUnit -q -linear -fullName`;
 
-        // Window is locked for image dimensions: 280�575
+        // Window is locked for image dimensions: 280x575
         // (add a few pixels to compensate for title bar and borders)
         window
                 -title "Panda Exporter"
