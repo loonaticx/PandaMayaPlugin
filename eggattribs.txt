@@ -17,6 +17,7 @@
 #   vertices; joints and morphs appearing outside of a hierarchy
 #   identified with a <Dart> flag are undefined.
 egg-object-type-dart            <Dart> { 1 }
+egg-object-type-structured      <Dart> { structured }
 
 #   This attribute indicates that the child nodes of this group
 #   represent a series of animation frames that should be
@@ -45,10 +46,16 @@ egg-object-type-seq24           <Switch> { 1 } <Scalar> fps { 24 }
 # even stronger, and means not to do any flattening below the node at
 # all.
 egg-object-type-model           <Model> { 1 }
+
+# Stands for a local transform: takes the root node of the hierarchy and transforms from there.
+# Good for things like environment models' locators, like door_origin or elevator_origin.
 egg-object-type-localdcs        <DCS> { local }
+
+# takes parent's transforms into account when translating. Good for actors that need joints exposed for further manipulation in the code.
 egg-object-type-netdcs          <DCS> { net }
 egg-object-type-dcs             <DCS> { 1 }
 egg-object-type-notouch         <DCS> { no-touch }
+
 
 
 ####################################################################################
@@ -268,16 +275,17 @@ egg-object-type billboard-point <Billboard> { point }
 #egg-object-type-env-modulate-gloss <Scalar> envtype { modulate_gloss }
 
 ####################################################################################
-# surface attributes, not used in toontown so can be omitted
-#egg-object-type-dirt-surface    <Tag> surface { dirt }
-#egg-object-type-gravel-surface  <Tag> surface { gravel }
-#egg-object-type-grass-surface   <Tag> surface { grass }
-#egg-object-type-asphalt-surface <Tag> surface { asphalt }
-#egg-object-type-wood-surface    <Tag> surface { wood }
-#egg-object-type-water-surface   <Tag> surface { water }
-#egg-object-type-snow-surface    <Tag> surface { snow }
-#egg-object-type-ice-surface     <Tag> surface { ice }
-#egg-object-type-sticky-surface  <Tag> surface { sticky }
+# surface attributes
+egg-object-type-surface-dirt    <Tag> surface { dirt }
+egg-object-type-surface-gravel  <Tag> surface { gravel }
+egg-object-type-surface-grass   <Tag> surface { grass }
+egg-object-type-surface-asphalt <Tag> surface { asphalt }
+egg-object-type-surface-wood    <Tag> surface { wood }
+egg-object-type-surface-water   <Tag> surface { water }
+egg-object-type-surface-snow    <Tag> surface { snow }
+egg-object-type-surface-ice   <Tag> surface { ice }
+egg-object-type-surface-sticky  <Tag> surface { sticky }
+egg-object-type-surface-metal  <Tag> surface { metal }
 
 ####################################################################################
 # I don't know what these are used for, it's not listed anywhere in the egg syntax
