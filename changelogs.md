@@ -178,7 +178,7 @@
 // - Adjusted coding of the 'MP_TexPathOptionsUI' process for new text box and corrected options
 // - Modified code in 'MP_ArgsBuilder' and 'MP_Export2Bam' process to add to and correct for errors
 // - --from a previous update involving texture referencing:
-// - 
+// -
 // - When using 'Reference textures relative to specified path':
 // - If exporting to ONLY an egg file:
 // - --The egg file textures will be referenced to the specified path.
@@ -190,7 +190,7 @@
 // - If calling an egg file to bam up, the referencing and/or copying options will also
 // - --function as they should. Referencing options in this case change based on the
 // - --setting of 'Output File Type' prior to browsing for egg file.
-// - 
+// -
 // - When using 'Copy textures and make relative to specified path':
 // - If exporting to ONLY an egg file:
 // - --The textures will be copied-to the specified path.
@@ -210,7 +210,7 @@
 // - ----The original textures will be copied-to the specified path in the 'Egg file Texture Ref Path' text box.
 // - ----The bam file textures will be relative to the path specified in the 'Bam file Texture Ref Path' text box.
 // - ----NOTE: The reference path MUST start with the path to the copied-to path being utilized.
-// - 
+// -
 // - 07/11/2017 : Mods by Sean /a.k.a. "Sweet" (primary coding was done 07/06/2016)
 // - Added support to the following processes to handle converting multiple files at one time.
 // - --MP_BrowseForFile, MP_GetEggFile2Bam, MP_GetMayaFile2Egg, MP_GetBamFile2Egg, MP_ImportPandaFile
@@ -228,7 +228,7 @@
 // - Added GUI checkBox and needed function(s) to remove the "groundPlane_transform" tuple from exported egg MESH files.
 // - --While this Maya node is normally empty, care should be taken to ensure it is empty when exporting.
 // - --Otherwise there runs the risk of data loss in the egg/bam file(s).
-// - 
+// -
 // - 10/01/2017 : Mods by Sean /a.k.a. "Sweet"
 // - Added the ability to add UVScroll values to nodes via the "Add Egg Tags" GUI.
 // - Recoded the way confirmDialogs pull their menu and annotation values.
@@ -245,5 +245,9 @@
 // -
 // - 11/22/2020 : Mods by Benjamin Frisby
 // - Added the "camera-collide" egg-type-attribute to the "Add Egg Tags" GUI.
+// -
+// - 2/28/2020 : Mods by Erica Miller, aka "Loonatic"
+// - Removed unnecessary egg object-types from the "Add Egg Tags" GUI for Toontown use.
+// - Added custom egg-type attributes for Toontown use in the "Add Egg Tags" GUI.
 // -
 /////////////////////////////////////////////////////////////////////////////////////////////
