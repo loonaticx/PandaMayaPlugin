@@ -200,6 +200,8 @@ egg-object-type-bin-unsorted    <Scalar> bin { unsorted }
 # Background might be good for dust clouds
 egg-object-type-bin-background  <Scalar> bin { background }
 egg-object-type-bin-transparent <Scalar> bin { transparent }
+# aux support
+egg-object-type-transparent <Scalar> bin { transparent }
 # Used in DistributedGolfHole
 egg-object-type-bin-opaque      <Scalar> bin { opaque }
 
