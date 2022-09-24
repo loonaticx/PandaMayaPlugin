@@ -1884,13 +1884,18 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
     switch($objectType)
     {
         case "barrier":
-            $annotation = ("<Collide> { Polyset descend }"
-                            +"\n\nCreates a barrier that other objects cannot pass through."
-                            +"\nThe collision is active on the \"Normals\" side of the object(s)");
+            $annotation = (
+                "<Scalar> collide-mask { 0x01 } <Collide> { Polyset descend }"
+                +"\n\nCreates a barrier that other objects cannot pass through."
+                +"\nThe collision is active on the \"Normals\" side of the object(s)"
+            );
         break;
 
         case "barrier-no-mask":
-            $annotation = ("<Collide> { Polyset descend }");
+            $annotation = (
+                "<Collide> { Polyset descend }" +
+                "\nCreates a barrier without applying a 0x1 Bitmask."
+            );
         break;
 
         case "floor":
@@ -1910,6 +1915,12 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\n\nDefine a \"shadow\" object type, so we can render all shadows in their"
                             +"\nown bin and have them not fight with each other (or with other"
                             +"\ntransparent geometry).");
+        break;
+
+        case "shground":
+        $annotation = (
+            "<Tag> cam { shground }"
+                        +"\nShadow ground. Used to ensure characters have dropshadows standing on this.");
         break;
 
         case "shadow-cast":
@@ -2068,17 +2079,36 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
         break;
 
         case "netdcs":
-            $annotation = ("<DCS> { Net }");
+            $annotation = (
+                "<DCS> { net }"
+                +"\nstands for a net transform: takes parent's transforms into account when translating."
+                +"\nGood for actors that need joints exposed for further manipulation in the code."
+                );
         break;
 
-        case "netdcs":
-            $annotation = ("<DCS> { Local }");
+        case "localdcs":
+            $annotation = (
+                "<DCS> { local }"
+                +"\nStands for a local transform: takes the root node of the hierarchy and transforms from there."
+                +"\nGood for things like environment models' locators, like door_origin or elevator_origin"
+                );
         break;
 
         case "notouch":
-            $annotation = ("<DCS> { no-touch }"
-                            +"\n\nIndicates the node, and below, should not be flattened"
-                            +"\nout of the hierarchy during the conversion process.");
+            $annotation = (
+                "<DCS> { no-touch }"
+                +"\n\nIndicates the node, and below, should not be flattened"
+                +"\nout of the hierarchy during the conversion process."
+                );
+        break;
+
+        case "structured":
+            $annotation = (
+                "<Dart> { structured }"
+                +"\nUsed for actors that need nodes preserved, such as multi-part actors."
+                +"\nIndicates the node, and below, should not be flattened, and"
+                +"\nallows for transformations of any kind, code or model, on nodes in the actor"
+                );
         break;
 
         case "double-sided":
@@ -2163,6 +2193,12 @@ global proc string MP_GetObjectTypeAnnotation(string $objectType)
                             +"\nThe <Scalar> fps { 24 } indicates rate of animation for the SequenceNode."
                             +"\nA value of zero indicates only a SwitchNode should be created instead."
                             +"\nand it the responsibility of the show code to perform the switching.");
+        break;
+
+        case "norender":
+            $annotation = ("<Tag> surface { norender }"
+                            +"\nSPECIAL tag used for placeholder and debugging ONLY."
+                            +"\nCustom tag intended to remove the node (called by the user) out of the scene.");
         break;
 
         default:
@@ -3038,20 +3074,23 @@ global proc MP_Globals()
         //        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
     global string $gMP_EggObjectTypeArray[];
     clear $gMP_EggObjectTypeArray;
-    $gMP_EggObjectTypeArray = {"barrier","barrier-no-mask","ground","floor","dupefloor","smooth-floors","floor-collide",
-                                "camera-collide","camera-collide-sphere","camera-barrier","cambarrier-sphere","camtransparent","camtransbarrier",
-                                "sphere","invsphere","tube","trigger","trigger-sphere","bubble",
-                                "decal","dual","blend","ghost","binary","multisample","shadow","shadow-cast","glass","glow",
-                                "indexed","model","dcs","localdcs","netdcs","notouch", "shground", "draw0", "draw1",
-                                "billboard","double-sided", "safety-net", "safety-gate", "pie", "catch-grab", "invisible", "dart",
-                                "seq2", "seq4", "seq6", "seq8", "seq10", "seq12", "seq24"
+    $gMP_EggObjectTypeArray = {
+                "background", "barrier", "barrier-no-mask", "billboard", "binary", "blend", "bubble", 
+                "cambarrier-sphere", "camera-barrier", "camera-collide", "camera-collide-sphere", "camtransbarrier",
+                 "camtransparent", "catch-grab", "dart", "dcs", "decal", "double-sided", "draw0", "draw1", "dual",
+                  "dupefloor", "fixed", "floor", "floor-collide", "ghost", "glass", "glow", "ground", "gui-popup",
+                   "indexed", "invisible", "invsphere", "localdcs", "model", "multisample", "netdcs", "norender", "notouch",
+                    "occlude", "opaque", "pie", "safety-gate", "safety-net", "seq10", "seq12", "seq2", "seq24", "seq4",
+                     "seq6", "seq8", "shadow", "shadow-cast", "shground", "smooth-floors", "sphere", "structured", "surface-grass",
+                      "surface-metal", "surface-snow", "surface-water", "transparent", "trigger", "trigger-sphere", "tube"
+
                               };
 
         // Removed:
         // polylight portal
-        
+
         // todo: maybe add option to type own number for seqX
-        
+
 
         //Global variable that keeps track of whether or not user has seen the import Panda file notification.
         //It is designed so that the user only sees the notification once during session.
