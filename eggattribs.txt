@@ -185,6 +185,7 @@ egg-object-type-glass           <Scalar> alpha { blend-no-occlude }
 #   behind the drop shadows.
 egg-object-type-ground          <Scalar> bin { ground }
 egg-object-type-shground        <Tag> cam { shground }
+egg-object-type-shadow-ground   <Tag> cam { shground }
 
 #   Define a "shadow" object type, so we can render all shadows in their
 #   own bin and have them not fight with each other (or with other
@@ -204,6 +205,8 @@ egg-object-type-bin-transparent <Scalar> bin { transparent }
 egg-object-type-transparent <Scalar> bin { transparent }
 # Used in DistributedGolfHole
 egg-object-type-bin-opaque      <Scalar> bin { opaque }
+# aux support
+egg-object-type-opaque <Scalar> bin { opaque }
 
 
 #   This works in conjunction with bin to further refine the
