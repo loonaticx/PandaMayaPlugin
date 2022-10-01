@@ -1,0 +1,20 @@
+// sometimes windows dont wanna show up in a custom workspace since they're located out of the window boundaries. happens when you may switch from a 3 monitor setup to a 2 monitor setup etc.
+// this resets common windows that may be affected
+// if a problematic window isn't listed here, you can do getMayaPanelTypes(1); and add panelName + 1Window 
+
+/*
+panelTypes(1)
+blindDataEditor clipEditorPanel componentEditorPanel contentBrowserPanel createNodePanel dopeSheetPanel dynPaintScriptedPanelType dynRelEdPanel graphEditor hyperGraphPanel hyperShadePanel multiListerPanel nodeEditorPanel polySelectionConstraintPanel polyTexturePlacementPanel profilerPanel referenceEditorPanel relationshipPanel renderWindowPanel scriptEditorPanel sequenceEditorPanel shotPlaylistPanel timeEditorPanel
+*/
+
+/*
+panelTypes(0)
+posePanel shapePanel blendShapePanel outlinerPanel modelPanel
+*/
+
+window -e -tlc 1 1 scriptEditorPanel1Window;
+
+// uv editor window
+window -e -tlc 1 1 polyTexturePlacementPanel1Window; 
+
+window -e -tlc 1 1 hyperShadePanel1Window; 
