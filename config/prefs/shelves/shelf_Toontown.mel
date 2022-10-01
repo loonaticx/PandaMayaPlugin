@@ -16,7 +16,7 @@ global proc shelf_Toontown () {
         -preventOverride 0
         -annotation "Merge vertices / border edges based on selection." 
         -enableBackground 1
-        -backgroundColor 0.115496 0.749996 0.115496 
+        -backgroundColor 0.115496 0.749996 0.603586 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
         -label "Merge" 
@@ -51,7 +51,7 @@ global proc shelf_Toontown () {
         -preventOverride 0
         -annotation "Detach selected components" 
         -enableBackground 1
-        -backgroundColor 0.8 0.0256046 0.0256046 
+        -backgroundColor 0.936004 0.431998 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
         -label "Detach" 
@@ -97,8 +97,8 @@ global proc shelf_Toontown () {
         -font "plainLabelFont" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "ungroup.png" 
-        -image1 "ungroup.png" 
+        -image "group.png" 
+        -image1 "group.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
@@ -140,6 +140,19 @@ global proc shelf_Toontown () {
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
+    ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
     ;
     shelfButton
         -enableCommandRepeat 1
@@ -281,6 +294,19 @@ global proc shelf_Toontown () {
         -commandRepeatable 1
         -flat 1
     ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
+    ;
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
@@ -318,7 +344,90 @@ global proc shelf_Toontown () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 36
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Custom polygon display options" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Custom polygon display options" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Cpdo" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "polyConvertToFace.png" 
+        -image1 "polyConvertToFace.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "CustomPolygonDisplayOptions" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Measure distance between two points" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Distance Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "DIST" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "distanceDim.png" 
+        -image1 "distanceDim.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "DistanceTool" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
         -enable 1
         -width 39
         -height 34
@@ -386,7 +495,7 @@ global proc shelf_Toontown () {
     shelfButton
         -enableCommandRepeat 1
         -flexibleWidthType 3
-        -flexibleWidthValue 32
+        -flexibleWidthValue 43
         -enable 1
         -width 46
         -height 34
@@ -407,8 +516,8 @@ global proc shelf_Toontown () {
         -font "plainLabelFont" 
         -overlayLabelColor 0.8 0.8 0.8 
         -overlayLabelBackColor 0 0 0 0.5 
-        -image "C:/Users/Loonatic-IV/Documents/maya/2019/prefs/icons/istockphoto-146876354-612x612.jpg" 
-        -image1 "C:/Users/Loonatic-IV/Documents/maya/2019/prefs/icons/istockphoto-146876354-612x612.jpg" 
+        -image "C:/Users/Loonatic-V/Documents/maya/2019/prefs/icons/eggDeleteAttribsIco.jpg" 
+        -image1 "C:/Users/Loonatic-V/Documents/maya/2019/prefs/icons/eggDeleteAttribsIco.jpg" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
@@ -416,6 +525,19 @@ global proc shelf_Toontown () {
         -sourceType "python" 
         -commandRepeatable 1
         -flat 1
+    ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
     ;
     shelfButton
         -enableCommandRepeat 1
@@ -462,27 +584,262 @@ global proc shelf_Toontown () {
         -manage 1
         -visible 1
         -preventOverride 0
-        -annotation "Custom polygon display options" 
-        -enableBackground 0
+        -annotation "Select an object(s)" 
+        -enableBackground 1
         -backgroundColor 0 0 0 
         -highlightColor 0.321569 0.521569 0.65098 
         -align "center" 
-        -label "Custom polygon display options" 
+        -label "Freeze Transformations" 
         -labelOffset 0
         -rotation 0
         -flipX 0
         -flipY 0
         -useAlpha 1
         -font "plainLabelFont" 
-        -imageOverlayLabel "Cpdo" 
+        -imageOverlayLabel "FREEZE" 
         -overlayLabelColor 0.8 0.8 0.8 
-        -overlayLabelBackColor 0 0 0 0.5 
-        -image "polyConvertToFace.png" 
-        -image1 "polyConvertToFace.png" 
+        -overlayLabelBackColor 0 1 1 0.4 
+        -image "menuIconModify.png" 
+        -image1 "menuIconModify.png" 
         -style "iconOnly" 
         -marginWidth 1
         -marginHeight 1
-        -command "CustomPolygonDisplayOptions" 
+        -command "FreezeTransformations" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Moves selected objects to origin according to their pivot point." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Move Object to Origin" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ORIGIN" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "grid.svg" 
+        -image1 "grid.svg" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "python(\"import gt_utilities\\nif python_version==3:\\n\\timportlib.reload(gt_utilities)\\nelse:\\n\\treload(gt_utilities)\\ngt_utilities.gtu_move_to_origin()\");" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a locator object on the grid" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Locator" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "locator.png" 
+        -image1 "locator.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "CreateLocator" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal locator" 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Mesh Locator" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "POLY" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "locator.svg" 
+        -image1 "locator.svg" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "python \"from bt_createMeshLocator import *\";python \"bt_createMeshLocator()\"" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    separator
+        -enable 1
+        -width 12
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -style "shelf" 
+        -horizontal 0
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "A script for managing and repairing the path of many nodes." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Path Manager" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "PATHS" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "annotation.png" 
+        -image1 "annotation.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "python(\"import gt_path_manager\\nif python_version == 3:\\n\\timportlib.reload(gt_path_manager)\\nelse:\\n\\treload(gt_path_manager)\\ntry:\\n\\tgt_path_manager_dialog.close()\\n\\tgt_path_manager_dialog.deleteLater()\\nexcept:\\n\\tpass\\ngt_path_manager.try_to_close_gt_path_manager()\\ngt_path_manager_dialog = gt_path_manager.GTPathManagerDialog()\\ngt_path_manager_dialog.show()\");" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "A way to quickly change colors of objects and objects names (outliner)." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Color Manager" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "COLORS" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "render_swColorPerVertex.png" 
+        -image1 "render_swColorPerVertex.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "python(\"import gt_color_manager\\nif python_version==3:\\n\\timportlib.reload(gt_color_manager)\\nelse:\\n\\treload(gt_color_manager)\\ngt_color_manager.build_gui_color_manager()\");" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -flexibleWidthType 3
+        -flexibleWidthValue 32
+        -enable 1
+        -width 35
+        -height 34
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Performs a series of checks to detect common issues that are often accidently ignored/unnoticed." 
+        -enableBackground 0
+        -backgroundColor 0 0 0 
+        -highlightColor 0.321569 0.521569 0.65098 
+        -align "center" 
+        -label "Render Checklist" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "RENDER" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "checkboxOn.png" 
+        -image1 "checkboxOn.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "python(\"import gt_render_checklist\\nif python_version==3:\\n\\timportlib.reload(gt_render_checklist)\\nelse:\\n\\treload(gt_render_checklist)\\ngt_render_checklist.build_gui_gt_render_checklist()\");" 
         -sourceType "mel" 
         -commandRepeatable 1
         -flat 1
