@@ -8,33 +8,30 @@ There are a few egg-type attributes that will not automatically register when im
 
 This plugin should work for newer Maya versions, as it's working perfectly fine with my version of Maya 2016 and Maya 2019 installations.
 
-# Instructions
+# Structure
 
-Copy the two ".mel" files. "MayaPandaUI.mel" & "eggImportOptions.mel" to:
-C:\Users\%Username%\Documents\maya\scripts\
+``MayaPandaUI.mel`` is the main script file of this exporter.
+On Maya start-up, the script will place a new menu item on the main menu inside of Maya, at the top of the Maya GUI.
 
-In the above folder, may be a Maya MEL file named "userSetup.mel".
-If the userSetup.mel file is NOT present, simply use any text
-editor and manually create the file with the entry below,
-and make sure to save-as "userSetup.mel".
-If the file is present, open it up for editing in something like notepad.
-Add the following line entry into it and save it.
-source MayaPandaUI.mel;
-
-This file above is used to load scripts on starting up Maya
-and can be used for any script the user wishes to load at started time.
-
-"MayaPandaUI.mel" is the main script file of this exporter.
-On Maya start-up, the script will place a new menu item on the main menu
-inside of Maya, at the top of the Maya GUI.
-
-The file "eggImportOptions.mel" is for a sub menu,
-which is used/called when a user runs File>Import.
+The file ``eggImportOptions.mel`` is for a sub menu, which is used/called when a user runs File>Import.
 It creates an option menu inside that GUI window.
 
-Finally, you must copy the two ".mll" from your Panda3d>plugins directory,
-that reflect the version of Maya your running, to your
-"\Program Files\Autodesk\[MayaVersion]\bin\plug-ins" directory
+# Installation
+
+Copy the two ``.mel`` files, ``MayaPandaUI.mel`` & ``eggImportOptions.mel`` to:
+``C:\Users\%Username%\Documents\maya\scripts\``
+
+In the above folder, may be a Maya MEL file named ``userSetup.mel``.
+If the ``userSetup.mel`` file is NOT present, simply use any text editor and manually create the file with the entry below, and make sure to save-as ``userSetup.mel``.
+
+If the file is present, open it up for editing in something like Notepad.
+Add the following line entry into it and save it.:
+```
+source MayaPandaUI.mel;
+```
+This file above is used to load scripts on starting up Maya and can be used for any script the user wishes to load at started time.
+
+Finally, you must copy the two ``.mll`` from your Panda3d>plugins directory, that reflect the version of Maya your running, to your ``C:\Program Files\Autodesk\[MayaVersion]\bin\plug-ins`` directory
 File to copy to Maya installation:
 "mayaeggimport[mayaVersion].mll"
 "libmayapview[mayaVersion].mll"
@@ -45,12 +42,10 @@ When the Plug-In Manager GUI opens, find and "Check" the following:
 Under "mayaeggimport[mayaVersion].mll"    Check both "Loaded" & "Auto load"
 Under "libmayapview[mayaVersion].mll"    Check both "Loaded" & "Auto load"
 
-That's it!  You should now be able to import and export egg and bam files,
-along with adding egg-object-types and taking advantage of many export options.
+That's it!  You should now be able to import and export egg and bam files, along with adding egg-object-types and taking advantage of many export options.
 
 Final Note:
-If you just installed the Panda3d SDK and have yet to reboot your computer,
-a restart is highly recommended so your computer can find the Panda3d installation!
+If you just installed the Panda3d SDK and have yet to reboot your computer, a restart is highly recommended so your computer can find the Panda3D installation!
 
 # Custom Egg Object Types
 
@@ -60,4 +55,4 @@ So, for example, if a certain node in an egg file calls for both
 ``<Scalar> collide-mask { 0x02 }`` and ``<Collide> { Polyset descend level }``
 then the plugin would replace the two with simply ``<ObjectType> { floor }``
 
-Refer to eggattribs.txt for a list of custom egg object types. In order for Panda to interpret the custom object types, paste the list from eggattribs.txt to your panda's Config.prc file.
+Refer to ``eggattribs.txt`` for a list of custom egg object types. In order for Panda to interpret the custom object types, paste the list from ``eggattribs.txt`` to your panda's ``Config.prc`` file.
