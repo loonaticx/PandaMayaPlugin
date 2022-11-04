@@ -11,7 +11,7 @@ This plugin should work for newer Maya versions, as it's working perfectly fine 
 # Instructions
 
 Copy the two ".mel" files. "MayaPandaUI.mel" & "eggImportOptions.mel" to:
-C:\Users\{YOURACCOUNT}\Documents\maya\scripts\
+C:\Users\%Username%\Documents\maya\scripts\
 
 In the above folder, may be a Maya MEL file named "userSetup.mel".
 If the userSetup.mel file is NOT present, simply use any text
