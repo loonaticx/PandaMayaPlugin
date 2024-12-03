@@ -1346,396 +1346,193 @@ def MP_ExportScene(selection):
 
 
 def MP_GetObjectTypeAnnotation(objectType):
-    annotation = ""
     """
     Returns the egg-object-type button annotation text of defined types as a string for GUI.
     """
-    if objectType == "barrier":
-        annotation = (
+    annotations = {
+        "barrier": (
             "<Collide> { Polyset descend }"
-            + "\n\nCreates a barrier that other objects cannot pass through."
-            + '\nThe collision is active on the "Normals" side of the object(s)'
-        )
-
-    elif objectType == "barrier-no-mask":
-        annotation = "<Collide> { Polyset descend }"
-
-    elif objectType == "floor":
-        annotation = (
+            "\n\nCreates a barrier that other objects cannot pass through."
+            '\nThe collision is active on the "Normals" side of the object(s)'
+        ),
+        "barrier-no-mask": "<Collide> { Polyset descend }",
+        "floor": (
             "<Scalar> collide-mask { 0x02 }"
-            + "\n<Collide> { Polyset descend level }"
-            + "\n\nCreates a collision "
-            "from the object(s) that "
-            '"Avatars" can walk '
-            "on." + "\nIf the "
-            "surface is "
-            "angled, "
-            "the Avatar will "
-            "not slide down "
-            "it." + "\nThe "
-            'collision is active on the "Normals" side of the object(s)'
-        )
-
-    elif objectType == "floor-collide":
-        annotation = "<Scalar> collide-mask { 0x06 }"
-
-    elif objectType == "shadow":
-        annotation = (
+            "\n<Collide> { Polyset descend level }"
+            "\n\nCreates a collision from the object(s) that 'Avatars' can walk on."
+            "\nIf the surface is angled, the Avatar will not slide down it."
+            '\nThe collision is active on the "Normals" side of the object(s)'
+        ),
+        "floor-collide": "<Scalar> collide-mask { 0x06 }",
+        "shadow": (
             "<Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }"
-            + '\n\nDefine a "shadow" object type, '
-            "so we can render all shadows in "
-            "their" + "\nown bin and have them "
-            "not fight with each other "
-            "(or with other" + "\ntransparent geometry)."
-        )
-
-    elif objectType == "shadow-cast":
-        annotation = (
+            '\n\nDefine a "shadow" object type, so we can render all shadows in '
+            "their own bin and have them not fight with each other (or with other "
+            "transparent geometry)."
+        ),
+        "shadow-cast": (
             "<Tag> cam { shground }"
-            + "\n<Scalar> draw-order { 0 }"
-            + "\n<Scalar> bin { ground }"
-            + "\n\nGives "
-            "the "
-            "selected "
-            "object(s) "
-            "the "
-            "required "
-            "attributes "
-            "so that an"
-            + '\n"Avatar\'s" shadow can be cast over it. Commonly used for casting'
-            + '\nan "Avatar\'s" shadow '
-            "onto floors."
-        )
-
-    elif objectType == "dupefloor":
-        annotation = (
+            "\n<Scalar> draw-order { 0 }"
+            "\n<Scalar> bin { ground }"
+            "\n\nGives the selected object(s) the required attributes so that an "
+            '"Avatar\'s" shadow can be cast over it. Commonly used for casting an '
+            '"Avatar\'s" shadow onto floors.'
+        ),
+        "dupefloor": (
             "<Collide> { Polyset keep descend level }"
-            + "\n\nThis type first creates a duplicate of the selected "
-            "object(s)." + "\nThen, creates a floor collision from "
-            'the duplicate object(s) that "Avatars"'
-            " can walk on." + "\nIf the surface is "
-            "angled, the Avatar "
-            "will not slide down "
-            "it." + "\nThe "
-            "collision is "
-            "active on the "
-            '"Normals" '
-            "side of the "
-            "object(s)"
-        )
-
-    elif objectType == "smooth-floors":
-        annotation = (
+            "\n\nThis type first creates a duplicate of the selected object(s)."
+            "\nThen, creates a floor collision from the duplicate object(s) that "
+            '"Avatars" can walk on.'
+            "\nIf the surface is angled, the Avatar will not slide down it."
+            '\nThe collision is active on the "Normals" side of the object(s)'
+        ),
+        "smooth-floors": (
             "<Collide> { Polyset descend }"
-            + "\n<Scalar> from-collide-mask { 0x000fffff }"
-            + "\n<Scalar> "
-            "into-collide-mask "
-            "{ 0x00000002 }"
-            + '\n\nMakes floors smooth for the "Avatars" to walk and stand on.'
-        )
-
-    elif objectType == "camera-collide":
-        annotation = (
+            "\n<Scalar> from-collide-mask { 0x000fffff }"
+            "\n<Scalar> into-collide-mask { 0x00000002 }"
+            '\n\nMakes floors smooth for the "Avatars" to walk and stand on.'
+        ),
+        "camera-collide": (
             "<Scalar> collide-mask { 0x04 }"
-            + "\n<Collide> { Polyset descend }"
-            + "\n\nAllows only the camera to "
-            "collide with the geometry."
-        )
-
-    elif objectType == "sphere":
-        annotation = (
+            "\n<Collide> { Polyset descend }"
+            "\n\nAllows only the camera to collide with the geometry."
+        ),
+        "sphere": (
             "<Collide> { Sphere descend }"
-            + '\n\nCreates a "minimum-sized" sphere collision around the '
-            "selected object(s)," + "\nthat other objects cannot enter into."
-        )
-
-    elif objectType == "tube":
-        annotation = (
+            '\n\nCreates a "minimum-sized" sphere collision around the selected '
+            "object(s), that other objects cannot enter into."
+        ),
+        "tube": (
             "<Collide> { Tube descend }"
-            + '\n\nCreates a "minimum-sized" tube collision around the selected '
-            "object(s)," + "\nthat other objects cannot enter into."
-        )
-
-    elif objectType == "trigger":
-        annotation = (
+            '\n\nCreates a "minimum-sized" tube collision around the selected '
+            "object(s), that other objects cannot enter into."
+        ),
+        "trigger": (
             "<Collide> { Polyset descend intangible }"
-            + "\n\nCreates a collision that can be used as a "
-            '"Trigger",' + "\nwhich can be used to activate, "
-            "or deactivate, specific processes."
-            + '\nThe collision is active on the "Normals" side of the object(s)'
-        )
-
-    elif objectType == "trigger-sphere":
-        annotation = (
+            "\n\nCreates a collision that can be used as a 'Trigger', which can be "
+            "used to activate, or deactivate, specific processes."
+            '\nThe collision is active on the "Normals" side of the object(s)'
+        ),
+        "trigger-sphere": (
             "<Collide> { Sphere descend intangible }"
-            + '\n\nCreates a "minimum-sized" sphere collision that '
-            'can be used as a "Trigger",' + "\nwhich can be used to "
-            "activate, "
-            "or deactivate, "
-            "specific processes"
-            + '\nThe collision is active on the "Normals" side of the object(s)'
-        )
-
-    elif objectType == "invsphere":
-        annotation = (
+            '\n\nCreates a "minimum-sized" sphere collision that can be used as a '
+            '"Trigger", which can be used to activate, or deactivate, specific processes.'
+            '\nThe collision is active on the "Normals" side of the object(s)'
+        ),
+        "invsphere": (
             "<Collide> { InvSphere descend }"
-            + '\n\nCreates a "minimum-sized" inverse-sphere collision around '
-            "the selected object(s)." + "\nAny object inside the sphere will "
-            "be prevented from exiting the sphere."
-        )
-
-    elif objectType == "bubble":
-        annotation = (
+            '\n\nCreates a "minimum-sized" inverse-sphere collision around the '
+            "selected object(s). Any object inside the sphere will be prevented from "
+            "exiting the sphere."
+        ),
+        "bubble": (
             "<Collide> { Sphere keep descend }"
-            + '\n\n"bubble" puts a Sphere collision around the geometry,'
-            "" + "\nbut does not otherwise remove the geometry."
-        )
-
-    elif objectType == "dual":
-        annotation = (
+            '\n\n"bubble" puts a Sphere collision around the geometry, but does not '
+            "otherwise remove the geometry."
+        ),
+        "dual": (
             "<Scalar> alpha { dual }"
-            + "\n\nNormally attached to polygons that have transparency,"
-            + "\nthat are "
-            "in the "
-            "scene by "
-            "themselves." + "\nSuch as a Tree, or Flower."
-        )
-
-    elif objectType == "multisample":
-        annotation = "<Scalar> alpha { ms }"
-
-    elif objectType == "blend":
-        annotation = "<Scalar> alpha { blend }"
-
-    elif objectType == "decal":
-        annotation = "<Scalar> decal { 1 }"
-
-    elif objectType == "ghost":
-        annotation = (
+            "\n\nNormally attached to polygons that have transparency, that are in "
+            "the scene by themselves, such as a Tree or Flower."
+        ),
+        "multisample": "<Scalar> alpha { ms }",
+        "blend": "<Scalar> alpha { blend }",
+        "decal": "<Scalar> decal { 1 }",
+        "ghost": (
             "<Scalar> collide-mask { 0 }"
-            + '\n\n"ghost" turns off the normal collide bit that is set on '
-            "visible" + "\ngeometry by default, so that if you are using visible "
-            "geometry for" + "\ncollisions, this particular geometry "
-            "will not be part of those"
-            + "\ncollisions--it is ghostlike."
-            + "\nIt means that the geometry beginning at this node and below"
-            + "\nshould never be collided with--characters will pass through it."
-        )
-
-    elif objectType == "glass":
-        annotation = "<Scalar> alpha { blend_no_occlude }"
-
-    elif objectType == "glow":
-        annotation = (
+            '\n\n"ghost" turns off the normal collide bit that is set on visible '
+            "geometry by default, so that if you are using visible geometry for "
+            "collisions, this particular geometry will not be part of those collisions--"
+            "it is ghostlike. Characters will pass through it."
+        ),
+        "glass": "<Scalar> alpha { blend_no_occlude }",
+        "glow": (
             "<Scalar> blend { add }"
-            + '\n\n"glow" is useful for halo effects and things of that ilk.'
-            + "\nIt "
-            "renders the object in add mode instead of the normal opaque mode."
-        )
-
-    elif objectType == "binary":
-        annotation = (
+            '\n\n"glow" is useful for halo effects and things of that ilk. It renders '
+            "the object in add mode instead of the normal opaque mode."
+        ),
+        "binary": (
             "<Scalar> alpha { binary }"
-            + "\nThis mode of alpha sets transparency pixels"
-            + "\nto either on, "
-            "or off. No blending "
-            "is used."
-        )
-
-    elif objectType == "indexed":
-        annotation = "<Scalar> indexed { 1 }"
-
-    elif objectType == "model":
-        annotation = (
+            "\n\nThis mode of alpha sets transparency pixels to either on or off. No "
+            "blending is used."
+        ),
+        "indexed": "<Scalar> indexed { 1 }",
+        "model": (
             "<Model> { 1 }"
-            + "\n\nThis creates a ModelNode at the corresponding level"
-            + "\nwhich is guaranteed "
-            "not to be removed by "
-            "any flatten "
-            "operation." + "\nHowever, its transform might still be changed"
-        )
-
-    elif objectType == "dcs":
-        annotation = (
+            "\n\nThis creates a ModelNode at the corresponding level, which is "
+            "guaranteed not to be removed by any flatten operation. However, its "
+            "transform might still be changed."
+        ),
+        "dcs": (
             "<DCS> { 1 }"
-            + "\n\nIndicates the node should not be flattened out of the hierarchy during "
-            "conversion."
-            + "\nAlso indicates that the node's transform is important and should "
-            "be preserved." + '\nHowever, nodes under the node "might be '
-            'flattened out".'
-        )
-
-    elif objectType == "netdcs":
-        annotation = "<DCS> { Net }"
-
-    elif objectType == "netdcs":
-        annotation = "<DCS> { Local }"
-
-    elif objectType == "notouch":
-        annotation = (
+            "\n\nIndicates the node should not be flattened out of the hierarchy during "
+            "conversion. The node's transform is important and should be preserved."
+        ),
+        "netdcs": "<DCS> { Net }",
+        "localdcs": "<DCS> { Local }",
+        "notouch": (
             "<DCS> { no-touch }"
-            + "\n\nIndicates the node, and below, should not be flattened"
-            + "\nout of the "
-            "hierarchy "
-            "during the "
-            "conversion "
-            "process."
-        )
-
-    elif objectType == "double-sided":
-        annotation = (
+            "\n\nIndicates the node, and below, should not be flattened out of the "
+            "hierarchy during the conversion process."
+        ),
+        "double-sided": (
             "<BFace> { 1 }"
-            + "\n\nThis defines whether the polygon will be rendered double-sided"
-            + "\n(i.e. its "
-            "back face "
-            "will be "
-            "visible)."
-            + "\n\nThis is a builtin type of Panda and no PRC setting is required"
-        )
-
-    elif objectType == "billboard":
-        annotation = (
+            "\n\nDefines whether the polygon will be rendered double-sided (i.e., its "
+            "back face will be visible)."
+        ),
+        "billboard": (
             "<Billboard> { axis }"
-            + "\n\nRotates the geometry to always face the camera."
-            + "\nGeometry will "
-            "rotate on its local"
-            " axis." + "\n\nThis "
-            "is a "
-            "builtin "
-            "type of "
-            "Panda "
-            "and no "
-            "PRC "
-            "setting "
-            "is "
-            "required"
-        )
-
-    elif objectType == "seq2":
-        annotation = (
+            "\n\nRotates the geometry to always face the camera. Geometry will rotate "
+            "on its local axis."
+        ),
+        "seq2": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 2 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 2 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should be "
-            "created instead."
-            + "\nand it the responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq4":
-        annotation = (
+            "\n<Scalar> fps { 2 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 2 fps."
+        ),
+        "seq4": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 4 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 4 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should be "
-            "created instead."
-            + "\nand it the responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq6":
-        annotation = (
+            "\n<Scalar> fps { 4 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 4 fps."
+        ),
+        "seq6": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 6 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 6 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should be "
-            "created instead."
-            + "\nand it the responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq8":
-        annotation = (
+            "\n<Scalar> fps { 6 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 6 fps."
+        ),
+        "seq8": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 8 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 8 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should be "
-            "created instead."
-            + "\nand it the responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq10":
-        annotation = (
+            "\n<Scalar> fps { 8 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 8 fps."
+        ),
+        "seq10": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 10 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 10 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should "
-            "be created "
-            "instead." + "\nand "
-            "it "
-            "the "
-            "responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq12":
-        annotation = (
+            "\n<Scalar> fps { 10 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 10 fps."
+        ),
+        "seq12": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 12 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 12 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should "
-            "be created "
-            "instead." + "\nand "
-            "it "
-            "the "
-            "responsibility of the show code to perform the switching."
-        )
-
-    elif objectType == "seq24":
-        annotation = (
+            "\n<Scalar> fps { 12 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 12 fps."
+        ),
+        "seq24": (
             "<Switch> { 1 }"
-            + "\n<Scalar>  fps { 24 }"
-            + "\n\nThe <Switch> { 1 } indicates that the child nodes "
-            "of this group represent" + "\na series of animation "
-            "frames that should be "
-            "consecutively displayed."
-            + "\nThe <Scalar> fps { 24 } indicates rate of animation for the SequenceNode."
-            + "\nA value of zero "
-            "indicates only a "
-            "SwitchNode should "
-            "be created "
-            "instead." + "\nand "
-            "it "
-            "the "
-            "responsibility of the show code to perform the switching."
-        )
+            "\n<Scalar> fps { 24 }"
+            "\n\nIndicates a series of animation frames that should be consecutively "
+            "displayed at 24 fps."
+        ),
+    }
 
-    else:
-        annotation = "Adds the " + objectType + " egg-object-type to selected geometry."
+    return annotations.get(
+        objectType, f"Adds the {objectType} egg-object-type to selected geometry."
+    )
 
-    return annotation
 
 
 # Return the string
