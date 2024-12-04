@@ -343,68 +343,35 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
 
 def MP_PY_TexPathOptionsUI():
     """
-    Updates the UI when a radio button is chosen
+    Updates the UI based on the selected texture path option.
     """
-    selectedRB = str(pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1))
-    outputPandaFileType = str(
-        pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = 1, select = 1)
-    )
-    if selectedRB == "MP_PY_ChooseDefaultTexPathRB":
+    selected_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query = True, select = True)
+    output_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True)
+
+    # Default settings for text fields and buttons
+    def set_fields(egg_enable=False, bam_enable=False, egg_clear=False, bam_clear=False):
+        pm.textField("MP_PY_CustomEggTexPathTF", edit = True, enable = egg_enable, text = "" if egg_clear else None)
+        pm.textField("MP_PY_CustomBamTexPathTF", edit = True, enable = bam_enable, text = "" if bam_clear else None)
+        pm.button("MP_PY_BrowseEggTexPathBTN", edit = True, enable = egg_enable)
+        pm.button("MP_PY_BrowseBamTexPathBTN", edit = True, enable = bam_enable)
+
+    if selected_option == "MP_PY_ChooseDefaultTexPathRB":
         print("Default Texture Path Chosen\n")
+        set_fields(egg_enable = False, bam_enable = False, egg_clear = True, bam_clear = True)
 
-        pm.textField("MP_PY_CustomEggTexPathTF", edit = 1, text = "", enable = 0)
-
-        pm.button("MP_PY_BrowseEggTexPathBTN", edit = 1, enable = 0)
-
-        pm.textField("MP_PY_CustomBamTexPathTF", edit = 1, text = "", enable = 0)
-
-        pm.button("MP_PY_BrowseBamTexPathBTN", edit = 1, enable = 0)
-
-    elif selectedRB == "MP_PY_ChooseCustomRefPathRB":
+    elif selected_option == "MP_PY_ChooseCustomRefPathRB":
         print("Custom Texture Reference Path Chosen\n")
-        # Set options based on file type
+        if output_file_type == "MP_PY_ChooseEggRB":
+            set_fields(egg_enable = True, bam_enable = False, bam_clear = True)
+        elif output_file_type == "MP_PY_ChooseEggBamRB":
+            set_fields(egg_enable = False, bam_enable = True, egg_clear = True)
 
-        if outputPandaFileType == "MP_PY_ChooseEggRB":
-            pm.textField("MP_PY_CustomBamTexPathTF", edit = 1, text = "", enable = 0)
-            # Disable bam file options
-            pm.button("MP_PY_BrowseBamTexPathBTN", edit = 1, enable = 0)
-            # Enable egg file options
-            pm.textField("MP_PY_CustomEggTexPathTF", edit = 1, enable = 1)
-            pm.button("MP_PY_BrowseEggTexPathBTN", edit = 1, enable = 1)
-
-        elif outputPandaFileType == "MP_PY_ChooseEggBamRB":
-            pm.textField("MP_PY_CustomBamTexPathTF", edit = 1, enable = 1)
-            # Enable bam file options
-            pm.button("MP_PY_BrowseBamTexPathBTN", edit = 1, enable = 1)
-            # Disable egg file options
-            pm.textField("MP_PY_CustomEggTexPathTF", edit = 1, text = "", enable = 0)
-            pm.button("MP_PY_BrowseEggTexPathBTN", edit = 1, enable = 0)
-
-    elif selectedRB == "MP_PY_ChooseCustomTexPathRB":
+    elif selected_option == "MP_PY_ChooseCustomTexPathRB":
         print("Custom Texture Path Chosen\n")
-        # Set options based on file type
-
-        if outputPandaFileType == "MP_PY_ChooseEggRB":
-            pm.textField("MP_PY_CustomBamTexPathTF", edit = 1, text = "", enable = 0)
-            # Disable bam file options
-
-            pm.button("MP_PY_BrowseBamTexPathBTN", edit = 1, enable = 0)
-            # Enable egg file options
-
-            pm.textField("MP_PY_CustomEggTexPathTF", edit = 1, enable = 1)
-
-            pm.button("MP_PY_BrowseEggTexPathBTN", edit = 1, enable = 1)
-
-        elif outputPandaFileType == "MP_PY_ChooseEggBamRB":
-            pm.textField("MP_PY_CustomBamTexPathTF", edit = 1, enable = 1)
-            # Enable bam file options
-
-            pm.button("MP_PY_BrowseBamTexPathBTN", edit = 1, enable = 1)
-            # Enable egg file options
-
-            pm.textField("MP_PY_CustomEggTexPathTF", edit = 1, enable = 1)
-
-            pm.button("MP_PY_BrowseEggTexPathBTN", edit = 1, enable = 1)
+        set_fields(
+            egg_enable = output_file_type in {"MP_PY_ChooseEggRB", "MP_PY_ChooseEggBamRB"},
+            bam_enable = output_file_type == "MP_PY_ChooseEggBamRB"
+        )
 
 
 def MP_PY_OutputPathOptionsUI():
