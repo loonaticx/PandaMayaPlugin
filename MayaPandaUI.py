@@ -2201,7 +2201,6 @@ def MP_PY_BrowseForFolderPreProcess(option):
             pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = folder_path)
 
 
-
 def MP_PY_ExportPrep(work_file, file_name):
     """
     Prepares the export process, generates arguments, exports the egg file,
@@ -2268,91 +2267,68 @@ def MP_PY_Export2Bam(egg_file, export_mode):
         pm.error("Invalid egg file")
 
     # Extract file details
-    file_name = os.path.splitext(os.path.basename(egg_file))[0]
-    file_extension = os.path.splitext(egg_file)[1]
+    file_name, file_extension = os.path.splitext(os.path.basename(egg_file))
     file_path = os.path.dirname(egg_file)
 
-    # Check for bam output options
-    raw_tex = "-rawtex " if pm.checkBox("MP_PY_RawtexCB", query = True, value = True) else ""
-    flatten = "-flatten 1 " if pm.checkBox("MP_PY_FlattenCB", query = True, value = True) else ""
-    path_store = ""
-    path_directory = ""
-    target_directory = ""
-    dirname = ""
+    # Additional options
+    raw_tex = "-rawtex " if pm.checkBox("MP_PY_RawtexCB", query=True, value=True) else ""
+    flatten = "-flatten 1 " if pm.checkBox("MP_PY_FlattenCB", query=True, value=True) else ""
 
-    # Handle custom output options in exportMode 1
+    # Handle custom output and filename for export_mode 1
     if export_mode == 1:
-        custom_filename = pm.textField("MP_PY_CustomFilenameTF", query = True, text = True)
-        if custom_filename:
-            file_name = custom_filename
+        custom_filename = pm.textField("MP_PY_CustomFilenameTF", query=True, text=True)
+        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query=True, text=True)
+        file_name = custom_filename or file_name
+        file_path = custom_output_path or file_path
 
-        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query = True, text = True)
-        if custom_output_path:
-            file_path = custom_output_path
+    # Texture path options
+    tex_path_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query=True, select=True)
+    custom_bam_tex_path = pm.textField("MP_PY_CustomBamTexPathTF", query=True, text=True)
+    custom_egg_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query=True, text=True)
 
-    # Custom texture referencing options
-    tex_path_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query = True, select = True)
-    output_panda_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True)
-    custom_bam_tex_path = pm.textField("MP_PY_CustomBamTexPathTF", query = True, text = True)
-    custom_egg_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query = True, text = True)
+    path_store = "-ps rel " \
+        if tex_path_option in {"MP_PY_ChooseCustomRefPathRB", "MP_PY_ChooseCustomTexPathRB"} \
+        else ""
 
-    if tex_path_option == "MP_PY_ChooseCustomRefPathRB":
-        path_store = "-ps rel "
-        if output_panda_file_type == "MP_PY_ChooseEggRB":
-            path_directory = f"-pd \"{custom_egg_tex_path or file_path}\" "
-            dirname = f"-pp \"{file_path}\" "
-        elif output_panda_file_type == "MP_PY_ChooseEggBamRB":
-            path_directory = f"-pd \"{custom_bam_tex_path or file_path}\" "
-            dirname = f"-pp \"{file_path}\" "
+    path_directory = f"-pd \"{custom_bam_tex_path or custom_egg_tex_path or file_path}\" " \
+        if tex_path_option != "MP_PY_ChooseDefaultTexPathRB" \
+        else ""
 
-    # Handle copy textures option
-    if tex_path_option == "MP_PY_ChooseCustomTexPathRB":
-        path_store = "-ps rel "
-        if output_panda_file_type == "MP_PY_ChooseEggRB":
-            path_directory = f"-pd \"{file_path}\" "
-            if export_mode == 1:
-                target_directory = f"-pc \"{custom_egg_tex_path or file_path}\" "
-            dirname = f"-pp \"{file_path}\" "
-        elif output_panda_file_type == "MP_PY_ChooseEggBamRB":
-            path_directory = f"-pd \"{custom_bam_tex_path or file_path}\" "
-            if export_mode == 1:
-                target_directory = f"-pc \"{custom_egg_tex_path or file_path}\" "
-            dirname = f"-pp \"{file_path}\" "
+    target_directory = f"-pc \"{custom_bam_tex_path or custom_egg_tex_path or file_path}\" " \
+        if tex_path_option == "MP_PY_ChooseCustomTexPathRB" \
+        else ""
+
+    dirname = f"-pp \"{file_path}\" " \
+        if tex_path_option != "MP_PY_ChooseDefaultTexPathRB" \
+        else ""
 
     # Define the .bam file path
     bam_file = os.path.join(file_path, f"{file_name}.bam")
-    print(f"Your file is: {file_name}{file_extension}")
-    print(f"Found in path: {file_path}/")
-    print(f"Your bam file will be saved as: {bam_file}")
+    print(f"Converting: {egg_file}")
+    print(f"Output BAM file: {bam_file}")
 
     # Get the appropriate egg2bam version
-    egg2bam = MP_PY_PandaVersion("getEgg2Bam")  # Returns the egg2bam version
+    egg2bam = MP_PY_PandaVersion("getEgg2Bam")
 
-    # Overwrite mode or not
-    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query = True, value = True)
+    # Overwrite mode
+    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query=True, value=True)
+    overwrite_flag = "-o " if overwrite else ""
+
+    # Construct the command
     cmd = (
         f"{egg2bam} {raw_tex}{flatten}{path_store}{path_directory}"
         f"{target_directory}{dirname}"
-        f"{'-o ' if overwrite else ''}\"{bam_file}\" \"{egg_file}\""
+        f"{overwrite_flag}\"{bam_file}\" \"{egg_file}\""
     )
-
-    # Execute the system command
+    # Execute the command
     result = os.system(cmd)
+    print(f"Command executed:\n{cmd}")
 
-    # Format and display the options used
-    path_store = f"\n{path_store}" if path_store else ""
-    path_directory = f"\n{path_directory}" if path_directory else ""
-    target_directory = f"\n{target_directory}" if target_directory else ""
-    dirname = f"\n{dirname}" if dirname else ""
-
-    print(f"Using these options:\n{cmd}")
-
-    # Run Pview if the option is selected
-    if pm.checkBox("MP_PY_ExportPviewCB", query = True, value = True):
+    # Run Pview if selected
+    if pm.checkBox("MP_PY_ExportPviewCB", query=True, value=True):
         MP_PY_Send2Pview(bam_file)
 
-    print(f"Finished converting (.egg -> .bam), unit: {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)}")
-
+    print(f"Conversion complete: .egg -> .bam\nUnit: {pm.optionMenu('MP_PY_UnitMenu', query=True, value=True)}")
 
 
 
