@@ -552,11 +552,10 @@ def MP_PY_SetEggObjectTypeAttribute(
     pm.addAttr(
         node,
         ln = ("eggObjectTypes" + str(attributeNumber)),
-        enumName = (enumerationList),
+        enumName = enumerationList,
         attributeType = "enum",
         keyable = 1,
     )
-    print(f"Do i get here?")
     # Adds the egg-object-type attribute to node if it was not already attached
     pm.setAttr((node + ".eggObjectTypes" + str(attributeNumber)), indexNumber)
 
@@ -715,12 +714,12 @@ def MP_PY_UVScrolling(option):
     Handles setting, getting, or deleting UV scrolling attributes for selected nodes.
     """
     # Fetch the UV scrolling values from the UI
-    scroll_u = pm.floatField("scrollUFF", query=True, value=True)
-    scroll_v = pm.floatField("scrollVFF", query=True, value=True)
-    scroll_r = pm.floatField("scrollRFF", query=True, value=True)
+    scroll_u = pm.floatField("scrollUFF", query = True, value = True)
+    scroll_v = pm.floatField("scrollVFF", query = True, value = True)
+    scroll_r = pm.floatField("scrollRFF", query = True, value = True)
 
     # Get selected nodes
-    selected_nodes = pm.ls(selection=True)
+    selected_nodes = pm.ls(selection = True)
     if not selected_nodes:
         MP_PY_ConfirmationDialog(
             "Selection Error!",
@@ -739,10 +738,10 @@ def MP_PY_UVScrolling(option):
 
         if option == "set":
             # Ensure scrollUV attribute exists, then set values
-            if not pm.attributeQuery("scrollUV", node=node, exists=True):
-                pm.addAttr(node, longName="scrollUV", attributeType="double3", keyable=True)
+            if not pm.attributeQuery("scrollUV", node = node, exists = True):
+                pm.addAttr(node, longName = "scrollUV", attributeType = "double3", keyable = True)
                 for attr in scroll_attrs:
-                    pm.addAttr(node, longName=attr, attributeType="double", parent="scrollUV", keyable=True)
+                    pm.addAttr(node, longName = attr, attributeType = "double", parent = "scrollUV", keyable = True)
 
             for attr, value in scroll_attrs.items():
                 pm.setAttr(f"{node}.{attr}", value)
@@ -750,17 +749,17 @@ def MP_PY_UVScrolling(option):
         elif option == "get":
             # Query existing UV scroll values and update UI
             for attr in scroll_attrs:
-                if pm.attributeQuery(attr, node=node, exists=True):
+                if pm.attributeQuery(attr, node = node, exists = True):
                     value = pm.getAttr(f"{node}.{attr}")
-                    pm.floatField(f"{attr}FF", edit=True, value=value)
+                    pm.floatField(f"{attr}FF", edit = True, value = value)
 
         elif option == "delete":
             # Remove scrollUV attribute if it exists
-            if pm.attributeQuery("scrollUV", node=node, exists=True):
-                pm.deleteAttr(node, attribute="scrollUV")
-                pm.floatField("scrollUFF", edit=True, value=0)
-                pm.floatField("scrollVFF", edit=True, value=0)
-                pm.floatField("scrollRFF", edit=True, value=0)
+            if pm.attributeQuery("scrollUV", node = node, exists = True):
+                pm.deleteAttr(node, attribute = "scrollUV")
+                pm.floatField("scrollUFF", edit = True, value = 0)
+                pm.floatField("scrollVFF", edit = True, value = 0)
+                pm.floatField("scrollRFF", edit = True, value = 0)
 
 
 def MP_PY_GetEggObjectTypes():
@@ -850,7 +849,7 @@ def MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray):
     pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0)], nc = 2)
     pm.columnLayout("nodeColumn", width = 150, adjustableColumn = False, rowSpacing = 0)
     pm.rowLayout(columnOffset1 = 15, rowAttach = (1, "top", 0), nc = 1, columnAttach1 = "left")
-    pm.text(bgc = (0.350, 0.820, 0.950), label = ("Node Name"))
+    pm.text(bgc = (0.350, 0.820, 0.950), label = "Node Name")
     pm.setParent(u = 1)
     pm.setParent(u = 1)
     pm.columnLayout("rowColumn", width = 350, adjustableColumn = False)
@@ -860,9 +859,9 @@ def MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray):
         columnAttach3 = ("left", "left", "left"),
         columnOffset3 = (30, 65, 65),
     )
-    pm.text(bgc = (0.350, 0.820, 0.950), label = ("Egg Tag 1"))
-    pm.text(bgc = (0.350, 0.820, 0.950), label = ("Egg Tag 2"))
-    pm.text(bgc = (0.350, 0.820, 0.950), label = ("Egg Tag 3"))
+    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 1")
+    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 2")
+    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 3")
     pm.setParent(u = 1)
     pm.setParent(u = 1)
     pm.setParent(u = 1)
@@ -1522,9 +1521,9 @@ def MP_PY_Globals():
             Otherwise, your computer will default to calling the file from your last installation.
             The most efficient renaming concept is to append the file names with their version at the end.
             EXAMPLE: For Panda3D-1.8.1, you might append the file [egg2bam.exe] into [egg2bam_630.exe].
-            the addtional '630' or more technically '6.30', is the bam file version that is created using the
+            the additional '630' or more technically '6.30', is the bam file version that is created using the
             egg2bam.exe file in version Panda3D-1.8.1.
-            Add anything to them that will make them easily differenciated by yourself, and of course
+            Add anything to them that will make them easily differentiated by yourself, and of course
             this script, even simply appending the panda version, i.e. 'egg2bam_181' is fine.
 
 
@@ -1566,7 +1565,7 @@ def MP_PY_Globals():
     # Removed:
     # polylight portal
     # todo: maybe add option to type own number for seqX
-    # Global variable that keeps track of whether or not user has seen the import Panda file notification.
+    # Global variable that keeps track of whether user has seen the import Panda file notification.
     # It is designed so that the user only sees the notification once during session.
     pm.melGlobals.initVar("int", "gMP_PY_ChoosePandaFileNotice")
     pm.melGlobals["gMP_PY_ChoosePandaFileNotice"] = 0
@@ -1675,7 +1674,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.columnLayout(columnAttach = ("left", 0))
     pm.checkBox(
         "MP_PY_ExportSelectedCB",
-        annotation = ("Will export only the selected scene nodes"),
+        annotation = "Will export only the selected scene nodes",
         value = 0,
         label = "Export only selected objects ",
     )
@@ -1691,7 +1690,7 @@ def MP_PY_CreatePandaExporterWindow():
     )
     pm.checkBox(
         "MP_PY_ExportOverwriteCB",
-        annotation = ("Will overwrite file if it already exists"),
+        annotation = "Will overwrite file if it already exists",
         value = 1,
         label = "Overwrite existing files",
     )
@@ -1765,26 +1764,10 @@ def MP_PY_CreatePandaExporterWindow():
     pm.checkBox(
         "MP_PY_RemoveGroundPlaneCB",
         annotation = (
-                'Removes the "groundPlane_transform" node from the exported egg file(s).'
-                + "\nCurrently, "
-                  "only Mesh exporting "
-                  "supports the removal of the "
-                  "tuple!" + "\nThough this is "
-                             "not normally "
-                             "utilized, care "
-                             "must be taken "
-                             "that the node"
-                + "\nis in fact EMPTY, before engaging this to be removed!"
-                + "\nThe primary purpose of adding this, "
-                  "was to offer a method of removing" + "\nthe "
-                                                        "empty "
-                                                        "node "
-                                                        "from "
-                                                        "the egg "
-                                                        "file, "
-                                                        "as it "
-                                                        "is "
-                                                        "exported, via maya2egg."
+            'Removes the "groundPlane_transform" node from the exported EGG file(s).\n'
+            "Currently, this is only supported for Mesh exporting.\n\n"
+            "NOTE: Ensure the node is EMPTY before enabling this option.\n"
+            "This feature allows for the removal of an empty node from the EGG file during the maya2egg export process."
         ),
         enable = 1,
         changeCommand = lambda *args: pm.mel.MP_RemoveGroundPlaneUI(),
@@ -1907,37 +1890,24 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_ChooseCustomRefPathRB",
         onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
         annotation = (
-                "References textures to relative to selected specified path"
-                + "\nNOTE: If exporting a bam "
-                  "and egg," + "\nThe egg file "
-                               "textures get "
-                               "referenced to "
-                               "the Maya "
-                               "file."
-                + "\nThe bam file textures will be referenced to specified directory."
+            "References textures relative to the specified path.\n"
+            "NOTE: If exporting both BAM and EGG files:\n"
+            "- EGG file textures are referenced relative to the Maya file.\n"
+            "- BAM file textures are referenced to the specified directory."
         ),
         collection = "MP_PY_TexPathOptionsRC",
         label = "Reference textures relative to specified path",
     )
+
     pm.radioButton(
         "MP_PY_ChooseCustomTexPathRB",
         onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
         annotation = (
-                "Copies textures to, and makes, textures relative to selected specified path"
-                + "\nNOTE: "
-                  "If "
-                  "exporting "
-                  "a bam and "
-                  "egg, "
-                  "textures "
-                  "get "
-                  "copied-to "
-                  '"Egg file '
-                  "texture "
-                  "Ref "
-                  'Directory"'
-                + "\nThe bam file ref directory defaults to this directory, but can be modified further."
-                + "\nIf it is modified, the edited path MUST start with the copied-to directory path."
+            "Copies textures and makes them relative to the selected specified path.\n"
+            "NOTE: If exporting both BAM and EGG files:\n"
+            "- Textures are copied to the 'Egg File Texture Ref Directory'.\n"
+            "- The BAM file reference directory defaults to this path but can be modified.\n"
+            "- If modified, the new path MUST start with the copied-to directory path."
         ),
         collection = "MP_PY_TexPathOptionsRC",
         label = "Copy textures and make relative to specified path",
@@ -1949,17 +1919,9 @@ def MP_PY_CreatePandaExporterWindow():
         width = 215,
         enable = 0,
         annotation = (
-                "Egg File custom texture reference path"
-                + "\n"
-                + "\nNOTE: If using the copy-to for the "
-                  "textures," + "\nthis will be the copied-to "
-                                "directory." + "\nIf "
-                                               "exporting "
-                                               "both an egg "
-                                               "and a bam "
-                                               "file,"
-                + "\nthe texture referencing for the bam file may be"
-                + "\nfurther modified below."
+            "Egg File custom texture reference path.\n\n"
+            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
+            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further modified below."
         ),
     )
     pm.button(
@@ -1969,15 +1931,9 @@ def MP_PY_CreatePandaExporterWindow():
             "customRelativeEggTexturePath"
         ),
         annotation = (
-                "Browse for Egg File custom texture reference path"
-                + "\n"
-                + "\nNOTE: If using the copy-to for "
-                  "the textures," + "\nthis will be "
-                                    "the copied-to "
-                                    "directory."
-                + "\nIf exporting both an egg and a bam file,"
-                + "\nthe texture referencing for the bam file may "
-                  "be" + "\nfurther modified below."
+            "Browse for the Egg File custom texture reference path.\n\n"
+            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
+            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further modified below."
         ),
         label = "Browse",
     )
@@ -2008,25 +1964,13 @@ def MP_PY_CreatePandaExporterWindow():
             "customRelativeBamTexturePath"
         ),
         annotation = (
-                "Browse for Bam File custom texture reference path"
-                + "\n"
-                + "\nNOTE:"
-                + "\nIf just referencing textures and exporting both an Egg and Bam "
-                  "file," + "\nThe Egg "
-                            "file is "
-                            "referenced "
-                            "to Maya "
-                            "file."
-                + "\nThe Bam file will be referenced to specified path."
-                + "\nThe Bam file reference path MUST "
-                  "start with the path to where textures "
-                  "are located." + "\n" + "\nIf copying "
-                                          "textures, this "
-                                          "path MUST "
-                                          "start with the "
-                                          "copied-to "
-                                          "directory "
-                                          "path" + '\ndefined in the "Egg file texture Ref Directory" above'
+            "Browse for the BAM File custom texture reference path.\n\n"
+            "NOTE:\n"
+            "If referencing textures and exporting both an EGG and BAM file:\n"
+            "- The EGG file is referenced relative to the Maya file.\n"
+            "- The BAM file is referenced to the specified path.\n\n"
+            "If copying textures, this path MUST start with the copied-to directory path\n"
+            'defined in the "Egg file texture Ref Directory" above.'
         ),
         label = "Browse",
     )
@@ -2079,14 +2023,14 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_CustomFilenameTF",
         text = "",
         enable = 0,
-        annotation = ("Browse to select or enter custom output file name."),
+        annotation = "Browse to select or enter custom output file name.",
         width = 215,
     )
     pm.button(
         "MP_PY_BrowseFilenameBTN",
         enable = 0,
         command = lambda *args: pm.mel.MP_BrowseForFilePreProcess("customFilename"),
-        annotation = ("Browse to select or enter custom output file name."),
+        annotation = "Browse to select or enter custom output file name.",
         label = "Browse",
     )
     pm.setParent(u = 1)
@@ -2152,9 +2096,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.text(
         "MP_PY_AnimationStartFrameLabel",
         enable = 0,
-        annotation = (
-                "Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"
-        ),
+        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
         label = "Start Frame",
     )
     pm.intField(
@@ -2166,12 +2108,8 @@ def MP_PY_CreatePandaExporterWindow():
         height = 20,
         width = 40,
         step = 1,
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "startFrameIFChanged"
-        ),
-        annotation = (
-                "Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"
-        ),
+        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "startFrameIFChanged"),
+        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
         noBackground = False,
     )
     pm.intScrollBar(
@@ -2190,16 +2128,12 @@ def MP_PY_CreatePandaExporterWindow():
             "updateFrameValues", "startFrameSliderMoved"
         ),
         horizontal = True,
-        annotation = (
-                "Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"
-        ),
+        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
     )
     pm.text(
         "MP_PY_AnimationEndFrameLabel",
         enable = 0,
-        annotation = (
-                "Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"
-        ),
+        annotation = ("Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"),
         label = "End Frame",
     )
     pm.intField(
@@ -2211,9 +2145,7 @@ def MP_PY_CreatePandaExporterWindow():
         height = 20,
         width = 40,
         step = 1,
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "endFrameIFChanged"
-        ),
+        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "endFrameIFChanged"),
         annotation = (
                 "Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"
         ),
@@ -2252,21 +2184,11 @@ def MP_PY_CreatePandaExporterWindow():
         height = 20,
         command = lambda *args: MP_PY_StartSceneExport(),
         annotation = (
-                "Creates a Panda Egg, (and a Bam file if both are chosen),"
-                + "\nby first exporting the scene "
-                  "as a Maya file." + "\nIt then "
-                                      "runs "
-                                      "maya2egg["
-                                      "version] on "
-                                      "the maya "
-                                      "file,"
-                + "\nwhile using the selected export options."
-                + "\n\nIf both egg and bam were chosen to export,"
-                  "" + "\nit will run the selected version of "
-                       "egg2bam on the egg file," + "\nwhile using "
-                                                    "the selected ["
-                                                    "Bam Specific "
-                                                    "Options]."
+            "Creates a Panda Egg file (and a BAM file if both are chosen) "
+            "by first exporting the scene as a Maya file.\n"
+            "It then runs maya2egg[version] on the Maya file using the selected export options.\n\n"
+            "If both EGG and BAM files are chosen, it will run the selected version of egg2bam on the EGG file, "
+            "applying the selected BAM-specific options."
         ),
         label = "Export Current Scene",
     )
@@ -2276,13 +2198,9 @@ def MP_PY_CreatePandaExporterWindow():
         height = 20,
         command = lambda *args: pm.mel.MP_Send2Pview(""),
         annotation = (
-                "Sends either the selected nodes, Or, the entire scene if nothing is selected"
-                + "\nTo the "
-                  "libmayapview "
-                  "plugin if it "
-                  "is installed "
-                  "and loaded"
-                + "\nIf plugin is not loaded or installed, it prompts for file to view instead"
+            "Sends either the selected nodes or the entire scene (if nothing is selected) to the libmayapview plugin, "
+            "if it is installed and loaded.\n"
+            "If the plugin is not installed or loaded, it prompts for a file to view instead."
         ),
         label = "Sent To Pview",
     )
@@ -2294,32 +2212,15 @@ def MP_PY_CreatePandaExporterWindow():
         height = 20,
         command = lambda *args: pm.mel.MP_ExportNodesToPandaFiles(),
         annotation = (
-                "Converts selected node, or nodes, to Panda files."
-                + "\nSupports multiple selections"
-                + "\nExports each selected node as its own set of files."
-                + "\nFile name will be node names, "
-                  "unless a custom name is chosen"
-                + "\nDefault will export a Maya binary file and an egg file."
-                + "\nHowever, if the '[EGG(ASCII) "
-                  "and BAM(Binary)]' option is "
-                  "selected" + "\nit will produce a "
-                               "set of three files "
-                               "for each node "
-                               "selected." + "\na "
-                                             "maya "
-                                             ".mb "
-                                             "file, "
-                                             "a "
-                                             "Panda "
-                                             ".bam "
-                                             "and an "
-                                             ".egg "
-                                             "file, "
-                                             "all in "
-                                             "the "
-                                             "chosen "
-                                             "output "
-                                             "directory."
+            "Converts the selected node(s) to Panda files, supporting multiple selections.\n"
+            "Each node is exported as its own set of files. "
+            "By default, this includes a Maya binary file (.mb) and an EGG file.\n"
+            "If the '[EGG(ASCII) and BAM(Binary)]' option is selected, it will generate:\n"
+            "- A Maya binary file (.mb)\n"
+            "- A BAM file (.bam)\n"
+            "- An EGG file (.egg)\n"
+            "All files are saved in the chosen output directory. "
+            "File names default to node names unless a custom name is provided."
         ),
         label = "Convert Nodes To Panda",
     )
@@ -2431,17 +2332,18 @@ def MP_PY_AnimationOptionsUI(option, to_update=""):
     :param option: The action to perform (e.g., "animationMode", "updateFrameValues").
     :param to_update: Specific element to update (e.g., "startFrameIFChanged").
     """
+
     def enable_animation_range(enable):
         """Enable or disable animation range fields and labels."""
-        pm.intField("MP_PY_AnimationStartFrameIF", edit=True, enable=enable)
-        pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit=True, enable=enable)
-        pm.intField("MP_PY_AnimationEndFrameIF", edit=True, enable=enable)
-        pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit=True, enable=enable)
-        pm.text("MP_PY_AnimationStartFrameLabel", edit=True, enable=enable)
-        pm.text("MP_PY_AnimationEndFrameLabel", edit=True, enable=enable)
+        pm.intField("MP_PY_AnimationStartFrameIF", edit = True, enable = enable)
+        pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, enable = enable)
+        pm.intField("MP_PY_AnimationEndFrameIF", edit = True, enable = enable)
+        pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, enable = enable)
+        pm.text("MP_PY_AnimationStartFrameLabel", edit = True, enable = enable)
+        pm.text("MP_PY_AnimationEndFrameLabel", edit = True, enable = enable)
 
     if option == "animationMode":
-        selected_rb = pm.radioCollection("MP_PY_AnimationOptionsRC", query=True, select=True)
+        selected_rb = pm.radioCollection("MP_PY_AnimationOptionsRC", query = True, select = True)
         if selected_rb == "MP_PY_chooseFullAnimationRangeRB":
             print("Exporting Full Animation Range")
             enable_animation_range(False)
@@ -2460,20 +2362,25 @@ def MP_PY_AnimationOptionsUI(option, to_update=""):
 
         if to_update in element_map:
             source, target = element_map[to_update]
-            value = pm.intField(source, query=True, value=True) if "IF" in source else pm.intScrollBar(source, query=True, value=True)
+            value = pm.intField(source, query = True, value = True) \
+                if "IF" in source \
+                else pm.intScrollBar(source, query = True, value = True)
+
             if "IF" in target:
-                pm.intField(target, edit=True, value=value)
+                pm.intField(target, edit = True, value = value)
             else:
-                pm.intScrollBar(target, edit=True, value=value)
+                pm.intScrollBar(target, edit = True, value = value)
 
         elif to_update == "updateAllValues":
             for source, target in element_map.values():
-                value = pm.intField(source, query=True, value=True) if "IF" in source else pm.intScrollBar(source, query=True, value=True)
-                if "IF" in target:
-                    pm.intField(target, edit=True, value=value)
-                else:
-                    pm.intScrollBar(target, edit=True, value=value)
+                value = pm.intField(source, query = True, value = True) \
+                    if "IF" in source \
+                    else pm.intScrollBar(source, query = True, value = True)
 
+                if "IF" in target:
+                    pm.intField(target, edit = True, value = value)
+                else:
+                    pm.intScrollBar(target, edit = True, value = value)
 
 
 def MP_PY_GetSelectedAnimationLayerLengthUI():
@@ -2482,31 +2389,31 @@ def MP_PY_GetSelectedAnimationLayerLengthUI():
     Defaults to start frame 0 and end frame 48 if no keyframes are found.
     """
     # Save current selection and playback options
-    current_selection = pm.ls(selection=True)
+    current_selection = pm.ls(selection = True)
     playback_options = {
-        "min": pm.playbackOptions(query=True, min=True),
-        "max": pm.playbackOptions(query=True, max=True),
-        "start": pm.playbackOptions(query=True, animationStartTime=True),
-        "end": pm.playbackOptions(query=True, animationEndTime=True),
+        "min": pm.playbackOptions(query = True, min = True),
+        "max": pm.playbackOptions(query = True, max = True),
+        "start": pm.playbackOptions(query = True, animationStartTime = True),
+        "end": pm.playbackOptions(query = True, animationEndTime = True),
     }
 
     # Default animation layer handling
     if pm.objExists("BaseAnimation"):
-        child_layers = pm.animLayer("BaseAnimation", query=True, children=True) or []
+        child_layers = pm.animLayer("BaseAnimation", query = True, children = True) or []
         if child_layers:
             # Find and select objects in the first selected child layer
             for layer in child_layers:
-                if pm.animLayer(layer, query=True, selected=True):
-                    pm.animLayer(layer, edit=True, select=True)
+                if pm.animLayer(layer, query = True, selected = True):
+                    pm.animLayer(layer, edit = True, select = True)
                     break
         else:
-            pm.select(all=True, hierarchy=True)
+            pm.select(all = True, hierarchy = True)
 
     # Temporarily set playback range to evaluate the entire timeline
-    pm.playbackOptions(edit=True, min=0, max=10000, animationStartTime=0, animationEndTime=10000)
+    pm.playbackOptions(edit = True, min = 0, max = 10000, animationStartTime = 0, animationEndTime = 10000)
 
     # Determine the last keyframe
-    last_keyframe = pm.findKeyframe(which="last")
+    last_keyframe = pm.findKeyframe(which = "last")
 
     # Update UI fields based on keyframes
     if last_keyframe > 1:
@@ -2514,22 +2421,22 @@ def MP_PY_GetSelectedAnimationLayerLengthUI():
     else:
         end_frame = 48  # Default to 48 if no keyframes are found
 
-    pm.intField("MP_PY_AnimationStartFrameIF", edit=True, value=0)
-    pm.intField("MP_PY_AnimationEndFrameIF", edit=True, value=end_frame)
-    pm.playbackOptions(edit=True, min=0, max=end_frame, animationStartTime=0, animationEndTime=end_frame)
+    pm.intField("MP_PY_AnimationStartFrameIF", edit = True, value = 0)
+    pm.intField("MP_PY_AnimationEndFrameIF", edit = True, value = end_frame)
+    pm.playbackOptions(edit = True, min = 0, max = end_frame, animationStartTime = 0, animationEndTime = end_frame)
 
     # Restore previous selection
-    pm.select(clear=True)
+    pm.select(clear = True)
     if current_selection:
         pm.select(current_selection)
 
     # Restore playback options
     pm.playbackOptions(
-        edit=True,
-        min=playback_options["min"],
-        max=playback_options["max"],
-        animationStartTime=playback_options["start"],
-        animationEndTime=playback_options["end"],
+        edit = True,
+        min = playback_options["min"],
+        max = playback_options["max"],
+        animationStartTime = playback_options["start"],
+        animationEndTime = playback_options["end"],
     )
 
 
@@ -2537,62 +2444,62 @@ def MP_PY_ExportOptionsUI():
     """
     Updates the UI based on the selected export option.
     """
+
     def toggle_animation_fields(enable):
         """Enable or disable animation-related fields."""
-        pm.intField("MP_PY_AnimationStartFrameIF", edit=True, enable=enable)
-        pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit=True, enable=enable)
-        pm.intField("MP_PY_AnimationEndFrameIF", edit=True, enable=enable)
-        pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit=True, enable=enable)
-        pm.radioButton("MP_PY_chooseFullAnimationRangeRB", edit=True, enable=enable)
-        pm.radioButton("MP_PY_chooseCustomAnimationRangeRB", edit=True, enable=enable)
-        pm.text("MP_PY_CharacterNameLabel", edit=True, enable=enable)
-        pm.textField("MP_PY_CharacterNameTF", edit=True, enable=enable)
-        pm.text("MP_PY_ForceJointLabel", edit=True, enable=enable)
-        pm.textField("MP_PY_ForceJointTF", edit=True, enable=enable)
+        pm.intField("MP_PY_AnimationStartFrameIF", edit = True, enable = enable)
+        pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, enable = enable)
+        pm.intField("MP_PY_AnimationEndFrameIF", edit = True, enable = enable)
+        pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, enable = enable)
+        pm.radioButton("MP_PY_chooseFullAnimationRangeRB", edit = True, enable = enable)
+        pm.radioButton("MP_PY_chooseCustomAnimationRangeRB", edit = True, enable = enable)
+        pm.text("MP_PY_CharacterNameLabel", edit = True, enable = enable)
+        pm.textField("MP_PY_CharacterNameTF", edit = True, enable = enable)
+        pm.text("MP_PY_ForceJointLabel", edit = True, enable = enable)
+        pm.textField("MP_PY_ForceJointTF", edit = True, enable = enable)
 
     def toggle_general_fields(enable_lights, enable_cameras, enable_ground_plane):
         """Toggle general export options."""
-        pm.checkBox("MP_PY_ExportLightsCB", edit=True, enable=enable_lights)
-        pm.checkBox("MP_PY_ExportCamerasCB", edit=True, enable=enable_cameras)
-        pm.checkBox("MP_PY_RemoveGroundPlaneCB", edit=True, enable=enable_ground_plane)
+        pm.checkBox("MP_PY_ExportLightsCB", edit = True, enable = enable_lights)
+        pm.checkBox("MP_PY_ExportCamerasCB", edit = True, enable = enable_cameras)
+        pm.checkBox("MP_PY_RemoveGroundPlaneCB", edit = True, enable = enable_ground_plane)
 
     # Get the selected export option
-    selected_rb = pm.radioCollection("MP_PY_ExportOptionsRC", query=True, select=True)
+    selected_rb = pm.radioCollection("MP_PY_ExportOptionsRC", query = True, select = True)
 
     if selected_rb == "MP_PY_ChooseActorRB":
         print("Export as animated Actor")
         toggle_animation_fields(True)
         toggle_general_fields(False, False, False)
-        pm.radioButton("MP_PY_ChooseTransformModelRB", edit=True, select=True)
+        pm.radioButton("MP_PY_ChooseTransformModelRB", edit = True, select = True)
 
     elif selected_rb == "MP_PY_ChooseAnimationRB":
         print("Export Current Actor Animation")
         toggle_animation_fields(True)
         toggle_general_fields(False, False, False)
-        pm.radioButton("MP_PY_ChooseTransformModelRB", edit=True, select=True)
+        pm.radioButton("MP_PY_ChooseTransformModelRB", edit = True, select = True)
 
     elif selected_rb == "MP_PY_ChooseBothRB":
         print("Export Meshes and Animation")
         toggle_animation_fields(True)
         toggle_general_fields(False, False, False)
-        pm.radioButton("MP_PY_ChooseTransformModelRB", edit=True, select=True)
+        pm.radioButton("MP_PY_ChooseTransformModelRB", edit = True, select = True)
 
     elif selected_rb == "MP_PY_ChooseMeshRB":
         print("Export as Mesh")
         toggle_animation_fields(False)
         toggle_general_fields(True, True, True)
-        pm.radioButton("MP_PY_ChooseTransformModelRB", edit=True, select=True)
+        pm.radioButton("MP_PY_ChooseTransformModelRB", edit = True, select = True)
 
     elif selected_rb == "MP_PY_ChoosePoseRB":
         print("Export Selected Actor Animation Pose")
         toggle_animation_fields(True)
         toggle_general_fields(False, False, False)
-        pm.radioButton("MP_PY_ChooseTransformModelRB", edit=True, select=True)
+        pm.radioButton("MP_PY_ChooseTransformModelRB", edit = True, select = True)
 
     # Update animation options and frame values
     MP_PY_AnimationOptionsUI("animationMode", "")
     MP_PY_AnimationOptionsUI("updateFrameValues", "updateAllValues")
-
 
 
 def MP_PY_BrowseForFolderPreProcess(option):
@@ -2602,33 +2509,35 @@ def MP_PY_BrowseForFolderPreProcess(option):
     :param option: Specifies the type of folder browsing operation.
     """
     # Define output file type based on the radio button selection
-    output_panda_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query=True, select=True)
+    output_panda_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True)
 
     if option == "customRelativeEggTexturePath":
         file_mode = 3
         caption = "Choose Texture Relative Directory For Egg File"
         folder_path = MP_BrowseForFolder(file_mode, caption)
         if folder_path:
-            pm.textField("MP_PY_CustomEggTexPathTF", edit=True, enable=True, text=folder_path)
+            pm.textField("MP_PY_CustomEggTexPathTF", edit = True, enable = True, text = folder_path)
             # If exporting both file types, use the same folder for Bam file texture referencing
             if output_panda_file_type == "MP_PY_ChooseEggBamRB":
-                pm.textField("MP_PY_CustomBamTexPathTF", edit=True, enable=True, text=folder_path)
+                pm.textField("MP_PY_CustomBamTexPathTF", edit = True, enable = True, text = folder_path)
 
     elif option == "customRelativeBamTexturePath":
         file_mode = 3
         caption = "Choose Texture Relative Directory For Bam File"
         folder_path = MP_BrowseForFolder(file_mode, caption)
         if folder_path:
-            pm.textField("MP_PY_CustomBamTexPathTF", edit=True, enable=True, text=folder_path)
+            pm.textField("MP_PY_CustomBamTexPathTF", edit = True, enable = True, text = folder_path)
 
     elif option == "customOutputPath":
         file_mode = 3
         caption = "Choose Custom Output Folder"
         folder_path = MP_BrowseForFolder(file_mode, caption)
         if folder_path:
-            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit=True, select=True)
-            pm.button("MP_PY_BrowseOutputPathBTN", edit=True, enable=True)
-            pm.textField("MP_PY_CustomOutputPathTF", edit=True, enable=True, text=folder_path)
+            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
+            pm.button("MP_PY_BrowseOutputPathBTN", edit = True, enable = True)
+            pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = folder_path)
+
+
 
 
 def MP_BrowseForFolder(file_mode, caption):
@@ -2639,7 +2548,7 @@ def MP_BrowseForFolder(file_mode, caption):
     :param caption: The title of the dialog box.
     :return: The selected folder path as a string.
     """
-    folder_path = pm.fileDialog2(dialogStyle=2, fileMode=file_mode, caption=caption)
+    folder_path = pm.fileDialog2(dialogStyle = 2, fileMode = file_mode, caption = caption)
     if folder_path:
         return folder_path[0]  # Return the first selected path
     return ""
