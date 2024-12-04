@@ -1127,9 +1127,6 @@ def MP_PY_GetObjectTypeAnnotation(objectType):
     )
 
 
-# Return the string
-
-
 def MP_PY_Globals():
     """
     Contains MP_PY_PandaVersion and egg-object-type arrays
@@ -1939,51 +1936,38 @@ def MP_PY_CreatePandaExporterWindow():
 
 pm.melGlobals.initVar("string", "gMainWindow")
 pm.setParent(pm.melGlobals["gMainWindow"])
-# Delete any current instances of the menu
-if pm.menu("MP_PY_PandaMenu", exists = 1):
-    pm.deleteUI("MP_PY_PandaMenu", menu = 1)
 
-if pm.window("MP_PY_NodesExportedToPandaFilesGUI", exists = 1):
-    pm.deleteUI("MP_PY_NodesExportedToPandaFilesGUI", window = 1)
-# Delete any current instances of the exportedPandaFile window
+# region Delete UI elements
+# Define UI elements to delete
+ui_elements = {
+    "MP_PY_PandaMenu": "menu",
+    "MP_PY_NodesExportedToPandaFilesGUI": "window",
+    "MP_PY_PandaExporter": "window",
+    "MP_PY_AddEggObjectTypesWindow": "window",
+    "MP_PY_DeleteEggObjectTypesWindow": "window",
+}
 
-if pm.window("MP_PY_PandaExporter", exists = 1):
-    pm.deleteUI("MP_PY_PandaExporter", window = 1)
-# Delete any current instances of the MP_PY_PandaExporter window
-
-if pm.window("MP_PY_AddEggObjectTypesWindow", exists = 1):
-    pm.deleteUI("MP_PY_AddEggObjectTypesWindow", window = 1)
-# Delete any current instances of the MP_PY_AddEggObjectTypesWindow window
+# Delete any current instances of the UI elements
+for element, ui_type in ui_elements.items():
+    if ui_type == "menu" and pm.menu(element, exists=True):
+        pm.deleteUI(element, menu=True)
+    elif ui_type == "window" and pm.window(element, exists=True):
+        pm.deleteUI(element, window = True)
 # endregion
 
-if pm.window("MP_PY_DeleteEggObjectTypesWindow", exists = 1):
-    pm.deleteUI("MP_PY_DeleteEggObjectTypesWindow", window = 1)
-# Delete any current instances of the MP_PY_DeleteEggObjectTypesWindow window
 
-pm.menu("MP_PY_PandaMenu", label = "Panda3D_Python")
 # region Init menu
 # Define main menu and menu items
+pm.menu("MP_PY_PandaMenu", label = "Panda3D_Python")
 # Set the MP_PY_PandaMenu as the parent for the following menuItems
 pm.setParent("MP_PY_PandaMenu", menu = 1)
-pm.menuItem(
-    command = lambda *args: MP_PY_PandaExporterUI(), label = "Panda Export GUI..."
-)
-pm.menuItem(
-    command = lambda *args: MP_PY_GetFile2Pview(), label = "View file in PView..."
-)
-pm.menuItem(
-    command = lambda *args: MP_PY_AddEggObjectTypesGUI(),
-    label = "Add Egg-Type Attribute",
-)
+pm.menuItem(command = lambda *args: MP_PY_PandaExporterUI(), label = "Panda Export GUI...")
+pm.menuItem(command = lambda *args: MP_PY_GetFile2Pview(), label = "View file in PView...")
+pm.menuItem(command = lambda *args: MP_PY_AddEggObjectTypesGUI(), label = "Add Egg-Type Attribute")
 pm.menuItem(command = lambda *args: MP_PY_GotoPanda3D(), label = "Panda3D Home")
 pm.menuItem(command = lambda *args: MP_PY_GotoPanda3DManual(), label = "Panda3D Manual")
-pm.menuItem(
-    command = lambda *args: MP_PY_GotoPanda3DForum(), label = "Panda3D Help Forums"
-)
-pm.menuItem(
-    command = lambda *args: MP_PY_GotoPanda3DSDKDownload(),
-    label = "Download Panda3D-SDK",
-)
+pm.menuItem(command = lambda *args: MP_PY_GotoPanda3DForum(), label = "Panda3D Help Forums")
+pm.menuItem(command = lambda *args: MP_PY_GotoPanda3DSDKDownload(), label = "Download Panda3D-SDK")
 
 
 # endregion
@@ -2445,7 +2429,6 @@ def MP_PY_GetFile2Pview():
         MP_PY_Send2Pview(pview_file[0])
     else:
         pm.error("No file selected!\n")
-
 
 
 def MP_PY_ExportNodesToPandaFiles():
