@@ -4,7 +4,9 @@ import os
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
 PANDA_FILE_VERSIONS = "gMP_PY_PandaFileVersions"
+PANDA_SDK_NOTICE = "gMP_PY_ChoosePandaFileNotice"
 ADDON_RELEASE_VERSION = "gMP_PY_ReleaseRevision"
+MAYA_VER_SHORT = "gMP_PY_MayaVersionShort"
 # endregion
 
 OT_ENTRIES = {
@@ -1500,14 +1502,15 @@ def MP_PY_Globals():
     """
     mayaVersionLong = str(pm.mel.getApplicationVersionAsFloat())
     # get the current Maya version
-    pm.melGlobals.initVar("string", "gMP_PY_MayaVersionShort")
-    pm.melGlobals["gMP_PY_MayaVersionShort"] = str(
+    pm.melGlobals.initVar("string", MAYA_VER_SHORT)
+    pm.melGlobals[MAYA_VER_SHORT] = str(
         pm.mel.substituteAllString(mayaVersionLong, ".", "")
     )
     # Strips the version zeroes if the version number length is less than 4
-    if len(pm.melGlobals["gMP_PY_MayaVersionShort"]) < 4:
-        pm.melGlobals["gMP_PY_MayaVersionShort"] = str(
-            pm.mel.substituteAllString(pm.melGlobals["gMP_PY_MayaVersionShort"], "0", "")
+    if len(pm.melGlobals[MAYA_VER_SHORT]) < 4:
+        pm.melGlobals[MAYA_VER_SHORT] = str(
+            pm.mel.substituteAllString(pm.melGlobals[MAYA_VER_SHORT], "0", "")
+        )
         )
 
     pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
@@ -1567,8 +1570,8 @@ def MP_PY_Globals():
     # todo: maybe add option to type own number for seqX
     # Global variable that keeps track of whether user has seen the import Panda file notification.
     # It is designed so that the user only sees the notification once during session.
-    pm.melGlobals.initVar("int", "gMP_PY_ChoosePandaFileNotice")
-    pm.melGlobals["gMP_PY_ChoosePandaFileNotice"] = 0
+    pm.melGlobals.initVar("int", PANDA_SDK_NOTICE)
+    pm.melGlobals[PANDA_SDK_NOTICE] = 0
 
 
 def MP_PY_CreatePandaExporterWindow():
@@ -2722,7 +2725,7 @@ def MP_PY_Send2Pview(file_path=""):
     :param file_path: The file to preview. If empty, uses Maya's Pview plugin to preview the scene.
     """
     # Process Variables
-    maya_version_short = pm.melGlobals["gMP_PY_MayaVersionShort"]
+    maya_version_short = pm.melGlobals[MAYA_VER_SHORT]
 
     if not file_path:
         # No file provided, use Pview plugin for the scene
