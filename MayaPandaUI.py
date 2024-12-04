@@ -335,9 +335,8 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
         if len(selectedNodes) == 0:
             MP_PY_ConfirmationDialog(
                 "Selection Error!",
-                "You must first make a selection!"
-                + "\nPlease select at least one node, "
-                  "then try again.",
+                "You must first make a selection!\n"
+                "Please select at least one node, then try again.",
                 "ok",
             )
             return
@@ -1706,9 +1705,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.checkBox(
         "MP_PY_ExportLegacyShadersCB",
         annotation = (
-                "Use this flag to turn off modern (Phong) shader generation"
-                + "\nand treat shaders as if they were "
-                  "Lamberts (legacy)"
+            "Use this flag to turn off modern (Phong) shader generation \n"
+            "and treat shaders as if they were Lamberts (legacy)"
         ),
         value = 0,
         label = "Only legacy shaders",
@@ -1716,9 +1714,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.checkBox(
         "MP_PY_ExportKeepUvsCB",
         annotation = (
-                "Convert all UV sets on all vertices, even those that do"
-                + "\nnot appear to be referenced by any "
-                  "textures."
+            "Convert all UV sets on all vertices, even those that do \n"
+            "not appear to be referenced by any textures."
         ),
         value = 1,
         label = "Keep all UV's",
@@ -1726,9 +1723,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.checkBox(
         "MP_PY_ExportRoundUvsCB",
         annotation = (
-                "Round up uv coordinates to the nearest 1/100th. i.e."
-                + "\n-0.001 becomes0.0; 0.444 becomes 0.44; 0.778 "
-                  "becomes 0.78"
+            "Round up uv coordinates to the nearest 1/100th. i.e.\n"
+            "-0.001 becomes0.0; 0.444 becomes 0.44; 0.778 becomes 0.78"
         ),
         value = 1,
         label = "Round UV's",
@@ -1784,10 +1780,8 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_BamVersionOptionMenu",
         width = 100,
         annotation = (
-                "Bam file version to use for creating the bam file"
-                + "These can be added to the "
-                  "$gMP_PY_PandaFileVersions Array as "
-                  "needed"
+            "Bam file version to use for creating the bam file. "
+            "These can be added to the $gMP_PY_PandaFileVersions Array as needed"
         ),
     )
 
@@ -2127,7 +2121,7 @@ def MP_PY_CreatePandaExporterWindow():
         width = 40,
         step = 1,
         changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "startFrameIFChanged"),
-        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
+        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
         noBackground = False,
     )
     pm.intScrollBar(
@@ -2146,12 +2140,12 @@ def MP_PY_CreatePandaExporterWindow():
             "updateFrameValues", "startFrameSliderMoved"
         ),
         horizontal = True,
-        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
+        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
     )
     pm.text(
         "MP_PY_AnimationEndFrameLabel",
         enable = 0,
-        annotation = ("Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"),
+        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
         label = "End Frame",
     )
     pm.intField(
@@ -2164,9 +2158,7 @@ def MP_PY_CreatePandaExporterWindow():
         width = 40,
         step = 1,
         changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "endFrameIFChanged"),
-        annotation = (
-                "Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"
-        ),
+        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
         noBackground = False,
     )
     pm.intScrollBar(
@@ -2185,9 +2177,7 @@ def MP_PY_CreatePandaExporterWindow():
             "updateFrameValues", "endFrameSliderMoved"
         ),
         horizontal = True,
-        annotation = (
-                "Set the animation end frame: Default is 48" + "\nRange is 0 to 10,000"
-        ),
+        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
     )
 
     pm.setParent(upLevel = 1)
