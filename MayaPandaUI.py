@@ -1188,9 +1188,9 @@ def MP_PY_ArgsBuilder(FileName):
       The specified DAGs have to be tagged as a DCS egg-type.
       Routine checks for this and if it doesn't exist, it adds the DCS tag to it.
     """
-    joints = []
     JointNames = str(pm.textField("MP_PY_ForceJointTF", query = 1, text = 1))
-    numberEntries = int(joints = JointNames.split(" "))
+    joints = JointNames.split(" ")
+    numberEntries = int(len(joints))
     if pm.textField("MP_PY_ForceJointTF", query = 1, text = 1) != "":
         # iterate through each named joint and verify they have the required 'DCS' object-type flag set
         # If not, we add the attribute and request restarting the export process
