@@ -2511,60 +2511,59 @@ def MP_PY_AnimationOptionsUI(option, to_update=""):
 
 def MP_PY_GetSelectedAnimationLayerLengthUI():
     """
-    Determines the last key frame of the currently selected animation layer
-    and updates the 'Start Frame' and 'End Frame' integer fields in the UI.
-    Defaults to '0' for the start frame and uses the last key frame as the end frame.
+    Updates the 'Start Frame' and 'End Frame' UI fields based on the selected animation layer.
+    Defaults to start frame 0 and end frame 48 if no keyframes are found.
     """
-    # Record any currently selected nodes to restore selection later
-    current_selection = pm.ls(selection = True)
+    # Save current selection and playback options
+    current_selection = pm.ls(selection=True)
+    playback_options = {
+        "min": pm.playbackOptions(query=True, min=True),
+        "max": pm.playbackOptions(query=True, max=True),
+        "start": pm.playbackOptions(query=True, animationStartTime=True),
+        "end": pm.playbackOptions(query=True, animationEndTime=True),
+    }
 
-    # Variables to hold nodes selected in the animation layer, if any
-    nodes_selected = []
-
-    # Record the current playback options to revert after processing
-    current_min = pm.playbackOptions(query = True, min = True)
-    current_max = pm.playbackOptions(query = True, max = True)
-    current_start_time = pm.playbackOptions(query = True, animationStartTime = True)
-    current_end_time = pm.playbackOptions(query = True, animationEndTime = True)
-
+    # Default animation layer handling
     if pm.objExists("BaseAnimation"):
-        # Get all child layers of the default 'BaseAnimation' layer
-        child_layers_list = pm.animLayer("BaseAnimation", query = True, children = True) or []
-
-        if not child_layers_list:
-            # Select everything in the scene if no additional animation layers exist
-            pm.select(all = True, hierarchy = True)
-        else:
-            # Cycle through each child layer to determine the selected one
-            for layer in child_layers_list:
-                if pm.animLayer(layer, query = True, selected = True):
-                    # Select all objects in the selected animation layer
-                    pm.animLayer(layer, edit = True, select = True)
-                    nodes_selected = pm.ls(selection = True)
+        child_layers = pm.animLayer("BaseAnimation", query=True, children=True) or []
+        if child_layers:
+            # Find and select objects in the first selected child layer
+            for layer in child_layers:
+                if pm.animLayer(layer, query=True, selected=True):
+                    pm.animLayer(layer, edit=True, select=True)
                     break
-
-        # Set animation start to '0' and end time to an extreme '10000'
-        pm.playbackOptions(edit = True, min = 0, max = 10000, animationStartTime = 0, animationEndTime = 10000)
-
-        # Get the last key frame
-        last_key_frame = pm.findKeyframe(which = "last")
-
-        # Update the frame times if key frames are present
-        if last_key_frame > 1:
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, value = 0)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, value = last_key_frame)
-            pm.playbackOptions(edit = True, min = 0, max = last_key_frame, animationStartTime = 0,
-                               animationEndTime = last_key_frame)
         else:
-            # Default to 48 if no key frames are found
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, value = 0)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, value = 48)
-            pm.playbackOptions(edit = True, min = 0, max = 48, animationStartTime = 0, animationEndTime = 48)
+            pm.select(all=True, hierarchy=True)
+
+    # Temporarily set playback range to evaluate the entire timeline
+    pm.playbackOptions(edit=True, min=0, max=10000, animationStartTime=0, animationEndTime=10000)
+
+    # Determine the last keyframe
+    last_keyframe = pm.findKeyframe(which="last")
+
+    # Update UI fields based on keyframes
+    if last_keyframe > 1:
+        end_frame = last_keyframe
+    else:
+        end_frame = 48  # Default to 48 if no keyframes are found
+
+    pm.intField("MP_PY_AnimationStartFrameIF", edit=True, value=0)
+    pm.intField("MP_PY_AnimationEndFrameIF", edit=True, value=end_frame)
+    pm.playbackOptions(edit=True, min=0, max=end_frame, animationStartTime=0, animationEndTime=end_frame)
 
     # Restore previous selection
-    pm.select(clear = True)
+    pm.select(clear=True)
     if current_selection:
-        pm.select(current_selection, add = True)
+        pm.select(current_selection)
+
+    # Restore playback options
+    pm.playbackOptions(
+        edit=True,
+        min=playback_options["min"],
+        max=playback_options["max"],
+        animationStartTime=playback_options["start"],
+        animationEndTime=playback_options["end"],
+    )
 
 
 def MP_PY_ExportOptionsUI():
