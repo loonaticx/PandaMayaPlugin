@@ -234,80 +234,41 @@ def MP_PY_PandaVersion(option):
     return executableToUse
 
 
-def MP_PY_ConfirmationDialog(title, message, type):
+def MP_PY_ConfirmationDialog(title, message, dialog_type):
     """
-    Shows a confirmation dialog with the passed title and message to the user.
+    Shows a confirmation dialog with the given title, message, and button type.
 
-    :returns: the value of the button that was pressed by user.
+    :param title: Title of the dialog.
+    :param message: Message displayed in the dialog.
+    :param dialog_type: Type of dialog (e.g., "ok", "okcancel", "yesno", etc.).
+    :returns: The value of the button pressed by the user.
     """
-    confirmValue = ""
+    # would be nice sometime in the future to have message be a list of strings, combined together with \n separator
+    # Define button configurations based on the dialog type
+    button_configs = {
+        "ok": {"buttons": ["OK"], "default": "OK", "cancel": "CANCEL"},
+        "okcancel": {"buttons": ["OK", "CANCEL"], "default": "OK", "cancel": "CANCEL"},
+        "selectcancel": {"buttons": ["SELECT", "CANCEL"], "default": "SELECT", "cancel": "CANCEL"},
+        "yesno": {"buttons": ["YES", "NO"], "default": "YES", "cancel": "NO"},
+        "downloadcancel": {"buttons": ["DOWNLOAD", "CANCEL"], "default": "DOWNLOAD", "cancel": "CANCEL"},
+    }
 
-    # Displays only an 'OK' button to user
-    if type == "ok":
-        confirmValue = str(
-            pm.confirmDialog(
-                title = title,
-                cancelButton = "CANCEL",
-                defaultButton = "OK",
-                button = "OK",
-                message = message,
-                dismissString = "CANCEL",
-            )
+    # Get the configuration for the dialog type
+    config = button_configs.get(dialog_type)
+    if not config:
+        raise ValueError(f"Unknown dialog type: {dialog_type}")
+
+    # Show the confirmation dialog
+    return str(
+        pm.confirmDialog(
+            title = title,
+            message = message,
+            button = config["buttons"],
+            defaultButton = config["default"],
+            cancelButton = config["cancel"],
+            dismissString = config["cancel"],
         )
-
-    # Displays an 'OK' and 'CANCEL' button to user
-    elif type == "okcancel":
-        confirmValue = str(
-            pm.confirmDialog(
-                title = title,
-                cancelButton = "CANCEL",
-                defaultButton = "OK",
-                button = ["OK", "CANCEL"],
-                message = message,
-                dismissString = "CANCEL",
-            )
-        )
-
-    # Displays an 'SELECT' and 'CANCEL' button to user
-    elif type == "selectcancel":
-        confirmValue = str(
-            pm.confirmDialog(
-                title = title,
-                cancelButton = "CANCEL",
-                defaultButton = "SELECT",
-                button = ["SELECT", "CANCEL"],
-                message = message,
-                dismissString = "CANCEL",
-            )
-        )
-
-    elif type == "yesno":
-        confirmValue = str(
-            pm.confirmDialog(
-                title = title,
-                cancelButton = "NO",
-                defaultButton = "YES",
-                button = ["YES", "NO"],
-                message = message,
-                dismissString = "NO",
-            )
-        )
-    # Displays a 'YES' and 'NO' button to user
-
-    elif type == "downloadcancel":
-        confirmValue = str(
-            pm.confirmDialog(
-                title = title,
-                cancelButton = "CANCEL",
-                defaultButton = "DOWNLOAD",
-                button = ["DOWNLOAD", "CANCEL"],
-                message = message,
-                dismissString = "CANCEL",
-            )
-        )
-    # Displays a 'Download' and 'Cancel' button to user
-
-    return confirmValue
+    )
 
 
 def MP_PY_AddEggObjectFlags(eggObjectType):
