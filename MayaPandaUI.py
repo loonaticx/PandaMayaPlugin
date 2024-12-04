@@ -1032,194 +1032,123 @@ def MP_PY_ArgsBuilder(FileName):
 
 
 def MP_PY_StartSceneExport():
-    tempMBFile = ""
     """
-    We need to do before calling Export2Egg/BAM/Pview:
-    -Export a temporary MB
-    -Get the destination path
-    -Get the filename
-    -Get the custom arguments
+    Prepares the scene for export:
+    - Exports a temporary Maya Binary file (MB).
+    - Prepares the export path and file name.
+    - Executes the export process with the necessary arguments.
     """
-    if pm.checkBox("MP_PY_ExportSelectedCB", query = 1, value = 1):
-        tempMBFile = str(MP_PY_ExportScene("selected"))
-        # returns $tempScenePath as $tempMBFile
-        if tempMBFile == "failed":
-            return 0
+    # Determine whether to export selected objects or the entire scene
+    selection_mode = "selected" if pm.checkBox("MP_PY_ExportSelectedCB", query = True, value = True) else "all"
+    temp_mb_file = MP_PY_ExportScene(selection_mode)
 
-    else:
-        tempMBFile = str(MP_PY_ExportScene("all"))
-        # returns $tempScenePath as $tempMBFile
-        if tempMBFile == "failed":
-            return 0
+    if temp_mb_file == "failed":
+        return 0  # Export failed
 
-    origFileName = str(pm.mel.basenameEx(pm.cmds.file(q = 1, sceneName = 1)))
-    # Determine base file name from the scene name.
-    """
-    Get the destination path
-    Get the filename
-    Get the custom arguments
-    """
-    eggFile = str(MP_PY_ExportPrep(tempMBFile, origFileName))
-    # Delete the temporary Maya binary file
-    # sysFile -del $tempMBFile;
-    # Check if the eggFile passed return, else return it failed as an integer
-    if eggFile == "failed":
-        return 0
+    # Retrieve original file name without extension
+    orig_file_name = str(pm.mel.basenameEx(pm.cmds.file(query = True, sceneName = True)))
 
-    else:
-        return 1
+    # Prepare and execute the export process
+    egg_file = MP_PY_ExportPrep(temp_mb_file, orig_file_name)
+
+    return egg_file != "failed"
 
 
 def MP_PY_ExportScene(selection):
     """
-    exports the entire scene/selected objects
+    Exports the entire scene or selected objects.
     """
-    scenePath = str(pm.mel.dirname(pm.cmds.file(q = 1, sceneName = 1)))
-    # gets the current scene filename and path if present.
-    fileName = str(pm.mel.basenameEx(pm.cmds.file(q = 1, sceneName = 1)))
-    # cut off the file extension
-    fileExtension = str(pm.mel.fileExtension(pm.cmds.file(q = 1, sceneName = 1)))
-    # Returns file extension
-    tempScenePath = ""
-    # Processes if exporting file with original file name and default output path
-    if (
-            pm.radioCollection("MP_PY_OutputFilenameOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseOriginalFilenameRB"
-    ) and (
-            pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseDefaultOutputPathRB"
-    ):
-        if (scenePath == "") or (fileName == ""):
-            MP_PY_ConfirmationDialog(
-                "File Error!",
-                "It appears you have not yet saved this scene. Please save your scene first"
-                + "\nOR, specify a Custom Output Directory AND Custom Filename.",
-                "ok",
-            )
-            return "failed"
+    # Get scene details
+    scene_path = str(pm.mel.dirname(pm.cmds.file(query = True, sceneName = True)))
+    file_name = str(pm.mel.basenameEx(pm.cmds.file(query = True, sceneName = True)))
+    temp_scene_path = ""
 
-        else:
-            tempScenePath = scenePath + "/" + fileName + "_temp.mb"
+    # Output options
+    filename_option = pm.radioCollection("MP_PY_OutputFilenameOptionsRC", query = True, select = True)
+    path_option = pm.radioCollection("MP_PY_OutputPathOptionsRC", query = True, select = True)
 
-    if (
-            pm.radioCollection("MP_PY_OutputFilenameOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseOriginalFilenameRB"
-    ) and (
-            pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseCustomOutputPathRB"
-    ):
-        if fileName == "":
-            MP_PY_ConfirmationDialog(
-                "File Error!",
-                "It appears you have not yet saved this scene. Please save your scene first"
-                + "\nOR, specify a Custom Output Directory AND Custom Filename.",
-                "ok",
-            )
-            # Processes if exporting file with original file name and custom output path
-            return "failed"
-
-        else:
-            TempPath = str(pm.textField("MP_PY_CustomOutputPathTF", query = 1, text = 1))
-            if TempPath == "":
-                MP_PY_ConfirmationDialog(
-                    "File Error!",
-                    "It appears you have not entered a Custom Path."
-                    + "\nPlease Enter a "
-                      "Custom Path and then"
-                      " try Exporting again",
-                    "ok",
+    # Validate input based on options
+    if filename_option == "MP_PY_ChooseOriginalFilenameRB":
+        if path_option == "MP_PY_ChooseDefaultOutputPathRB":
+            if not scene_path or not file_name:
+                return handle_error(
+                    "It appears you have not yet saved this scene. Please save your scene first\n"
+                    "OR specify a custom output directory AND custom filename."
                 )
-                return "failed"
+            temp_scene_path = f"{scene_path}/{file_name}_temp.mb"
 
-            else:
-                tempScenePath = TempPath + "/" + fileName + "_temp.mb"
-
-    if (
-            pm.radioCollection("MP_PY_OutputFilenameOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseCustomFilenameRB"
-    ) and (
-            pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseDefaultOutputPathRB"
-    ):
-        if scenePath == "":
-            MP_PY_ConfirmationDialog(
-                "File Error!",
-                "It appears you have not yet saved this scene. Please save your scene first"
-                + "\nOR, specify a Custom Output Directory AND Custom Filename.",
-                "ok",
+        elif path_option == "MP_PY_ChooseCustomOutputPathRB":
+            custom_path = validate_text_field(
+                "MP_PY_CustomOutputPathTF",
+                "You have not entered a custom path.\n"
+                "Please enter a custom path and try exporting again."
             )
-            # Processes if exporting file with custom file name and default output path
+            if not custom_path:
+                return "failed"
+            temp_scene_path = f"{custom_path}/{file_name}_temp.mb"
+
+    elif filename_option == "MP_PY_ChooseCustomFilenameRB":
+        custom_file_name = validate_text_field(
+            "MP_PY_CustomFilenameTF",
+            "You have not entered a custom file name.\n"
+            "Please enter a custom name and try exporting again."
+        )
+        if not custom_file_name:
             return "failed"
 
-        else:
-            tempFileName = str(pm.textField("MP_PY_CustomFilenameTF", query = 1, text = 1))
-            if tempFileName == "":
-                MP_PY_ConfirmationDialog(
-                    "File Error!",
-                    "It appears you have not entered a Custom File Name."
-                    + "\nPlease Enter "
-                      "a Custom Name "
-                      "and then try "
-                      "Exporting again",
-                    "ok",
+        if path_option == "MP_PY_ChooseDefaultOutputPathRB":
+            if not scene_path:
+                return handle_error(
+                    "It appears you have not yet saved this scene. Please save your scene first\n"
+                    "OR specify a custom output directory AND custom filename."
                 )
-                return "failed"
+            temp_scene_path = f"{scene_path}/{custom_file_name}_temp.mb"
 
-            else:
-                tempScenePath = scenePath + "/" + tempFileName + "_temp.mb"
-
-    if (
-            pm.radioCollection("MP_PY_OutputFilenameOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseCustomFilenameRB"
-    ) and (
-            pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_PY_ChooseCustomOutputPathRB"
-    ):
-        TempPath = str(pm.textField("MP_PY_CustomOutputPathTF", query = 1, text = 1))
-        # Processes if exporting file with custom file name and custom output path
-        if TempPath == "":
-            MP_PY_ConfirmationDialog(
-                "File Error!",
-                "It appears you have not entered a Custom Path."
-                + "\nPlease Enter a Custom "
-                  "Path and then try "
-                  "Exporting again",
-                "ok",
+        elif path_option == "MP_PY_ChooseCustomOutputPathRB":
+            custom_path = validate_text_field(
+                "MP_PY_CustomOutputPathTF",
+                "You have not entered a custom path.\n"
+                "Please enter a custom path and try exporting again."
             )
-            return "failed"
-
-        else:
-            tempFileName = str(pm.textField("MP_PY_CustomFilenameTF", query = 1, text = 1))
-            if tempFileName == "":
-                MP_PY_ConfirmationDialog(
-                    "File Error!",
-                    "It appears you have not entered a Custom File Name."
-                    + "\nPlease Enter "
-                      "a Custom Name "
-                      "and then try "
-                      "Exporting again",
-                    "ok",
-                )
+            if not custom_path:
                 return "failed"
+            temp_scene_path = f"{custom_path}/{custom_file_name}_temp.mb"
 
-            else:
-                tempScenePath = TempPath + "/" + tempFileName + "_temp.mb"
-
+    # Export logic
     if selection == "all":
-        print("Exporting scene...\n")
-        # Export entire scene contents
-        pm.cmds.file(tempScenePath, ea = 1, typ = "mayaBinary", op = "v=1")
-        # export the whole scene
-        print("Saved entire scene as temporary file: " + tempScenePath + "\n")
-
+        print("Exporting entire scene...\n")
+        pm.cmds.file(temp_scene_path, exportAll = True, type = "mayaBinary", options = "v=1")
+        print(f"Saved entire scene as temporary file: {temp_scene_path}\n")
     else:
-        print("Exporting scene...\n")
-        # Export selected scene contents
-        pm.cmds.file(tempScenePath, typ = "mayaBinary", es = 1, op = "v=1")
-        # export only selected objects
-        print("Saved selected objects as temporary file: " + tempScenePath + "\n")
+        print("Exporting selected objects...\n")
+        pm.cmds.file(temp_scene_path, exportSelected = True, type = "mayaBinary", options = "v=1")
+        print(f"Saved selected objects as temporary file: {temp_scene_path}\n")
 
-    return tempScenePath
+    return temp_scene_path
+
+
+def validate_text_field(field_name, error_message):
+    """
+    Validates the content of a text field. If empty, displays an error dialog.
+    :param field_name: Name of the text field to validate.
+    :param error_message: Error message to display if validation fails.
+    :return: The text content of the field if valid, None otherwise.
+    """
+    text = str(pm.textField(field_name, query = True, text = True))
+    if not text:
+        MP_PY_ConfirmationDialog("File Error!", error_message, "ok")
+        return None
+    return text
+
+
+def handle_error(message):
+    """
+    Displays an error message in a confirmation dialog.
+    :param message: The error message to display.
+    :return: "failed" to indicate an error state.
+    """
+    MP_PY_ConfirmationDialog("File Error!", message, "ok")
+    return "failed"
 
 
 def MP_PY_GetObjectTypeAnnotation(objectType):
