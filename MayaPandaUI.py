@@ -1,6 +1,207 @@
 import pymel.core as pm
 
+# region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
+PANDA_FILE_VERSIONS = "gMP_PY_PandaFileVersions"
+ADDON_RELEASE_VERSION = "gMP_PY_ReleaseRevision"
+# endregion
+
+OT_ENTRIES = {
+    "barrier": (
+        "<Collide> { Polyset descend }"
+        "\n\nCreates a barrier that other objects cannot pass through."
+        '\nThe collision is active on the "Normals" side of the object(s)'
+    ),
+    "barrier-no-mask": "<Collide> { Polyset descend }",
+    "floor": (
+        "<Scalar> collide-mask { 0x02 }"
+        "\n<Collide> { Polyset descend level }"
+        "\n\nCreates a collision from the object(s) that 'Avatars' can walk on."
+        "\nIf the surface is angled, the Avatar will not slide down it."
+        '\nThe collision is active on the "Normals" side of the object(s)'
+    ),
+    "floor-collide": "<Scalar> collide-mask { 0x06 }",
+    "shadow": (
+        "<Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }"
+        '\n\nDefine a "shadow" object type, so we can render all shadows in '
+        "their own bin and have them not fight with each other (or with other "
+        "transparent geometry)."
+    ),
+    "shadow-cast": (
+        "<Tag> cam { shground }"
+        "\n<Scalar> draw-order { 0 }"
+        "\n<Scalar> bin { ground }"
+        "\n\nGives the selected object(s) the required attributes so that an "
+        '"Avatar\'s" shadow can be cast over it. Commonly used for casting an '
+        '"Avatar\'s" shadow onto floors.'
+    ),
+    "dupefloor": (
+        "<Collide> { Polyset keep descend level }"
+        "\n\nThis type first creates a duplicate of the selected object(s)."
+        "\nThen, creates a floor collision from the duplicate object(s) that "
+        '"Avatars" can walk on.'
+        "\nIf the surface is angled, the Avatar will not slide down it."
+        '\nThe collision is active on the "Normals" side of the object(s)'
+    ),
+    "smooth-floors": (
+        "<Collide> { Polyset descend }"
+        "\n<Scalar> from-collide-mask { 0x000fffff }"
+        "\n<Scalar> into-collide-mask { 0x00000002 }"
+        '\n\nMakes floors smooth for the "Avatars" to walk and stand on.'
+    ),
+    "camera-collide": (
+        "<Scalar> collide-mask { 0x04 }"
+        "\n<Collide> { Polyset descend }"
+        "\n\nAllows only the camera to collide with the geometry."
+    ),
+    "sphere": (
+        "<Collide> { Sphere descend }"
+        '\n\nCreates a "minimum-sized" sphere collision around the selected '
+        "object(s), that other objects cannot enter into."
+    ),
+    "tube": (
+        "<Collide> { Tube descend }"
+        '\n\nCreates a "minimum-sized" tube collision around the selected '
+        "object(s), that other objects cannot enter into."
+    ),
+    "trigger": (
+        "<Collide> { Polyset descend intangible }"
+        "\n\nCreates a collision that can be used as a 'Trigger', which can be "
+        "used to activate, or deactivate, specific processes."
+        '\nThe collision is active on the "Normals" side of the object(s)'
+    ),
+    "trigger-sphere": (
+        "<Collide> { Sphere descend intangible }"
+        '\n\nCreates a "minimum-sized" sphere collision that can be used as a '
+        '"Trigger", which can be used to activate, or deactivate, specific processes.'
+        '\nThe collision is active on the "Normals" side of the object(s)'
+    ),
+    "invsphere": (
+        "<Collide> { InvSphere descend }"
+        '\n\nCreates a "minimum-sized" inverse-sphere collision around the '
+        "selected object(s). Any object inside the sphere will be prevented from "
+        "exiting the sphere."
+    ),
+    "bubble": (
+        "<Collide> { Sphere keep descend }"
+        '\n\n"bubble" puts a Sphere collision around the geometry, but does not '
+        "otherwise remove the geometry."
+    ),
+    "dual": (
+        "<Scalar> alpha { dual }"
+        "\n\nNormally attached to polygons that have transparency, that are in "
+        "the scene by themselves, such as a Tree or Flower."
+    ),
+    "multisample": "<Scalar> alpha { ms }",
+    "blend": "<Scalar> alpha { blend }",
+    "decal": "<Scalar> decal { 1 }",
+    "ghost": (
+        "<Scalar> collide-mask { 0 }"
+        '\n\n"ghost" turns off the normal collide bit that is set on visible '
+        "geometry by default, so that if you are using visible geometry for "
+        "collisions, this particular geometry will not be part of those collisions--"
+        "it is ghostlike. Characters will pass through it."
+    ),
+    "glass": "<Scalar> alpha { blend_no_occlude }",
+    "glow": (
+        "<Scalar> blend { add }"
+        '\n\n"glow" is useful for halo effects and things of that ilk. It renders '
+        "the object in add mode instead of the normal opaque mode."
+    ),
+    "binary": (
+        "<Scalar> alpha { binary }"
+        "\n\nThis mode of alpha sets transparency pixels to either on or off. No "
+        "blending is used."
+    ),
+    "indexed": "<Scalar> indexed { 1 }",
+    "model": (
+        "<Model> { 1 }"
+        "\n\nThis creates a ModelNode at the corresponding level, which is "
+        "guaranteed not to be removed by any flatten operation. However, its "
+        "transform might still be changed."
+    ),
+    "dcs": (
+        "<DCS> { 1 }"
+        "\n\nIndicates the node should not be flattened out of the hierarchy during "
+        "conversion. The node's transform is important and should be preserved."
+    ),
+    "netdcs": "<DCS> { Net }",
+    "localdcs": "<DCS> { Local }",
+    "notouch": (
+        "<DCS> { no-touch }"
+        "\n\nIndicates the node, and below, should not be flattened out of the "
+        "hierarchy during the conversion process."
+    ),
+    "double-sided": (
+        "<BFace> { 1 }"
+        "\n\nDefines whether the polygon will be rendered double-sided (i.e., its "
+        "back face will be visible)."
+    ),
+    "billboard": (
+        "<Billboard> { axis }"
+        "\n\nRotates the geometry to always face the camera. Geometry will rotate "
+        "on its local axis."
+    ),
+    "seq2": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 2 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 2 fps."
+    ),
+    "seq4": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 4 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 4 fps."
+    ),
+    "seq6": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 6 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 6 fps."
+    ),
+    "seq8": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 8 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 8 fps."
+    ),
+    "seq10": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 10 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 10 fps."
+    ),
+    "seq12": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 12 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 12 fps."
+    ),
+    "seq24": (
+        "<Switch> { 1 }"
+        "\n<Scalar> fps { 24 }"
+        "\n\nIndicates a series of animation frames that should be consecutively "
+        "displayed at 24 fps."
+    ),
+    "ground": (
+        ""
+    ),
+    "invisible": "",
+    "catch-grab": "",
+    "pie": "",
+    "safety-gate": "",
+    "safety-net": "",
+    "draw1": "",
+    "draw0": "",
+    "shground": "",
+    "camtransbarrier": "",
+    "camtransparent": "",
+    "cambarrier-sphere": "",
+    "camera-barrier": "",
+    "camera-collide-sphere": "",
+    "backstage": "",
+}
 
 
 def MP_PY_PandaVersion(option):
@@ -13,19 +214,19 @@ def MP_PY_PandaVersion(option):
 
        EXAMPLE $gMP_PY_PandaFileVersions ARRAY ENTRY: "Default","bam2egg","egg2bam","pview"
     """
-    pm.melGlobals.initVar("string[]", "gMP_PY_PandaFileVersions")
+    pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
     executableToUse = ""
     selectedBamVersion = str(
         pm.optionMenu("MP_PY_BamVersionOptionMenu", query = 1, value = 1)
     )
-    for i in range(0, len(pm.melGlobals["gMP_PY_PandaFileVersions"])):
-        if selectedBamVersion == pm.melGlobals["gMP_PY_PandaFileVersions"][i]:
+    for i in range(0, len(pm.melGlobals[PANDA_FILE_VERSIONS])):
+        if selectedBamVersion == pm.melGlobals[PANDA_FILE_VERSIONS][i]:
             if option == "getBam2Egg":
-                executableToUse = pm.melGlobals["gMP_PY_PandaFileVersions"][i + 1]
+                executableToUse = pm.melGlobals[PANDA_FILE_VERSIONS][i + 1]
             elif option == "getEgg2Bam":
-                executableToUse = pm.melGlobals["gMP_PY_PandaFileVersions"][i + 2]
+                executableToUse = pm.melGlobals[PANDA_FILE_VERSIONS][i + 2]
             elif option == "getPview":
-                executableToUse = pm.melGlobals["gMP_PY_PandaFileVersions"][i + 3]
+                executableToUse = pm.melGlobals[PANDA_FILE_VERSIONS][i + 3]
             break
     return executableToUse
 
@@ -1286,187 +1487,7 @@ def MP_PY_GetObjectTypeAnnotation(objectType):
     """
     Returns the egg-object-type button annotation text of defined types as a string for GUI.
     """
-    annotations = {
-        "barrier": (
-            "<Collide> { Polyset descend }"
-            "\n\nCreates a barrier that other objects cannot pass through."
-            '\nThe collision is active on the "Normals" side of the object(s)'
-        ),
-        "barrier-no-mask": "<Collide> { Polyset descend }",
-        "floor": (
-            "<Scalar> collide-mask { 0x02 }"
-            "\n<Collide> { Polyset descend level }"
-            "\n\nCreates a collision from the object(s) that 'Avatars' can walk on."
-            "\nIf the surface is angled, the Avatar will not slide down it."
-            '\nThe collision is active on the "Normals" side of the object(s)'
-        ),
-        "floor-collide": "<Scalar> collide-mask { 0x06 }",
-        "shadow": (
-            "<Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }"
-            '\n\nDefine a "shadow" object type, so we can render all shadows in '
-            "their own bin and have them not fight with each other (or with other "
-            "transparent geometry)."
-        ),
-        "shadow-cast": (
-            "<Tag> cam { shground }"
-            "\n<Scalar> draw-order { 0 }"
-            "\n<Scalar> bin { ground }"
-            "\n\nGives the selected object(s) the required attributes so that an "
-            '"Avatar\'s" shadow can be cast over it. Commonly used for casting an '
-            '"Avatar\'s" shadow onto floors.'
-        ),
-        "dupefloor": (
-            "<Collide> { Polyset keep descend level }"
-            "\n\nThis type first creates a duplicate of the selected object(s)."
-            "\nThen, creates a floor collision from the duplicate object(s) that "
-            '"Avatars" can walk on.'
-            "\nIf the surface is angled, the Avatar will not slide down it."
-            '\nThe collision is active on the "Normals" side of the object(s)'
-        ),
-        "smooth-floors": (
-            "<Collide> { Polyset descend }"
-            "\n<Scalar> from-collide-mask { 0x000fffff }"
-            "\n<Scalar> into-collide-mask { 0x00000002 }"
-            '\n\nMakes floors smooth for the "Avatars" to walk and stand on.'
-        ),
-        "camera-collide": (
-            "<Scalar> collide-mask { 0x04 }"
-            "\n<Collide> { Polyset descend }"
-            "\n\nAllows only the camera to collide with the geometry."
-        ),
-        "sphere": (
-            "<Collide> { Sphere descend }"
-            '\n\nCreates a "minimum-sized" sphere collision around the selected '
-            "object(s), that other objects cannot enter into."
-        ),
-        "tube": (
-            "<Collide> { Tube descend }"
-            '\n\nCreates a "minimum-sized" tube collision around the selected '
-            "object(s), that other objects cannot enter into."
-        ),
-        "trigger": (
-            "<Collide> { Polyset descend intangible }"
-            "\n\nCreates a collision that can be used as a 'Trigger', which can be "
-            "used to activate, or deactivate, specific processes."
-            '\nThe collision is active on the "Normals" side of the object(s)'
-        ),
-        "trigger-sphere": (
-            "<Collide> { Sphere descend intangible }"
-            '\n\nCreates a "minimum-sized" sphere collision that can be used as a '
-            '"Trigger", which can be used to activate, or deactivate, specific processes.'
-            '\nThe collision is active on the "Normals" side of the object(s)'
-        ),
-        "invsphere": (
-            "<Collide> { InvSphere descend }"
-            '\n\nCreates a "minimum-sized" inverse-sphere collision around the '
-            "selected object(s). Any object inside the sphere will be prevented from "
-            "exiting the sphere."
-        ),
-        "bubble": (
-            "<Collide> { Sphere keep descend }"
-            '\n\n"bubble" puts a Sphere collision around the geometry, but does not '
-            "otherwise remove the geometry."
-        ),
-        "dual": (
-            "<Scalar> alpha { dual }"
-            "\n\nNormally attached to polygons that have transparency, that are in "
-            "the scene by themselves, such as a Tree or Flower."
-        ),
-        "multisample": "<Scalar> alpha { ms }",
-        "blend": "<Scalar> alpha { blend }",
-        "decal": "<Scalar> decal { 1 }",
-        "ghost": (
-            "<Scalar> collide-mask { 0 }"
-            '\n\n"ghost" turns off the normal collide bit that is set on visible '
-            "geometry by default, so that if you are using visible geometry for "
-            "collisions, this particular geometry will not be part of those collisions--"
-            "it is ghostlike. Characters will pass through it."
-        ),
-        "glass": "<Scalar> alpha { blend_no_occlude }",
-        "glow": (
-            "<Scalar> blend { add }"
-            '\n\n"glow" is useful for halo effects and things of that ilk. It renders '
-            "the object in add mode instead of the normal opaque mode."
-        ),
-        "binary": (
-            "<Scalar> alpha { binary }"
-            "\n\nThis mode of alpha sets transparency pixels to either on or off. No "
-            "blending is used."
-        ),
-        "indexed": "<Scalar> indexed { 1 }",
-        "model": (
-            "<Model> { 1 }"
-            "\n\nThis creates a ModelNode at the corresponding level, which is "
-            "guaranteed not to be removed by any flatten operation. However, its "
-            "transform might still be changed."
-        ),
-        "dcs": (
-            "<DCS> { 1 }"
-            "\n\nIndicates the node should not be flattened out of the hierarchy during "
-            "conversion. The node's transform is important and should be preserved."
-        ),
-        "netdcs": "<DCS> { Net }",
-        "localdcs": "<DCS> { Local }",
-        "notouch": (
-            "<DCS> { no-touch }"
-            "\n\nIndicates the node, and below, should not be flattened out of the "
-            "hierarchy during the conversion process."
-        ),
-        "double-sided": (
-            "<BFace> { 1 }"
-            "\n\nDefines whether the polygon will be rendered double-sided (i.e., its "
-            "back face will be visible)."
-        ),
-        "billboard": (
-            "<Billboard> { axis }"
-            "\n\nRotates the geometry to always face the camera. Geometry will rotate "
-            "on its local axis."
-        ),
-        "seq2": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 2 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 2 fps."
-        ),
-        "seq4": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 4 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 4 fps."
-        ),
-        "seq6": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 6 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 6 fps."
-        ),
-        "seq8": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 8 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 8 fps."
-        ),
-        "seq10": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 10 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 10 fps."
-        ),
-        "seq12": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 12 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 12 fps."
-        ),
-        "seq24": (
-            "<Switch> { 1 }"
-            "\n<Scalar> fps { 24 }"
-            "\n\nIndicates a series of animation frames that should be consecutively "
-            "displayed at 24 fps."
-        ),
-    }
-
-    return annotations.get(
+    return OT_ENTRIES.get(
         objectType, f"Adds the {objectType} egg-object-type to selected geometry."
     )
 
@@ -1490,7 +1511,7 @@ def MP_PY_Globals():
             pm.mel.substituteAllString(pm.melGlobals["gMP_PY_MayaVersionShort"], "0", "")
         )
 
-    pm.melGlobals.initVar("string[]", "gMP_PY_PandaFileVersions")
+    pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
     # Global array containing all users versioned executable file names
     """
     NOTICE REGARDING THE PANDA3D/BIN FILES:
@@ -1536,66 +1557,12 @@ def MP_PY_Globals():
     # NOTE: WHEN ENTERING IN OTHER VERSIONS, DO NOT INCLUDE THE FILE EXTENSIONS!!
     # Array Format: {"MenuDisplayText","bam2egg[version]","egg2bam[version]","pview[version]"}
     # Please leave the initial set of four entries as they are the fallback defaults used.
-    pm.melGlobals["gMP_PY_PandaFileVersions"] = ["Default", "bam2egg", "egg2bam", "pview"]
+    pm.melGlobals[PANDA_FILE_VERSIONS] = ["Default", "bam2egg", "egg2bam", "pview"]
     # User editable egg-object-type global array.
     # NOTICE: Each egg-object-type that is added into the array MUST ALSO be referenced in a user Panda3D PRC file!!!
     #        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
-    pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted([
-        "barrier",
-        "barrier-no-mask",
-        "ground",
-        "floor",
-        "dupefloor",
-        "smooth-floors",
-        "floor-collide",
-        "camera-collide",
-        "camera-collide-sphere",
-        "camera-barrier",
-        "cambarrier-sphere",
-        "camtransparent",
-        "camtransbarrier",
-        "sphere",
-        "invsphere",
-        "tube",
-        "trigger",
-        "trigger-sphere",
-        "bubble",
-        "decal",
-        "dual",
-        "blend",
-        "ghost",
-        "binary",
-        "multisample",
-        "shadow",
-        "shadow-cast",
-        "glass",
-        "glow",
-        "indexed",
-        "model",
-        "dcs",
-        "localdcs",
-        "netdcs",
-        "notouch",
-        "shground",
-        "draw0",
-        "draw1",
-        "billboard",
-        "double-sided",
-        "safety-net",
-        "safety-gate",
-        "pie",
-        "catch-grab",
-        "invisible",
-        "dart",
-        "seq2",
-        "seq4",
-        "seq6",
-        "seq8",
-        "seq10",
-        "seq12",
-        "seq24",
-    ])
+    pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted(OT_ENTRIES.keys())
     # Removed:
     # polylight portal
     # todo: maybe add option to type own number for seqX
@@ -1609,16 +1576,16 @@ def MP_PY_CreatePandaExporterWindow():
     """
     Creates the GUI control
     """
-    pm.melGlobals.initVar("string[]", "gMP_PY_PandaFileVersions")
+    pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
     # Process Variables
     pm.melGlobals.initVar("string", "gMP_PY_MayaVersionShort")
-    pm.melGlobals.initVar("string", "gMP_PY_ReleaseRevision")
+    pm.melGlobals.initVar("string", ADDON_RELEASE_VERSION)
     # Exporter GUI Creation
     pm.window(
         "MP_PY_PandaExporter",
         sizeable = 1,
         width = 400,
-        title = ("Panda Exporter " + pm.melGlobals["gMP_PY_ReleaseRevision"]),
+        title = ("Panda Exporter " + pm.melGlobals[ADDON_RELEASE_VERSION]),
         height = 400,
         visible = 0,
         retain = 1,
@@ -2710,7 +2677,7 @@ def MP_PY_PandaExporterUI():
 
 MP_PY_Globals()
 # Variable to hold our release revision
-pm.melGlobals.initVar("string", "gMP_PY_ReleaseRevision")
-pm.melGlobals["gMP_PY_ReleaseRevision"] = "v1.9"
+pm.melGlobals.initVar("string", ADDON_RELEASE_VERSION)
+pm.melGlobals[ADDON_RELEASE_VERSION] = "v1.9"
 # Call the GUI creation process
 MP_PY_CreatePandaExporterWindow()
