@@ -2877,9 +2877,7 @@ def MP_PY_ExportNodesToPandaFiles():
 
         # Export the node as a Maya binary file
         pm.select(node, replace = True)
-        pm.system("file", op = "v=1", typ = "mayaBinary", exportSelected = True, force = True,
-                  exportPath = temp_mb_file)
-
+        pm.cmds.file(temp_mb_file, op="v=1", typ="mayaBinary", exportSelected=True, force=True)
         # Add Maya file info to results
         nodes_to_panda_files.append((maya_file_name, dest_path))
 
@@ -2957,7 +2955,7 @@ def MP_PY_NodesExportedAsPandaFilesGUI(nodes_to_panda_files):
     for i in range(0, len(nodes_to_panda_files), 2):
         file_name = nodes_to_panda_files[i]
         file_path = nodes_to_panda_files[i + 1]
-        scroll_field.appendText(f"{file_name} : {file_path}\n")
+        pm.scrollField(scroll_field, edit = True, insertText = f"{file_name} : {file_path}\n")
 
 
 def MP_PY_BrowseForFilePreProcess(option):
