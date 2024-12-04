@@ -1178,6 +1178,10 @@ def MP_PY_Globals():
         pm.melGlobals[MAYA_VER_SHORT] = str(
             pm.mel.substituteAllString(pm.melGlobals[MAYA_VER_SHORT], "0", "")
         )
+    # silly little hack because sometimes maya wants to say 20220 instead of 2022 -o-
+    elif len(pm.melGlobals[MAYA_VER_SHORT]) > 4:
+        pm.melGlobals[MAYA_VER_SHORT] = str(
+            pm.melGlobals[MAYA_VER_SHORT][0:4]
         )
 
     pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
@@ -1247,7 +1251,7 @@ def MP_PY_CreatePandaExporterWindow():
     """
     pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
     # Process Variables
-    pm.melGlobals.initVar("string", "gMP_PY_MayaVersionShort")
+    pm.melGlobals.initVar("string", MAYA_VER_SHORT)
     pm.melGlobals.initVar("string", ADDON_RELEASE_VERSION)
     # Exporter GUI Creation
     pm.window(
