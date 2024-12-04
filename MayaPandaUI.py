@@ -509,157 +509,57 @@ def MP_PY_AddEggObjectTypesGUI():
     )
 
 
-def MP_PY_UVScrolling(Option):
+def MP_PY_UVScrolling(option):
     """
-    Process to set/edit the UV scrolling of a texture.
+    Handles setting, getting, or deleting UV scrolling attributes for selected nodes.
     """
-    item = ""
-    buff = []
-    numTokens = 0
-    scrollU = 0.0
-    scrollV = 0.0
-    scrollR = 0.0
-    if pm.floatField("scrollUFF", query = 1, value = 1) == 0:
-        scrollU = float(0)
+    # Fetch the UV scrolling values from the UI
+    scroll_u = pm.floatField("scrollUFF", query=True, value=True)
+    scroll_v = pm.floatField("scrollVFF", query=True, value=True)
+    scroll_r = pm.floatField("scrollRFF", query=True, value=True)
 
-    else:
-        scrollU = float(pm.floatField("scrollUFF", query = 1, value = 1))
-
-    if pm.floatField("scrollVFF", query = 1, value = 1) == "":
-        scrollV = float(0)
-
-    else:
-        scrollV = float(pm.floatField("scrollVFF", query = 1, value = 1))
-
-    if pm.floatField("scrollRFF", query = 1, value = 1) == "":
-        scrollR = float(0)
-
-    else:
-        scrollR = float(pm.floatField("scrollRFF", query = 1, value = 1))
-
-    nodeName = pm.ls(l = 1, sl = 1)
-    if len(nodeName) == 0:
+    # Get selected nodes
+    selected_nodes = pm.ls(selection=True)
+    if not selected_nodes:
         MP_PY_ConfirmationDialog(
             "Selection Error!",
-            "You must first make a selection!" +
-            "\nPlease select at least one node, then try again.",
+            "No nodes selected.\nPlease select at least one node and try again.",
             "ok",
         )
+        return
 
-    else:
-        for node in nodeName:
-            numTokens = int(len(node.split("|")))
-            item = buff[numTokens - 1]
-            if Option == "set":
-                if pm.mel.attributeExists("scrollUV", node):
-                    if pm.mel.attributeExists("scrollU", node):
-                        if scrollU != 0:
-                            pm.setAttr((str(node) + ".scrollU"), scrollU)
-                        else:
-                            pm.setAttr((str(node) + ".scrollU"), 0)
-                    else:
-                        MP_PY_UVScrolling("set")
+    # Process each selected node
+    for node in selected_nodes:
+        scroll_attrs = {
+            "scrollU": scroll_u,
+            "scrollV": scroll_v,
+            "scrollR": scroll_r
+        }
 
-                    if pm.mel.attributeExists("scrollV", node):
-                        if scrollV != 0:
-                            pm.setAttr((str(node) + ".scrollV"), scrollV)
-                        else:
-                            pm.setAttr((str(node) + ".scrollV"), 0)
-                    else:
-                        MP_PY_UVScrolling("set")
+        if option == "set":
+            # Ensure scrollUV attribute exists, then set values
+            if not pm.attributeQuery("scrollUV", node=node, exists=True):
+                pm.addAttr(node, longName="scrollUV", attributeType="double3", keyable=True)
+                for attr in scroll_attrs:
+                    pm.addAttr(node, longName=attr, attributeType="double", parent="scrollUV", keyable=True)
 
-                    if pm.mel.attributeExists("scrollR", node):
-                        if scrollR != 0:
-                            pm.setAttr((str(node) + ".scrollR"), scrollR)
-                        else:
-                            pm.setAttr((str(node) + ".scrollR"), 0)
-                    else:
-                        MP_PY_UVScrolling("set")
+            for attr, value in scroll_attrs.items():
+                pm.setAttr(f"{node}.{attr}", value)
 
-                else:
-                    pm.addAttr(attributeType = "double3", longName = "scrollUV")
-                    if scrollU != 0:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = scrollU,
-                            parent = "scrollUV",
-                            longName = "scrollU",
-                        )
+        elif option == "get":
+            # Query existing UV scroll values and update UI
+            for attr in scroll_attrs:
+                if pm.attributeQuery(attr, node=node, exists=True):
+                    value = pm.getAttr(f"{node}.{attr}")
+                    pm.floatField(f"{attr}FF", edit=True, value=value)
 
-                    else:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = 0,
-                            parent = "scrollUV",
-                            longName = "scrollU",
-                        )
-
-                    if scrollV != 0:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = scrollV,
-                            parent = "scrollUV",
-                            longName = "scrollV",
-                        )
-
-                    else:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = 0,
-                            parent = "scrollUV",
-                            longName = "scrollV",
-                        )
-
-                    if scrollR != 0:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = scrollR,
-                            parent = "scrollUV",
-                            longName = "scrollR",
-                        )
-
-                    else:
-                        pm.addAttr(
-                            k = True,
-                            attributeType = "double",
-                            defaultValue = 0,
-                            parent = "scrollUV",
-                            longName = "scrollR",
-                        )
-            elif Option == "get":
-                if pm.mel.attributeExists("scrollUV", node):
-                    if pm.mel.attributeExists("scrollU", node):
-                        pm.floatField(
-                            "scrollUFF",
-                            edit = 1,
-                            value = pm.getAttr((str(node) + ".scrollU"), asString = 1),
-                        )
-
-                    if pm.mel.attributeExists("scrollV", node):
-                        pm.floatField(
-                            "scrollVFF",
-                            edit = 1,
-                            value = pm.getAttr((str(node) + ".scrollV"), asString = 1),
-                        )
-
-                    if pm.mel.attributeExists("scrollR", node):
-                        pm.floatField(
-                            "scrollRFF",
-                            edit = 1,
-                            value = pm.getAttr((str(node) + ".scrollR"), asString = 1),
-                        )
-
-            elif Option == "delete":
-                if pm.mel.attributeExists("scrollUV", node):
-                    pm.deleteAttr(attribute = "scrollUV", n = node)
-                    pm.floatField("scrollUFF", edit = 1, value = 0)
-                    pm.floatField("scrollVFF", edit = 1, value = 0)
-                    pm.floatField("scrollRFF", edit = 1, value = 0)
+        elif option == "delete":
+            # Remove scrollUV attribute if it exists
+            if pm.attributeQuery("scrollUV", node=node, exists=True):
+                pm.deleteAttr(node, attribute="scrollUV")
+                pm.floatField("scrollUFF", edit=True, value=0)
+                pm.floatField("scrollVFF", edit=True, value=0)
+                pm.floatField("scrollRFF", edit=True, value=0)
 
 
 def MP_PY_GetEggObjectTypes():
