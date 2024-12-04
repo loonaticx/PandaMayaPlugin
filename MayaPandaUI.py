@@ -1593,7 +1593,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.rowLayout(
         numberOfColumns = 2, rowAttach = [(1, "top", 0), (2, "top", 0), (3, "top", 0)]
     )
-    # Construct LEFT Column
+    # region  Construct LEFT Column
     pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
     pm.frameLayout(width = 200, height = 65, label = "Export File Type")
     pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
@@ -1802,13 +1802,18 @@ def MP_PY_CreatePandaExporterWindow():
     pm.text("Bam Version")
     pm.setParent(upLevel = 1)
     pm.rowLayout(numberOfColumns = 2)
+    # region rawtex
     pm.checkBox("MP_PY_RawtexCB", value = 0, label = "Pack Textures into Bam (-rawtex)")
     pm.setParent(upLevel = 1)
     pm.rowLayout(numberOfColumns = 2)
+    # endregion
+    # region flatten
     pm.checkBox("MP_PY_FlattenCB", value = 0, label = "Flatten (-flatten 1)")
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
+    # region convert units from
     pm.frameLayout(width = 200, height = 50, label = "Convert Units From")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.optionMenu("MP_PY_UnitMenu")
@@ -1824,6 +1829,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.optionMenu("MP_PY_UnitMenu", edit = 1, value = "cm")
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
+    # region output filetype
     pm.frameLayout(width = 200, height = 70, label = "Output File Type:")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.radioCollection("MP_PY_OutputPandaFileTypeRC")
@@ -1842,6 +1849,7 @@ def MP_PY_CreatePandaExporterWindow():
     )
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
     pm.frameLayout(width = 200, height = 50, label = "Egg-Object-Types:")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.rowLayout(numberOfColumns = 2)
@@ -1873,10 +1881,14 @@ def MP_PY_CreatePandaExporterWindow():
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
-    # Construct RIGHT Column
+    # endregion
+
+    # region Construct RIGHT Column
     pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
     pm.frameLayout(width = 270, height = 320, label = "Output Path & Name Options:")
     pm.columnLayout(columnAttach = ("left", 0))
+
+    # region Texture path options
     pm.text(fn = "boldLabelFont", label = "Texture Path Options:")
     pm.radioCollection("MP_PY_TexPathOptionsRC")
     pm.radioButton(
@@ -1899,7 +1911,6 @@ def MP_PY_CreatePandaExporterWindow():
         collection = "MP_PY_TexPathOptionsRC",
         label = "Reference textures relative to specified path",
     )
-
     pm.radioButton(
         "MP_PY_ChooseCustomTexPathRB",
         onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
@@ -1977,6 +1988,9 @@ def MP_PY_CreatePandaExporterWindow():
     )
     pm.setParent(u = 1)
     pm.separator(style = "none", height = 5)
+    # endregion
+
+    # region Output filepath options
     pm.text(fn = "boldLabelFont", label = "Output File Path:")
     pm.radioCollection("MP_PY_OutputPathOptionsRC")
     pm.radioButton(
@@ -2037,6 +2051,9 @@ def MP_PY_CreatePandaExporterWindow():
     pm.setParent(u = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
+
+    # region Animation options
     pm.frameLayout(width = 270, height = 120, label = "Animation Options")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.rowLayout(numberOfColumns = 2)
@@ -2176,6 +2193,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
+    # region Export scene/nodes options
     pm.frameLayout(width = 270, height = 80, label = "Export Scene or Export Nodes:")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.rowLayout(numberOfColumns = 2)
@@ -2193,6 +2212,7 @@ def MP_PY_CreatePandaExporterWindow():
         ),
         label = "Export Current Scene",
     )
+    # region send to pview
     pm.button(
         "MP_PY_Send2PviewBTN",
         width = 80,
@@ -2207,6 +2227,8 @@ def MP_PY_CreatePandaExporterWindow():
     )
     pm.setParent(upLevel = 1)
     pm.rowLayout(numberOfColumns = 3)
+    # endregion
+    # region convert nodes to panda
     pm.button(
         "MP_PY_ConvertNodesToPandaBTN",
         width = 135,
@@ -2228,6 +2250,8 @@ def MP_PY_CreatePandaExporterWindow():
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
+    # region convert files
     pm.frameLayout(width = 270, height = 80, label = "Convert Files:")
     pm.columnLayout(columnAttach = ("left", 0))
     pm.rowLayout(numberOfColumns = 3)
@@ -2264,6 +2288,7 @@ def MP_PY_CreatePandaExporterWindow():
     )
     pm.setParent(upLevel = 1)
     pm.rowLayout(numberOfColumns = 3)
+    # endregion
     pm.button(
         "MP_PY_ImportPandaFileBTN",
         width = 100,
@@ -2276,7 +2301,9 @@ def MP_PY_CreatePandaExporterWindow():
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
     pm.setParent(upLevel = 1)
+    # endregion
     pm.setParent(top = 1)
+    # endregion
 
 
 pm.melGlobals.initVar("string", "gMainWindow")
@@ -2296,12 +2323,14 @@ if pm.window("MP_PY_PandaExporter", exists = 1):
 if pm.window("MP_PY_AddEggObjectTypesWindow", exists = 1):
     pm.deleteUI("MP_PY_AddEggObjectTypesWindow", window = 1)
 # Delete any current instances of the MP_PY_AddEggObjectTypesWindow window
+# endregion
 
 if pm.window("MP_PY_DeleteEggObjectTypesWindow", exists = 1):
     pm.deleteUI("MP_PY_DeleteEggObjectTypesWindow", window = 1)
 # Delete any current instances of the MP_PY_DeleteEggObjectTypesWindow window
 
 pm.menu("MP_PY_PandaMenu", label = "Panda3D_Python")
+# region Init menu
 # Define main menu and menu items
 # Set the MP_PY_PandaMenu as the parent for the following menuItems
 pm.setParent("MP_PY_PandaMenu", menu = 1)
@@ -2325,6 +2354,8 @@ pm.menuItem(
     label = "Download Panda3D-SDK",
 )
 
+
+# endregion
 
 def MP_PY_AnimationOptionsUI(option, to_update=""):
     """
