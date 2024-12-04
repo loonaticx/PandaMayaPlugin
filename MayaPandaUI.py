@@ -937,321 +937,98 @@ def mp_py_delete_egg_object_type(node_hierarchy, index):
 
 def MP_PY_ArgsBuilder(FileName):
     """
-    constructs the arguments to pass to maya2egg
+    Constructs the arguments to pass to maya2egg.
     """
-    ARGS = "maya2egg"
-    pm.melGlobals.initVar("string", "gMP_PY_MayaVersionShort")
-    ARGS += pm.melGlobals["gMP_PY_MayaVersionShort"]
-    ARGS += " "
-    # Increase output verbosity.  More v's means more verbose.
-    ARGS += "-v "
-    # We always want polygons, never nurbs.
-    ARGS += "-p "
-    # check back face culling i.e. 'double-sided faces'
-    if pm.checkBox("MP_PY_ExportBfaceCB", query = 1, value = 1):
-        ARGS += "-bface "
+    # Base arguments
+    pm.melGlobals.initVar("string", MAYA_VER_SHORT)
+    ARGS = f"maya2egg{pm.melGlobals[MAYA_VER_SHORT]} -v -p "
 
-    if pm.checkBox("MP_PY_ExportLegacyShadersCB", query = 1, value = 1):
-        ARGS += "-legacy-shaders "
-    # check Shader option
+    # Checkbox flags
+    checkboxes = {
+        "MP_PY_ExportBfaceCB": "-bface",
+        "MP_PY_ExportLegacyShadersCB": "-legacy-shaders",
+        "MP_PY_ExportKeepUvsCB": "-keep-uvs",
+        "MP_PY_ExportRoundUvsCB": "-round-uvs",
+        "MP_PY_ExportTbnallCB": "-tbnall",
+        "MP_PY_ExportLightsCB": "-convert-lights",
+        "MP_PY_ExportCamerasCB": "-convert-cameras",
+    }
+    ARGS += " ".join(
+        flag for checkbox, flag in checkboxes.items() if pm.checkBox(checkbox, query = True, value = True)) + " "
 
-    if pm.checkBox("MP_PY_ExportKeepUvsCB", query = 1, value = 1):
-        ARGS += "-keep-uvs "
-    # check Keep UV option
+    # Export options
+    export_options = {
+        "MP_PY_ChooseMeshRB": "-a none",
+        "MP_PY_ChooseActorRB": "-a model",
+        "MP_PY_ChooseAnimationRB": "-a chan",
+        "MP_PY_ChooseBothRB": "-a both",
+        "MP_PY_ChoosePoseRB": "-a pose",
+    }
+    selected_export = pm.radioCollection("MP_PY_ExportOptionsRC", query = True, select = True)
+    ARGS += f"{export_options.get(selected_export, '')} "
 
-    if pm.checkBox("MP_PY_ExportRoundUvsCB", query = 1, value = 1):
-        ARGS += "-round-uvs "
-    # check Round UV option
-
-    if pm.checkBox("MP_PY_ExportTbnallCB", query = 1, value = 1):
-        ARGS += "-tbnall "
-    # check tbnall option  'Compute tangent and binormal for all texture coordinate sets'
-
-    if pm.checkBox("MP_PY_ExportLightsCB", query = 1, value = 1):
-        ARGS += "-convert-lights "
-    # check lights option  'Convert all light nodes to locators.'
-
-    if pm.checkBox("MP_PY_ExportCamerasCB", query = 1, value = 1):
-        ARGS += "-convert-cameras "
-    # check cameras option  'Convert all camera nodes to locators.'
-
-    exportOptionsARGS = str(
-        pm.radioCollection("MP_PY_ExportOptionsRC", query = 1, select = 1)
-    )
-    # check Export File Type option 'none, pose, flip, strobe, model, chan, or both'
-    if exportOptionsARGS == "MP_PY_ChooseMeshRB":
-        ARGS += "-a none "
-
-    elif exportOptionsARGS == "MP_PY_ChooseActorRB":
-        ARGS += "-a model "
-
-    elif exportOptionsARGS == "MP_PY_ChooseAnimationRB":
-        ARGS += "-a chan "
-        # set the start frames
-        #  **Does not check if start frame < end frame
-        #  **Does not support negative values
-        #  **Does not check if start/end frame is within bounds of the scene
-
-        if (
-                pm.radioCollection("MP_PY_AnimationOptionsRC", query = 1, select = 1)
-                == "MP_PY_chooseCustomAnimationRangeRB"
-        ):
-            startFrameARGS = str(
-                pm.intField("MP_PY_AnimationStartFrameIF", query = 1, value = 1)
-            )
-            endFrameARGS = str(
-                pm.intField("MP_PY_AnimationEndFrameIF", query = 1, value = 1)
-            )
-            # start frame
-            if (
-                    pm.mel.match("[0-9]+", startFrameARGS) == startFrameARGS
-                    and startFrameARGS != ""
-            ):
-                ARGS += "-sf " + str(pm.mel.match("[0-9]+", startFrameARGS)) + " "
-
+    # Animation frame range
+    if selected_export in {"MP_PY_ChooseAnimationRB", "MP_PY_ChooseBothRB", "MP_PY_ChoosePoseRB"}:
+        if pm.radioCollection("MP_PY_AnimationOptionsRC", query = True,
+                              select = True) == "MP_PY_chooseCustomAnimationRangeRB":
+            start_frame = pm.intField("MP_PY_AnimationStartFrameIF", query = True, value = True)
+            end_frame = pm.intField("MP_PY_AnimationEndFrameIF", query = True, value = True)
+            if isinstance(start_frame, int) and isinstance(end_frame, int):
+                ARGS += f"-sf {start_frame} -ef {end_frame} "
             else:
-                pm.mel.error(
-                    "Start Frame entered data is the wrong format.  Should be an integer.\n"
-                )
+                pm.mel.error("Start or End Frame entered data is invalid. Must be integers.")
                 return "failed"
 
-            if (
-                    pm.mel.match("[0-9]+", endFrameARGS) == endFrameARGS
-                    and endFrameARGS != ""
-            ):
-                ARGS += "-ef " + str(pm.mel.match("[0-9]+", endFrameARGS)) + " "
-            # end frame
+    # Transform modes
+    transform_modes = {
+        "MP_PY_ChooseTransformModelRB": "-trans model",
+        "MP_PY_ChooseTransformAllRB": "-trans all",
+        "MP_PY_ChooseTransformDCSRB": "-trans dcs",
+        "MP_PY_ChooseTransformNoneRB": "-trans none",
+    }
+    selected_transform = pm.radioCollection("MP_PY_TransformModeRC", query = True, select = True)
+    ARGS += f"{transform_modes.get(selected_transform, '')} "
 
-            else:
-                pm.mel.error(
-                    "End Frame entered data is the wrong format.      Should be an integer.\n"
-                )
-                return "failed"
-
-    elif exportOptionsARGS == "MP_PY_ChooseBothRB":
-        ARGS += "-a both "
-        # set the start frames
-        #  **Does not check if start frame < end frame
-        #  **Does not support negative values
-        #  **Does not check if start/end frame is within bounds of the scene
-
-        if (
-                pm.radioCollection("MP_PY_AnimationOptionsRC", query = 1, select = 1)
-                == "MP_PY_chooseCustomAnimationRangeRB"
-        ):
-            startFrameARGS = str(
-                pm.intField("MP_PY_AnimationStartFrameIF", query = 1, value = 1)
-            )
-            endFrameARGS = str(
-                pm.intField("MP_PY_AnimationEndFrameIF", query = 1, value = 1)
-            )
-            # start frame
-            if (
-                    pm.mel.match("[0-9]+", startFrameARGS) == startFrameARGS
-                    and startFrameARGS != ""
-            ):
-                ARGS += "-sf " + str(pm.mel.match("[0-9]+", startFrameARGS)) + " "
-
-            else:
-                pm.mel.error(
-                    "Start Frame entered data is the wrong format.  Should be an integer.\n"
-                )
-                return "failed"
-
-            if (
-                    pm.mel.match("[0-9]+", endFrameARGS) == endFrameARGS
-                    and endFrameARGS != ""
-            ):
-                ARGS += "-ef " + str(pm.mel.match("[0-9]+", endFrameARGS)) + " "
-            # end frame
-
-            else:
-                pm.mel.error(
-                    "End Frame entered data is the wrong format.      Should be an integer.\n"
-                )
-                return "failed"
-
-    elif exportOptionsARGS == "MP_PY_ChoosePoseRB":
-        ARGS += "-a pose "
-        # set the pose frame for animation
-        #  **Does not support negative values
-
-        startFrameARGS = str(
-            pm.intField("MP_PY_AnimationStartFrameIF", query = 1, value = 1)
-        )
-
-        if (
-                pm.mel.match("[0-9]+", startFrameARGS) == startFrameARGS
-                and startFrameARGS != ""
-        ):
-            ARGS += "-sf " + str(pm.mel.match("[0-9]+", startFrameARGS)) + " "
-
-        else:
-            pm.mel.error(
-                "Start Frame entered data is the wrong format.  Should be an integer.\n"
-            )
-            return "failed"
-
-    transformMode = str(pm.radioCollection("MP_PY_TransformModeRC", query = 1, select = 1))
-    # Get the 'transform mode' option and append to $ARGS string
-    if transformMode == "MP_PY_ChooseTransformModelRB":
-        ARGS += "-trans model "
-
-    elif transformMode == "MP_PY_ChooseTransformAllRB":
-        ARGS += "-trans all "
-
-    elif transformMode == "MP_PY_ChooseTransformDCSRB":
-        ARGS += "-trans dcs "
-
-    elif transformMode == "MP_PY_ChooseTransformNoneRB":
-        ARGS += "-trans none "
-
-    if pm.checkBox("MP_PY_RemoveGroundPlaneCB", query = 1, value = 1) == 1:
+    # Remove groundPlane_transform
+    if pm.checkBox("MP_PY_RemoveGroundPlaneCB", query = True, value = True):
         ARGS += "-exclude groundPlane_transform "
-    # Check status of remove groundPlane_transform checkBox
 
-    up = str(pm.upAxis(q = 1, axis = 1))
-    # get scene up axis and append to $ARGS string
-    ARGS += "-cs " + up + "-up "
-    # get units from option menu and append to $ARGS string
-    unit = str(pm.optionMenu("MP_PY_UnitMenu", q = 1, value = 1))
-    ARGS += "-uo " + unit + " "
-    """-cn name
-      Specifies the name of the animation character.  This
-      should match between all of the model files and all of
-      the channel files for a particular model and its
-      associated channels.
-      Only applied if the exported file is not a mesh type.
-    """
-    if exportOptionsARGS != "MP_PY_ChooseMeshRB":
-        if pm.textField("MP_PY_CharacterNameTF", query = 1, text = 1) != "":
-            ARGS += (
-                    "-cn "
-                    + str(
-                pm.mel.substituteAllString(
-                    pm.textField("MP_PY_CharacterNameTF", query = 1, text = 1), " ", "_"
-                )
+    # Scene up axis and units
+    ARGS += f"-cs {pm.upAxis(query = True, axis = True)}-up "
+    ARGS += f"-uo {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)} "
+
+    # Character name
+    if selected_export != "MP_PY_ChooseMeshRB":
+        char_name = pm.textField("MP_PY_CharacterNameTF", query = True, text = True) or FileName
+        ARGS += f"-cn {char_name.replace(' ', '_')} "
+
+    # Handle force-joint flags
+    joints = pm.textField("MP_PY_ForceJointTF", query = True, text = True).split()
+    for joint in joints:
+        if not pm.mel.attributeExists("eggObjectTypes1", joint):
+            MP_PY_AddEggObjectFlags("dcs")
+            confirm_restart = MP_PY_ConfirmationDialog(
+                "File Error!",
+                "Added missing DCS flag to nodes. Restart export?",
+                "yesno",
             )
-                    + " "
-            )
-        # User has entered a character name, we use that
-        # spaces not allowed, replace with underscores
-
-        else:
-            ARGS += "-cn " + str(pm.mel.substituteAllString(FileName, " ", "_")) + " "
-    # User did not enter a character name, we use file name as character name
-    # spaces not allowed, replace with underscores
-
-    mustRestart = 0
-    """-force-joint name
-      Specifies the name(s) of a DAG node that maya2egg should
-      treat as a joint, even if it does not appear to be a
-      Maya joint and does not appear to be animated.
-      The specified DAGs have to be tagged as a DCS egg-type.
-      Routine checks for this and if it doesn't exist, it adds the DCS tag to it.
-    """
-    JointNames = str(pm.textField("MP_PY_ForceJointTF", query = 1, text = 1))
-    joints = JointNames.split(" ")
-    numberEntries = int(len(joints))
-    if pm.textField("MP_PY_ForceJointTF", query = 1, text = 1) != "":
-        # iterate through each named joint and verify they have the required 'DCS' object-type flag set
-        # If not, we add the attribute and request restarting the export process
-        # We MUST restart so the export process recognizes the added object-tags
-        for i in range(0, numberEntries):
-            eggObjectTypes1 = ""
-            eggObjectTypes2 = ""
-            eggObjectTypes3 = ""
-            pm.select(joints[i], r = 1)
-            if pm.mel.attributeExists("eggObjectTypes1", joints[i]) == 1:
-                eggObjectTypes1 = str(
-                    pm.getAttr((joints[i] + ".eggObjectTypes1"), asString = 1)
-                )
-
-            if pm.mel.attributeExists("eggObjectTypes2", joints[i]) == 1:
-                eggObjectTypes2 = str(
-                    pm.getAttr((joints[i] + ".eggObjectTypes2"), asString = 1)
-                )
-
-            if pm.mel.attributeExists("eggObjectTypes3", joints[i]) == 1:
-                eggObjectTypes3 = str(
-                    pm.getAttr((joints[i] + ".eggObjectTypes3"), asString = 1)
-                )
-
-            if "dcs" in [eggObjectTypes1, eggObjectTypes2, eggObjectTypes3]:
-                ARGS += "-force-joint " + joints[i] + " "
-            # If any of the current object-type attributes are DCS, append to $ARGS
-            # If there is no DCS attribute, add it to the node
-
-            else:
-                MP_PY_AddEggObjectFlags("dcs")
-                mustRestart += 1
-
-        if mustRestart != 0:
-            confirmRestart = str(
-                MP_PY_ConfirmationDialog(
-                    "File Error!",
-                    "We had to add a missing DCS flag to one or more of the "
-                    '"-force-joint" nodes.' + "\nWe must restart the "
-                                              "exporting process now."
-                    + "\nPress 'Yes' to restart, Press 'No' to exit exporting",
-                    "yesno",
-                )
-            )
-            # If $mustRestart variable is greater than 0, we had to add a DCS tag.
-            # If we had to add a DCS tag to any nodes, we must restart exporting so it's recognized.
-            # Otherwise, the force-joint for that node will not export properly.
-            # Prompt user with confirm dialog if we had to add the DCS attribute to any of the nodes
-            if confirmRestart == "YES":
+            if confirm_restart == "yes":
                 MP_PY_StartSceneExport()
                 return "failed"
-            # needed to exit the previous exporting loop
+        ARGS += f"-force-joint {joint} "
 
-            else:
-                pm.mel.error("User cancelled exporting")
-                return "failed"
+    # Texture paths
+    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = True, select = True) != "MP_PY_ChooseDefaultTexPathRB":
+        ARGS += "-ps rel "
+        custom_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query = True, text = True)
+        if custom_tex_path:
+            ARGS += f'-pd "{custom_tex_path}" -pp "{custom_tex_path}" '
+        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query = True, text = True)
+        if custom_output_path:
+            ARGS += f'-pc "{custom_output_path}" '
 
-    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) != "MP_PY_ChooseDefaultTexPathRB":
-        ARGS += "-ps rel" + " "
-    # Check custom reference path and output path; append to $ARGS string
-    # -ps   The option may be one of: rel, abs, rel_abs, strip, or keep. If either rel or rel_abs is specified,
-    #      the files are made relative to the directory specified by -pd.  The default is rel.
-    # Check if we are referencing textures to a path OTHER than the Maya file
-
-    customTexPath = str(pm.textField("MP_PY_CustomEggTexPathTF", query = 1, text = 1))
-    # -pd   Specifies the name of a directory to make paths relative to, if '-ps rel' or '-ps rel_abs' is specified.
-    #      If this is omitted, the directory name is taken from the name of the output file.
-    # -pp   Adds the indicated directory name to the list of directories to search for filenames referenced by the
-    # source file.
-    #      We always want to add the file path to the search
-    # -pc   Copies textures and other dependent files into the indicated directory.
-    #      If a relative pathname is specified, it is relative to the directory specified with -pd, above.
-    # Check if we are referencing textures to a Custom path
-    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomRefPathRB":
-        if pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = 1, select = 1) == "MP_PY_ChooseEggRB":
-            if customTexPath != "":
-                ARGS += "-pd " + '"' + customTexPath + '"' + " "
-                # If we are exporting to an Egg File and Bam File, THE EGG MUST BE RELATIVE TO MAYA FILE!!
-                # So we skip this.
-                # Otherwise the bam file will be produced without textures since it can't find them during compiling
-                #  NOTE: Bam file texture referencing is handled in the MP_Export2Bam process
-                #  NOTE: Bam file texture referencing is handled in the Export2Bam process
-                # If exporting only to an Egg File, relative referencing will function as expected
-                #  and directory path MUST start with the path to where the textures are truly located
-                # Verify user entered in a path
-                ARGS += "-pp " + '"' + customTexPath + '"' + " "
-
-    customOutputPath = str(pm.textField("MP_PY_CustomOutputPathTF", query = 1, text = 1))
-    # Check if we are copying and referencing textures to a Custom path
-    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomTexPathRB":
-        if customTexPath != "":
-            ARGS += "-pc " + '"' + customTexPath + '"' + " "
-            ARGS += "-pp " + '"' + customTexPath + '"' + " "
-
-        if customOutputPath != "":
-            ARGS += "-pd " + '"' + customOutputPath + '"' + " "
-
-    print("Using these arguments: " + ARGS + "[END]\n")
-    return ARGS
+    print(f"Using these arguments: {ARGS.strip()}")
+    return ARGS.strip()
 
 
 def MP_PY_StartSceneExport():
