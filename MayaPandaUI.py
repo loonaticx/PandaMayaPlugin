@@ -1,5 +1,6 @@
 import pymel.core as pm
 import os
+import time
 
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
@@ -2393,8 +2394,11 @@ def MP_PY_Export2Egg(mb_file, dest_path, dest_filename, args):
         cmd = f"{args} \"{mb_file}\" \"{egg_file}\""
 
     # Execute the command
+    # Notice: cmd is a string, be careful with any spaces in the path.
+    start_time = time.time()
     result = os.system(cmd)
-    print(f"{result}\n")
+    end_time = time.time()
+    print(f"Elapsed time: {end_time - start_time} seconds")
 
     print(f"Finished exporting (.mb -> .egg), unit: {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)}")
     return egg_file
