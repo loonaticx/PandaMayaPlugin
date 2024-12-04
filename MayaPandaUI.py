@@ -2459,61 +2459,54 @@ pm.menuItem(
 
 def MP_PY_AnimationOptionsUI(option, to_update=""):
     """
-    Updates the Animation scroll bar and integer fields based on selection.
-    :param option: The type of update to perform.
-    :param to_update: The specific element to update.
+    Updates the UI based on animation options selected.
+
+    :param option: The action to perform (e.g., "animationMode", "updateFrameValues").
+    :param to_update: Specific element to update (e.g., "startFrameIFChanged").
     """
+    def enable_animation_range(enable):
+        """Enable or disable animation range fields and labels."""
+        pm.intField("MP_PY_AnimationStartFrameIF", edit=True, enable=enable)
+        pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit=True, enable=enable)
+        pm.intField("MP_PY_AnimationEndFrameIF", edit=True, enable=enable)
+        pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit=True, enable=enable)
+        pm.text("MP_PY_AnimationStartFrameLabel", edit=True, enable=enable)
+        pm.text("MP_PY_AnimationEndFrameLabel", edit=True, enable=enable)
+
     if option == "animationMode":
-        selected_rb = pm.radioCollection("MP_PY_AnimationOptionsRC", query = True, select = True)
+        selected_rb = pm.radioCollection("MP_PY_AnimationOptionsRC", query=True, select=True)
         if selected_rb == "MP_PY_chooseFullAnimationRangeRB":
             print("Exporting Full Animation Range")
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, enable = False)
-            pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, enable = False)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, enable = False)
-            pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, enable = False)
-            pm.text("MP_PY_AnimationStartFrameLabel", edit = True, enable = False)
-            pm.text("MP_PY_AnimationEndFrameLabel", edit = True, enable = False)
-            MP_PY_GetSelectedAnimationLayerLengthUI()
-
+            enable_animation_range(False)
         elif selected_rb == "MP_PY_chooseCustomAnimationRangeRB":
             print("Exporting Custom Animation Range")
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, enable = True)
-            pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, enable = True)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, enable = True)
-            pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, enable = True)
-            pm.text("MP_PY_AnimationStartFrameLabel", edit = True, enable = True)
-            pm.text("MP_PY_AnimationEndFrameLabel", edit = True, enable = True)
-            MP_PY_GetSelectedAnimationLayerLengthUI()
+            enable_animation_range(True)
+        MP_PY_GetSelectedAnimationLayerLengthUI()
 
     elif option == "updateFrameValues":
-        if to_update == "startFrameIFChanged":
-            start_frame_value = pm.intField("MP_PY_AnimationStartFrameIF", query = True, value = True)
-            pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, value = start_frame_value)
+        element_map = {
+            "startFrameIFChanged": ("MP_PY_AnimationStartFrameIF", "MP_PY_AnimationStartFrameSlider"),
+            "startFrameSliderMoved": ("MP_PY_AnimationStartFrameSlider", "MP_PY_AnimationStartFrameIF"),
+            "endFrameIFChanged": ("MP_PY_AnimationEndFrameIF", "MP_PY_AnimationEndFrameSlider"),
+            "endFrameSliderMoved": ("MP_PY_AnimationEndFrameSlider", "MP_PY_AnimationEndFrameIF"),
+        }
 
-        elif to_update == "startFrameSliderMoved":
-            start_frame_value = pm.intScrollBar("MP_PY_AnimationStartFrameSlider", query = True, value = True)
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, value = start_frame_value)
-
-        elif to_update == "endFrameIFChanged":
-            end_frame_value = pm.intField("MP_PY_AnimationEndFrameIF", query = True, value = True)
-            pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, value = end_frame_value)
-
-        elif to_update == "endFrameSliderMoved":
-            end_frame_value = pm.intScrollBar("MP_PY_AnimationEndFrameSlider", query = True, value = True)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, value = end_frame_value)
+        if to_update in element_map:
+            source, target = element_map[to_update]
+            value = pm.intField(source, query=True, value=True) if "IF" in source else pm.intScrollBar(source, query=True, value=True)
+            if "IF" in target:
+                pm.intField(target, edit=True, value=value)
+            else:
+                pm.intScrollBar(target, edit=True, value=value)
 
         elif to_update == "updateAllValues":
-            start_frame_value = pm.intField("MP_PY_AnimationStartFrameIF", query = True, value = True)
-            pm.intScrollBar("MP_PY_AnimationStartFrameSlider", edit = True, value = start_frame_value)
+            for source, target in element_map.values():
+                value = pm.intField(source, query=True, value=True) if "IF" in source else pm.intScrollBar(source, query=True, value=True)
+                if "IF" in target:
+                    pm.intField(target, edit=True, value=value)
+                else:
+                    pm.intScrollBar(target, edit=True, value=value)
 
-            start_slider_value = pm.intScrollBar("MP_PY_AnimationStartFrameSlider", query = True, value = True)
-            pm.intField("MP_PY_AnimationStartFrameIF", edit = True, value = start_slider_value)
-
-            end_frame_value = pm.intField("MP_PY_AnimationEndFrameIF", query = True, value = True)
-            pm.intScrollBar("MP_PY_AnimationEndFrameSlider", edit = True, value = end_frame_value)
-
-            end_slider_value = pm.intScrollBar("MP_PY_AnimationEndFrameSlider", query = True, value = True)
-            pm.intField("MP_PY_AnimationEndFrameIF", edit = True, value = end_slider_value)
 
 
 def MP_PY_GetSelectedAnimationLayerLengthUI():
