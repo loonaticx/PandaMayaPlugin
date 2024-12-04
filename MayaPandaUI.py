@@ -469,9 +469,8 @@ def MP_PY_SetEggObjectTypeAttribute(
             if pm.getAttr((node + ".eggObjectTypes" + str(i)), asString = 1) == eggObjectType:
                 MP_PY_ConfirmationDialog(
                     "Egg-Object-Type Error!",
-                    'egg-object-type  -  "' + eggObjectType + '"' +
-                    "\n\nAlready attached on node attribute:  \n" +
-                    (node + ".eggObjectTypes" + str(i)),
+                    f'egg-object-type - "{eggObjectType}"\n\n'
+                    f"Already attached on node attribute:\n{node}.eggObjectTypes{i}",
                     "ok",
                 )
                 return
@@ -1201,8 +1200,6 @@ def MP_PY_Globals():
     #        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
     pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted(OT_ENTRIES.keys())
-    # Removed:
-    # polylight portal
     # todo: maybe add option to type own number for seqX
     # Global variable that keeps track of whether user has seen the import Panda file notification.
     # It is designed so that the user only sees the notification once during session.
