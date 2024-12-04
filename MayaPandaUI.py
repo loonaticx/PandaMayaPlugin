@@ -1,4 +1,5 @@
 import pymel.core as pm
+import os
 
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
@@ -311,7 +312,6 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
     """
     Add an egg-object-type to poly
     """
-    print(f"MP_PY_AddEggObjectFlags!! - {eggObjectType}")
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
     # global egg-object-type array
     # generate attribute enumeration list from the array
@@ -330,7 +330,7 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
                 indexNumber = int(n)
 
         selectedNodes = pm.ls(sl = 1)
-        # Varible to hold all currently selected nodes
+        # Variable to hold all currently selected nodes
         # Iterate through each selected node one-by-one
         if len(selectedNodes) == 0:
             MP_PY_ConfirmationDialog(
@@ -376,7 +376,7 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
 
     if pm.window("MP_PY_DeleteEggObjectTypesWindow", exists = 1):
         MP_PY_GetEggObjectTypes()
-    # Method to update the MP_DeleteEggObjectTypesWindow window if it is currently being shown
+    # Method to update the DeleteEggObjectTypesWindow window if it is currently being shown
 
 
 def MP_PY_TexPathOptionsUI():
@@ -536,7 +536,7 @@ def MP_PY_SetEggObjectTypeAttribute(
     #  we skip adding it again and notify user it already exists.
     for i in range(1, 11):
         if pm.objExists(node + ".eggObjectTypes" + str(i)):
-            if (pm.getAttr((node + ".eggObjectTypes" + str(i)), asString = 1) == eggObjectType):
+            if pm.getAttr((node + ".eggObjectTypes" + str(i)), asString = 1) == eggObjectType:
                 MP_PY_ConfirmationDialog(
                     "Egg-Object-Type Error!",
                     'egg-object-type  -  "' + eggObjectType + '"' +
@@ -573,7 +573,7 @@ def MP_PY_AddEggObjectTypesGUI():
 
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
 
-    # Delete any current instances of the MP_AddEggObjectTypesWindow window
+    # Delete any current instances of the AddEggObjectTypesWindow window
     if pm.window("MP_PY_AddEggObjectTypesWindow", exists = 1):
         pm.deleteUI("MP_PY_AddEggObjectTypesWindow", window = 1)
 
@@ -1272,6 +1272,7 @@ def MP_PY_ArgsBuilder(FileName):
                 # So we skip this.
                 # Otherwise the bam file will be produced without textures since it can't find them during compiling
                 #  NOTE: Bam file texture referencing is handled in the MP_Export2Bam process
+                #  NOTE: Bam file texture referencing is handled in the Export2Bam process
                 # If exporting only to an Egg File, relative referencing will function as expected
                 #  and directory path MUST start with the path to where the textures are truly located
                 # Verify user entered in a path
@@ -1294,7 +1295,7 @@ def MP_PY_ArgsBuilder(FileName):
 def MP_PY_StartSceneExport():
     tempMBFile = ""
     """
-    We need to do before calling MP_Export2Egg/BAM/Pview:
+    We need to do before calling Export2Egg/BAM/Pview:
     -Export a temporary MB
     -Get the destination path
     -Get the filename
@@ -1319,7 +1320,7 @@ def MP_PY_StartSceneExport():
     Get the filename
     Get the custom arguments
     """
-    eggFile = str(pm.mel.MP_ExportPrep(tempMBFile, origFileName))
+    eggFile = str(MP_PY_ExportPrep(tempMBFile, origFileName))
     # Delete the temporary Maya binary file
     # sysFile -del $tempMBFile;
     # Check if the eggFile passed return, else return it failed as an integer
@@ -1747,7 +1748,7 @@ def MP_PY_CreatePandaExporterWindow():
             "Convert all light nodes to locators. Will preserve position and rotation"
         ),
         enable = 1,
-        changeCommand = lambda *args: pm.mel.MP_LightsSelectedUI(),
+        changeCommand = lambda *args: MP_PY_LightsSelectedUI(),
         value = 0,
         label = "Convert Lights",
     )
@@ -1757,7 +1758,7 @@ def MP_PY_CreatePandaExporterWindow():
             "Convert all camera nodes to locators. Will preserve position and rotation"
         ),
         enable = 1,
-        changeCommand = lambda *args: pm.mel.MP_CamerasSelectedUI(),
+        changeCommand = lambda *args: MP_PY_CamerasSelectedUI(),
         value = 0,
         label = "Convert Cameras",
     )
@@ -1770,7 +1771,7 @@ def MP_PY_CreatePandaExporterWindow():
             "This feature allows for the removal of an empty node from the EGG file during the maya2egg export process."
         ),
         enable = 1,
-        changeCommand = lambda *args: pm.mel.MP_RemoveGroundPlaneUI(),
+        changeCommand = lambda *args: MP_PY_RemoveGroundPlaneUI(),
         value = 1,
         label = "Remove groundPlane_transform",
     )
@@ -1791,8 +1792,8 @@ def MP_PY_CreatePandaExporterWindow():
     )
 
     # Construct the Bam Version Option Menu
-    for i in range(0, len(pm.melGlobals["gMP_PY_PandaFileVersions"])):
-        pm.menuItem(label = pm.melGlobals["gMP_PY_PandaFileVersions"][i])
+    for i in range(0, len(pm.melGlobals[PANDA_FILE_VERSIONS])):
+        pm.menuItem(label = pm.melGlobals[PANDA_FILE_VERSIONS][i])
         # Generate menu item
         # Increase counter by number of units between each version entry
         i = i + 3
@@ -1828,14 +1829,14 @@ def MP_PY_CreatePandaExporterWindow():
     pm.radioCollection("MP_PY_OutputPandaFileTypeRC")
     pm.radioButton(
         "MP_PY_ChooseEggRB",
-        onCommand = lambda *args: pm.mel.MP_OutputPandaFileTypeUI(),
+        onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
         select = 1,
         collection = "MP_PY_OutputPandaFileTypeRC",
         label = "EGG (ASCII) Only",
     )
     pm.radioButton(
         "MP_PY_ChooseEggBamRB",
-        onCommand = lambda *args: pm.mel.MP_OutputPandaFileTypeUI(),
+        onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
         collection = "MP_PY_OutputPandaFileTypeRC",
         label = "EGG(ASCII)   and   BAM(Binary)",
     )
@@ -2029,7 +2030,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.button(
         "MP_PY_BrowseFilenameBTN",
         enable = 0,
-        command = lambda *args: pm.mel.MP_BrowseForFilePreProcess("customFilename"),
+        command = lambda *args: MP_PY_BrowseForFilePreProcess("customFilename"),
         annotation = "Browse to select or enter custom output file name.",
         label = "Browse",
     )
@@ -2196,7 +2197,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_Send2PviewBTN",
         width = 80,
         height = 20,
-        command = lambda *args: pm.mel.MP_Send2Pview(""),
+        command = lambda *args: MP_PY_Send2Pview(""),
         annotation = (
             "Sends either the selected nodes or the entire scene (if nothing is selected) to the libmayapview plugin, "
             "if it is installed and loaded.\n"
@@ -2210,7 +2211,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_ConvertNodesToPandaBTN",
         width = 135,
         height = 20,
-        command = lambda *args: pm.mel.MP_ExportNodesToPandaFiles(),
+        command = lambda *args: MP_PY_ExportNodesToPandaFiles(),
         annotation = (
             "Converts the selected node(s) to Panda files, supporting multiple selections.\n"
             "Each node is exported as its own set of files. "
@@ -2234,7 +2235,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_GetMayaFile2EggBTN",
         width = 85,
         height = 20,
-        command = lambda *args: pm.mel.MP_GetMayaFile2Egg(),
+        command = lambda *args: MP_PY_GetMayaFile2Egg(),
         annotation = (
                 "Creates a Panda Egg file by running"
                 + "\nmaya2egg[version] on the selected Maya file(s)"
@@ -2245,7 +2246,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_GetEggFile2BamBTN",
         width = 80,
         height = 20,
-        command = lambda *args: pm.mel.MP_GetEggFile2Bam(),
+        command = lambda *args: MP_PY_GetEggFile2Bam(),
         annotation = (
             "Creates a Panda Bam file by running the selected version"
             "\nof egg2bam and the currently chosen export options"
@@ -2257,7 +2258,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_GetBamFile2EggBTN",
         width = 80,
         height = 20,
-        command = lambda *args: pm.mel.MP_GetBamFile2Egg(),
+        command = lambda *args: MP_PY_GetBamFile2Egg(),
         annotation = "Runs bam2egg on the selected bam file(s)",
         label = "Bam File 2 Egg",
     )
@@ -2267,7 +2268,7 @@ def MP_PY_CreatePandaExporterWindow():
         "MP_PY_ImportPandaFileBTN",
         width = 100,
         height = 20,
-        command = lambda *args: pm.mel.MP_ImportPandaFile(),
+        command = lambda *args: MP_PY_ImportPandaFile(),
         annotation = "Imports selected Panda Bam or Egg file(s).",
         label = "Import Panda File",
     )
@@ -2290,19 +2291,19 @@ if pm.window("MP_PY_NodesExportedToPandaFilesGUI", exists = 1):
 
 if pm.window("MP_PY_PandaExporter", exists = 1):
     pm.deleteUI("MP_PY_PandaExporter", window = 1)
-# Delete any current instances of the MP_PandaExporter window
+# Delete any current instances of the MP_PY_PandaExporter window
 
 if pm.window("MP_PY_AddEggObjectTypesWindow", exists = 1):
     pm.deleteUI("MP_PY_AddEggObjectTypesWindow", window = 1)
-# Delete any current instances of the MP_AddEggObjectTypesWindow window
+# Delete any current instances of the MP_PY_AddEggObjectTypesWindow window
 
 if pm.window("MP_PY_DeleteEggObjectTypesWindow", exists = 1):
     pm.deleteUI("MP_PY_DeleteEggObjectTypesWindow", window = 1)
-# Delete any current instances of the MP_DeleteEggObjectTypesWindow window
+# Delete any current instances of the MP_PY_DeleteEggObjectTypesWindow window
 
 pm.menu("MP_PY_PandaMenu", label = "Panda3D_Python")
 # Define main menu and menu items
-# Set the MP_PandaMenu as the parent for the following menuItems
+# Set the MP_PY_PandaMenu as the parent for the following menuItems
 pm.setParent("MP_PY_PandaMenu", menu = 1)
 pm.menuItem(
     command = lambda *args: MP_PY_PandaExporterUI(), label = "Panda Export GUI..."
@@ -2514,7 +2515,7 @@ def MP_PY_BrowseForFolderPreProcess(option):
     if option == "customRelativeEggTexturePath":
         file_mode = 3
         caption = "Choose Texture Relative Directory For Egg File"
-        folder_path = MP_BrowseForFolder(file_mode, caption)
+        folder_path = MP_PY_BrowseForFolder(file_mode, caption)
         if folder_path:
             pm.textField("MP_PY_CustomEggTexPathTF", edit = True, enable = True, text = folder_path)
             # If exporting both file types, use the same folder for Bam file texture referencing
@@ -2524,14 +2525,14 @@ def MP_PY_BrowseForFolderPreProcess(option):
     elif option == "customRelativeBamTexturePath":
         file_mode = 3
         caption = "Choose Texture Relative Directory For Bam File"
-        folder_path = MP_BrowseForFolder(file_mode, caption)
+        folder_path = MP_PY_BrowseForFolder(file_mode, caption)
         if folder_path:
             pm.textField("MP_PY_CustomBamTexPathTF", edit = True, enable = True, text = folder_path)
 
     elif option == "customOutputPath":
         file_mode = 3
         caption = "Choose Custom Output Folder"
-        folder_path = MP_BrowseForFolder(file_mode, caption)
+        folder_path = MP_PY_BrowseForFolder(file_mode, caption)
         if folder_path:
             pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
             pm.button("MP_PY_BrowseOutputPathBTN", edit = True, enable = True)
@@ -2539,8 +2540,46 @@ def MP_PY_BrowseForFolderPreProcess(option):
 
 
 
+def MP_PY_ExportPrep(work_file, file_name):
+    """
+    Prepares the export process, generates arguments, exports the egg file,
+    and optionally converts it to a bam file or views it in Pview.
 
-def MP_BrowseForFolder(file_mode, caption):
+    :param work_file: Full file path and name.
+    :param file_name: Base file name.
+    :return: The path to the exported egg file or "failed" on error.
+    """
+    # Get the destination path
+    dest_path = os.path.dirname(work_file) + "/"
+
+    # Check for custom file name option
+    custom_filename = pm.textField("MP_PY_CustomFilenameTF", query = True, text = True)
+    if custom_filename:
+        file_name = custom_filename
+
+    # Get the custom arguments
+    args = MP_PY_ArgsBuilder(file_name)
+    if args == "failed":
+        return "failed"
+
+    # Export the egg file
+    egg_file = MP_PY_Export2Egg(work_file, dest_path, file_name + ".egg", args)
+    if egg_file == "failed":
+        return "failed"
+
+    # If output option is both Egg and Bam, run egg2bam
+    selected_output_option = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True)
+    if selected_output_option == "MP_PY_ChooseEggBamRB":
+        MP_PY_Export2Bam(egg_file, 0)
+    else:
+        # If Pview option is selected, view the egg file
+        if pm.checkBox("MP_PY_ExportPviewCB", query = True, value = True):
+            MP_PY_Send2Pview(egg_file)
+
+    return egg_file
+
+
+def MP_PY_BrowseForFolder(file_mode, caption):
     """
     Displays a folder browsing dialog and returns the selected folder path.
 
@@ -2552,6 +2591,406 @@ def MP_BrowseForFolder(file_mode, caption):
     if folder_path:
         return folder_path[0]  # Return the first selected path
     return ""
+
+
+def MP_PY_Export2Bam(egg_file, export_mode):
+    """
+    Converts an .egg file to a .bam file using specified options.
+
+    :param egg_file: Path to the .egg file to be converted.
+    :param export_mode: Determines the export mode:
+                        0 = Normal scene exporting.
+                        1 = User has chosen a specific egg file to convert.
+    """
+    if not egg_file:
+        pm.error("Invalid egg file")
+
+    # Extract file details
+    file_name = os.path.splitext(os.path.basename(egg_file))[0]
+    file_extension = os.path.splitext(egg_file)[1]
+    file_path = os.path.dirname(egg_file)
+
+    # Check for bam output options
+    raw_tex = "-rawtex " if pm.checkBox("MP_PY_RawtexCB", query = True, value = True) else ""
+    flatten = "-flatten 1 " if pm.checkBox("MP_PY_FlattenCB", query = True, value = True) else ""
+    path_store = ""
+    path_directory = ""
+    target_directory = ""
+    dirname = ""
+
+    # Handle custom output options in exportMode 1
+    if export_mode == 1:
+        custom_filename = pm.textField("MP_PY_CustomFilenameTF", query = True, text = True)
+        if custom_filename:
+            file_name = custom_filename
+
+        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query = True, text = True)
+        if custom_output_path:
+            file_path = custom_output_path
+
+    # Custom texture referencing options
+    tex_path_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query = True, select = True)
+    output_panda_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True)
+    custom_bam_tex_path = pm.textField("MP_PY_CustomBamTexPathTF", query = True, text = True)
+    custom_egg_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query = True, text = True)
+
+    if tex_path_option == "MP_PY_ChooseCustomRefPathRB":
+        path_store = "-ps rel "
+        if output_panda_file_type == "MP_PY_ChooseEggRB":
+            path_directory = f"-pd \"{custom_egg_tex_path or file_path}\" "
+            dirname = f"-pp \"{file_path}\" "
+        elif output_panda_file_type == "MP_PY_ChooseEggBamRB":
+            path_directory = f"-pd \"{custom_bam_tex_path or file_path}\" "
+            dirname = f"-pp \"{file_path}\" "
+
+    # Handle copy textures option
+    if tex_path_option == "MP_PY_ChooseCustomTexPathRB":
+        path_store = "-ps rel "
+        if output_panda_file_type == "MP_PY_ChooseEggRB":
+            path_directory = f"-pd \"{file_path}\" "
+            if export_mode == 1:
+                target_directory = f"-pc \"{custom_egg_tex_path or file_path}\" "
+            dirname = f"-pp \"{file_path}\" "
+        elif output_panda_file_type == "MP_PY_ChooseEggBamRB":
+            path_directory = f"-pd \"{custom_bam_tex_path or file_path}\" "
+            if export_mode == 1:
+                target_directory = f"-pc \"{custom_egg_tex_path or file_path}\" "
+            dirname = f"-pp \"{file_path}\" "
+
+    # Define the .bam file path
+    bam_file = os.path.join(file_path, f"{file_name}.bam")
+    print(f"Your file is: {file_name}{file_extension}")
+    print(f"Found in path: {file_path}/")
+    print(f"Your bam file will be saved as: {bam_file}")
+
+    # Get the appropriate egg2bam version
+    egg2bam = MP_PY_PandaVersion("getEgg2Bam")  # Returns the egg2bam version
+
+    # Overwrite mode or not
+    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query = True, value = True)
+    cmd = (
+        f"{egg2bam} {raw_tex}{flatten}{path_store}{path_directory}"
+        f"{target_directory}{dirname}"
+        f"{'-o ' if overwrite else ''}\"{bam_file}\" \"{egg_file}\""
+    )
+
+    # Execute the system command
+    result = os.system(cmd)
+
+    # Format and display the options used
+    path_store = f"\n{path_store}" if path_store else ""
+    path_directory = f"\n{path_directory}" if path_directory else ""
+    target_directory = f"\n{target_directory}" if target_directory else ""
+    dirname = f"\n{dirname}" if dirname else ""
+
+    print(f"Using these options:\n{cmd}")
+
+    # Run Pview if the option is selected
+    if pm.checkBox("MP_PY_ExportPviewCB", query = True, value = True):
+        MP_PY_Send2Pview(bam_file)
+
+    print(f"Finished converting (.egg -> .bam), unit: {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)}")
+
+
+
+
+def MP_PY_Send2Pview(file_path=""):
+    """
+    Sends the specified file to Pview or uses the Pview plugin for Maya to preview the scene.
+
+    :param file_path: The file to preview. If empty, uses Maya's Pview plugin to preview the scene.
+    """
+    # Process Variables
+    maya_version_short = pm.melGlobals["gMP_PY_MayaVersionShort"]
+
+    if not file_path:
+        # No file provided, use Pview plugin for the scene
+        plugin_name = f"libmayapview{maya_version_short}"
+
+        if pm.pluginInfo(plugin_name, query = True, loaded = True):
+            # Check if viewing the whole scene or selected nodes
+            if pm.checkBox("MP_PY_ExportSelectedCB", query = True, value = True):
+                print("\nStarting Pview for selected nodes...\n")
+                pm.mel.pview()
+                print("End Pview\n")
+            else:
+                pm.select(clear = True)
+                print("\nStarting Pview for the entire scene...\n")
+                pm.mel.pview()
+                print("End Pview\n")
+
+        # Check for an alternate Pview plugin and prompt user for a file
+        plugin_name_save = f"libmayasavepview{maya_version_short}"
+        if pm.pluginInfo(plugin_name_save, query = True, loaded = True):
+            print("Pview plugin requires a saved scene. Prompting user to choose a file...")
+            MP_PY_GetFile2Pview()
+
+    else:
+        # A file is provided; use the external Pview executable
+        pview_executable = MP_PY_PandaVersion("getPview")
+        print("\nStarting Pview for file...\n")
+        print(f"File: {file_path}\n")
+
+        # Execute the Pview command
+        cmd = f"{pview_executable} -l -c \"{file_path}\""
+        result = os.system(cmd)
+
+        print(f"{result}\n")
+        print("End Pview\n")
+
+
+def MP_PY_Export2Egg(mb_file, dest_path, dest_filename, args):
+    """
+    Exports a Maya binary file to an egg file using the specified arguments.
+
+    :param mb_file: The path to the Maya binary (.mb) file.
+    :param dest_path: The destination directory for the .egg file.
+    :param dest_filename: The name of the destination .egg file.
+    :param args: The arguments to be passed to the maya2egg export command.
+    :return: The path to the exported .egg file, or "failed" if the export fails.
+    """
+    # Validate Maya binary file
+    if not mb_file:
+        pm.error("Not a valid Maya Binary file.")
+        return "failed"
+
+    # Define the full path for the .egg file
+    egg_file = os.path.join(dest_path, dest_filename)
+
+    print(f"Your scene will be saved as this egg file: {dest_filename}")
+    print(f"In this directory: {dest_path}")
+
+    # Check if overwriting is enabled
+    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query = True, value = True)
+
+    # Construct the system command
+    if overwrite:
+        print("!!Overwrite enabled!!")
+        cmd = f"{args} -o \"{egg_file}\" \"{mb_file}\""
+    else:
+        cmd = f"{args} \"{mb_file}\" \"{egg_file}\""
+
+    # Execute the command
+    result = os.system(cmd)
+    print(f"{result}\n")
+
+    print(f"Finished exporting (.mb -> .egg), unit: {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)}")
+    return egg_file
+
+
+def MP_PY_GetFile2Pview():
+    """
+    Allows the user to choose a .egg or .bam file and sends it to Pview.
+    """
+    # Get the Pview executable version
+    pview_executable = MP_PY_PandaVersion("getPview")
+
+    # Get the starting directory (directory of the current Maya scene)
+    starting_directory = os.path.dirname(pm.sceneName()) if pm.sceneName() else os.getcwd()
+
+    # Set up file browsing options
+    file_mode = 1  # A single existing file
+    caption = "Select Panda file to Pview..."
+    file_filter = "Panda Egg (*.egg);;Panda Bam (*.bam)"
+
+    # Prompt the user to select a file
+    pview_file = pm.fileDialog2(
+        dialogStyle = 2,
+        fileMode = file_mode,
+        startingDirectory = starting_directory,
+        caption = caption,
+        fileFilter = file_filter,
+    )
+
+    # If a file is selected, send it to Pview
+    if pview_file and len(pview_file) == 1:
+        MP_PY_Send2Pview(pview_file[0])
+    else:
+        pm.error("No file selected!\n")
+
+
+
+def MP_PY_ExportNodesToPandaFiles():
+    """
+    Converts the selected nodes in a Maya scene to Panda3D-compatible files.
+    Supports exporting multiple nodes to individual files with user-defined options.
+    """
+    # Get the export directory path
+    dest_path = pm.textField("MP_PY_CustomOutputPathTF", query = True, text = True)
+    selected_nodes = pm.ls(selection = True, long = True)
+    selected_nodes.sort()
+
+    if not selected_nodes:
+        MP_PY_ConfirmationDialog("Selection Error!", "You must select at least one(1) node to export.", "ok")
+        return
+
+    if not dest_path:
+        output_directory_error = MP_PY_ConfirmationDialog(
+            "Output Directory ERROR!",
+            "You must select a directory where the exported files will go.\n"
+            "Click \"Choose Directory\" to select the directory and continue\n"
+            "or click \"Cancel\" to exit process.",
+            "selectcancel"
+        )
+        if output_directory_error == "SELECT":
+            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
+            MP_PY_BrowseForFolderPreProcess("customOutputPath")
+            MP_PY_ExportNodesToPandaFiles()
+        return
+
+    # Ensure the destination path ends with a slash
+    dest_path = os.path.join(dest_path, "")
+
+    # Variables for tracking progress and results
+    nodes_to_panda_files = []
+    files_exported = 0
+    number_of_selected_nodes = len(selected_nodes)
+
+    # Initialize Maya progress bar
+    g_main_progress_bar = pm.melGlobals["gMainProgressBar"]
+    pm.progressBar(
+        g_main_progress_bar,
+        edit = True,
+        beginProgress = True,
+        isInterruptable = True,
+        minValue = 0,
+        maxValue = number_of_selected_nodes,
+    )
+
+    # Loop through selected nodes and export each
+    for this_file_number, node in enumerate(selected_nodes, start = 1):
+        if pm.progressBar(g_main_progress_bar, query = True, isCancelled = True):
+            break
+
+        # Update progress bar
+        pm.progressBar(
+            g_main_progress_bar,
+            edit = True,
+            step = 1,
+            status = f"Exporting selected node... {this_file_number} of Nodes: {number_of_selected_nodes}",
+        )
+
+        # Extract the node's name and construct file names
+        node_name = node.split("|")[-1]
+        maya_file_name = f"{node_name}.mb"
+        temp_mb_file = os.path.join(dest_path, maya_file_name)
+
+        # Export the node as a Maya binary file
+        pm.select(node, replace = True)
+        pm.system("file", op = "v=1", typ = "mayaBinary", exportSelected = True, force = True,
+                  exportPath = temp_mb_file)
+
+        # Add Maya file info to results
+        nodes_to_panda_files.append((maya_file_name, dest_path))
+
+        # Define egg file name
+        file_name = os.path.splitext(maya_file_name)[0]
+        dest_filename = f"{file_name}.egg"
+
+        # Build arguments for exporting
+        args = MP_PY_ArgsBuilder(file_name)
+
+        # Export the egg file
+        if pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True) == "MP_PY_ChooseEggRB":
+            egg_file = MP_PY_Export2Egg(temp_mb_file, dest_path, dest_filename, args)
+            nodes_to_panda_files.append((dest_filename, dest_path))
+            files_exported += 1
+        elif pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = True, select = True) == "MP_PY_ChooseEggBamRB":
+            # Export egg and bam files
+            egg_file = MP_PY_Export2Egg(temp_mb_file, dest_path, dest_filename, args)
+            nodes_to_panda_files.append((dest_filename, dest_path))
+
+            # Convert the egg file to a bam file
+            MP_PY_Export2Bam(egg_file, 0)
+            bam_file_name = f"{file_name}.bam"
+            nodes_to_panda_files.append((bam_file_name, dest_path))
+            files_exported += 1
+
+    # End progress bar
+    pm.progressBar(g_main_progress_bar, edit = True, endProgress = True)
+
+    # Show results if files were exported
+    if files_exported > 0 and nodes_to_panda_files:
+        MP_PY_NodesExportedAsPandaFilesGUI(nodes_to_panda_files)
+
+
+
+
+def MP_PY_NodesExportedAsPandaFilesGUI(nodes_to_panda_files):
+    """
+    Displays a window listing all nodes that were exported as Panda files.
+    Shows the file names and their export locations as a reference for the user.
+
+    :param nodes_to_panda_files: List of tuples with (file_name, file_path).
+    """
+    # Delete the window if it already exists
+    if pm.window("MP_PY_NodesExportedToPandaFilesGUI", exists = True):
+        pm.deleteUI("MP_PY_NodesExportedToPandaFilesGUI", window = True)
+
+    if not nodes_to_panda_files:
+        MP_PY_ConfirmationDialog("Data Error!", "There is currently no exported files in the array.", "ok")
+        return
+
+    # Create the window
+    window = pm.window(
+        "MP_PY_NodesExportedToPandaFilesGUI",
+        sizeable = False,
+        width = 600,
+        height = 200,
+        title = "...Listing of Exported nodes to Panda Files...",
+        toolbox = True,
+        titleBarMenu = True,
+    )
+    with pm.columnLayout(columnAttach = ("left", 0), adjustableColumn = True, rowSpacing = 0):
+        scroll_field = pm.scrollField(
+            wordWrap = False,
+            editable = False,
+            width = 600,
+            height = 200,
+        )
+
+    # Show the window
+    pm.showWindow(window)
+    pm.window("MP_PY_NodesExportedToPandaFilesGUI", edit = True, width = 600, height = 200)
+
+    # Populate the scroll field with exported files and paths
+    for i in range(0, len(nodes_to_panda_files), 2):
+        file_name = nodes_to_panda_files[i]
+        file_path = nodes_to_panda_files[i + 1]
+        scroll_field.appendText(f"{file_name} : {file_path}\n")
+
+
+def MP_PY_BrowseForFilePreProcess(option):
+    """
+    Prepares and invokes a file browsing dialog for various scenarios and updates UI elements.
+
+    :param option: Specifies the type of file browsing operation.
+    """
+    if option == "customFilename":
+        # File dialog configuration
+        file_mode = 0  # Any file, whether it exists or not
+        caption = "Select file name to save as"
+        file_filter = "Panda Egg (*.egg);;All Files (*.*)"
+        starting_directory = os.path.dirname(pm.sceneName()) if pm.sceneName() else os.getcwd()
+
+        # Open file dialog
+        custom_file = pm.fileDialog2(
+            dialogStyle = 2,
+            fileMode = file_mode,
+            caption = caption,
+            fileFilter = file_filter,
+            startingDirectory = starting_directory,
+        )
+
+        if custom_file and len(custom_file) > 0:
+            # Extract file name and directory
+            file_name = os.path.splitext(os.path.basename(custom_file[0]))[0]
+            directory_name = os.path.dirname(custom_file[0])
+
+            # Update UI elements
+            pm.textField("MP_PY_CustomFilenameTF", edit = True, enable = True, text = file_name)
+            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
+            pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = directory_name)
 
 
 # The following processes define the functions called by using the menu items
