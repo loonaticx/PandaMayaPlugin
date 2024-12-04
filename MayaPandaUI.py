@@ -26,7 +26,7 @@ def MP_PY_PandaVersion(option):
                 executableToUse = pm.melGlobals["gMP_PY_PandaFileVersions"][i + 2]
             elif option == "getPview":
                 executableToUse = pm.melGlobals["gMP_PY_PandaFileVersions"][i + 3]
-            i = len(pm.melGlobals["gMP_PY_PandaFileVersions"])
+            break
     return executableToUse
 
 
@@ -256,7 +256,7 @@ def MP_PY_OutputPathOptionsUI():
 
         pm.button("MP_PY_BrowseOutputPathBTN", edit = 1, enable = 0)
 
-    elif selectedRB == "MP_ChooseCustomOutputPathRB":
+    elif selectedRB == "MP_PY_ChooseCustomOutputPathRB":
         print("Custom Export File Path Chosen\n")
 
         pm.textField("MP_PY_CustomOutputPathTF", edit = 1, enable = 1)
@@ -1115,11 +1115,7 @@ def MP_PY_ArgsBuilder(FileName):
                     pm.getAttr((joints[i] + ".eggObjectTypes3"), asString = 1)
                 )
 
-            if (
-                    (eggObjectTypes1 == "dcs")
-                    or (eggObjectTypes2 == "dcs")
-                    or (eggObjectTypes3 == "dcs")
-            ):
+            if "dcs" in [eggObjectTypes1, eggObjectTypes2, eggObjectTypes3]:
                 ARGS += "-force-joint " + joints[i] + " "
             # If any of the current object-type attributes are DCS, append to $ARGS
             # If there is no DCS attribute, add it to the node
@@ -1152,7 +1148,7 @@ def MP_PY_ArgsBuilder(FileName):
                 pm.mel.error("User cancelled exporting")
                 return "failed"
 
-    if (pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) != "MP_PY_ChooseDefaultTexPathRB"):
+    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) != "MP_PY_ChooseDefaultTexPathRB":
         ARGS += "-ps rel" + " "
     # Check custom reference path and output path; append to $ARGS string
     # -ps   The option may be one of: rel, abs, rel_abs, strip, or keep. If either rel or rel_abs is specified,
@@ -1168,8 +1164,8 @@ def MP_PY_ArgsBuilder(FileName):
     # -pc   Copies textures and other dependent files into the indicated directory.
     #      If a relative pathname is specified, it is relative to the directory specified with -pd, above.
     # Check if we are referencing textures to a Custom path
-    if (pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomRefPathRB"):
-        if (pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = 1, select = 1) == "MP_PY_ChooseEggRB"):
+    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomRefPathRB":
+        if pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query = 1, select = 1) == "MP_PY_ChooseEggRB":
             if customTexPath != "":
                 ARGS += "-pd " + '"' + customTexPath + '"' + " "
                 # If we are exporting to an Egg File and Bam File, THE EGG MUST BE RELATIVE TO MAYA FILE!!
@@ -1183,7 +1179,7 @@ def MP_PY_ArgsBuilder(FileName):
 
     customOutputPath = str(pm.textField("MP_PY_CustomOutputPathTF", query = 1, text = 1))
     # Check if we are copying and referencing textures to a Custom path
-    if (pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomTexPathRB"):
+    if pm.radioCollection("MP_PY_TexPathOptionsRC", query = 1, select = 1) == "MP_PY_ChooseCustomTexPathRB":
         if customTexPath != "":
             ARGS += "-pc " + '"' + customTexPath + '"' + " "
             ARGS += "-pp " + '"' + customTexPath + '"' + " "
@@ -1270,7 +1266,7 @@ def MP_PY_ExportScene(selection):
             == "MP_PY_ChooseOriginalFilenameRB"
     ) and (
             pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_ChooseCustomOutputPathRB"
+            == "MP_PY_ChooseCustomOutputPathRB"
     ):
         if fileName == "":
             MP_PY_ConfirmationDialog(
@@ -1337,7 +1333,7 @@ def MP_PY_ExportScene(selection):
             == "MP_PY_ChooseCustomFilenameRB"
     ) and (
             pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1)
-            == "MP_ChooseCustomOutputPathRB"
+            == "MP_PY_ChooseCustomOutputPathRB"
     ):
         TempPath = str(pm.textField("MP_PY_CustomOutputPathTF", query = 1, text = 1))
         # Processes if exporting file with custom file name and custom output path
@@ -1705,8 +1701,8 @@ def MP_PY_Globals():
     # todo: maybe add option to type own number for seqX
     # Global variable that keeps track of whether or not user has seen the import Panda file notification.
     # It is designed so that the user only sees the notification once during session.
-    pm.melGlobals.initVar("int", "gMP_ChoosePandaFileNotice")
-    pm.melGlobals["gMP_ChoosePandaFileNotice"] = 0
+    pm.melGlobals.initVar("int", "gMP_PY_ChoosePandaFileNotice")
+    pm.melGlobals["gMP_PY_ChoosePandaFileNotice"] = 0
 
 
 def MP_PY_CreatePandaExporterWindow():
@@ -2102,7 +2098,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.button(
         "MP_PY_BrowseEggTexPathBTN",
         enable = 0,
-        command = lambda *args: pm.mel.MP_BrowseForFolderPreProcess(
+        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
             "customRelativeEggTexturePath"
         ),
         annotation = (
@@ -2129,12 +2125,8 @@ def MP_PY_CreatePandaExporterWindow():
                 "Bam File custom texture reference path"
                 + "\n"
                 + "\nNOTE:"
-                + "\nIf just referencing "
-                  "textures and exporting both an "
-                  "Egg and Bam file," + "\nThe "
-                                        "Egg file "
-                                        "is "
-                                        "referenced to Maya file."
+                + "\nIf just referencing textures and exporting both an Egg and Bam file,"
+                + "\nThe Egg file is referenced to Maya file."
                 + "\nThe Bam file will be referenced to specified path."
                 + "\nThe Bam file reference path MUST start with the path to where textures are located."
                 + "\n"
@@ -2145,16 +2137,14 @@ def MP_PY_CreatePandaExporterWindow():
     pm.button(
         "MP_PY_BrowseBamTexPathBTN",
         enable = 0,
-        command = lambda *args: pm.mel.MP_BrowseForFolderPreProcess(
+        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
             "customRelativeBamTexturePath"
         ),
         annotation = (
                 "Browse for Bam File custom texture reference path"
                 + "\n"
                 + "\nNOTE:"
-                + "\nIf just referencing "
-                  "textures and exporting "
-                  "both an Egg and Bam "
+                + "\nIf just referencing textures and exporting both an Egg and Bam "
                   "file," + "\nThe Egg "
                             "file is "
                             "referenced "
@@ -2195,7 +2185,7 @@ def MP_PY_CreatePandaExporterWindow():
     pm.button(
         "MP_PY_BrowseOutputPathBTN",
         enable = 0,
-        command = lambda *args: pm.mel.MP_BrowseForFolderPreProcess("customOutputPath"),
+        command = lambda *args: MP_PY_BrowseForFolderPreProcess("customOutputPath"),
         label = "Browse",
     )
     pm.setParent(u = 1)
@@ -2500,7 +2490,7 @@ def MP_PY_CreatePandaExporterWindow():
         width = 80,
         height = 20,
         command = lambda *args: pm.mel.MP_GetBamFile2Egg(),
-        annotation = ("Runs bam2egg on the selected bam file(s)"),
+        annotation = "Runs bam2egg on the selected bam file(s)",
         label = "Bam File 2 Egg",
     )
     pm.setParent(upLevel = 1)
@@ -2510,7 +2500,7 @@ def MP_PY_CreatePandaExporterWindow():
         width = 100,
         height = 20,
         command = lambda *args: pm.mel.MP_ImportPandaFile(),
-        annotation = ("Imports selected Panda Bam or Egg file(s)."),
+        annotation = "Imports selected Panda Bam or Egg file(s).",
         label = "Import Panda File",
     )
     pm.setParent(upLevel = 1)
@@ -2784,6 +2774,56 @@ def MP_PY_ExportOptionsUI():
         pm.checkBox("MP_PY_RemoveGroundPlaneCB", edit = True, enable = False, value = False)
         MP_PY_AnimationOptionsUI("animationMode", "")
         MP_PY_AnimationOptionsUI("updateFrameValues", "updateAllValues")
+
+
+def MP_PY_BrowseForFolderPreProcess(option):
+    """
+    Prepares and invokes a folder browsing dialog for various scenarios.
+
+    :param option: Specifies the type of folder browsing operation.
+    """
+    # Define output file type based on the radio button selection
+    output_panda_file_type = pm.radioCollection("MP_PY_OutputPandaFileTypeRC", query=True, select=True)
+
+    if option == "customRelativeEggTexturePath":
+        file_mode = 3
+        caption = "Choose Texture Relative Directory For Egg File"
+        folder_path = MP_BrowseForFolder(file_mode, caption)
+        if folder_path:
+            pm.textField("MP_PY_CustomEggTexPathTF", edit=True, enable=True, text=folder_path)
+            # If exporting both file types, use the same folder for Bam file texture referencing
+            if output_panda_file_type == "MP_PY_ChooseEggBamRB":
+                pm.textField("MP_PY_CustomBamTexPathTF", edit=True, enable=True, text=folder_path)
+
+    elif option == "customRelativeBamTexturePath":
+        file_mode = 3
+        caption = "Choose Texture Relative Directory For Bam File"
+        folder_path = MP_BrowseForFolder(file_mode, caption)
+        if folder_path:
+            pm.textField("MP_PY_CustomBamTexPathTF", edit=True, enable=True, text=folder_path)
+
+    elif option == "customOutputPath":
+        file_mode = 3
+        caption = "Choose Custom Output Folder"
+        folder_path = MP_BrowseForFolder(file_mode, caption)
+        if folder_path:
+            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit=True, select=True)
+            pm.button("MP_PY_BrowseOutputPathBTN", edit=True, enable=True)
+            pm.textField("MP_PY_CustomOutputPathTF", edit=True, enable=True, text=folder_path)
+
+
+def MP_BrowseForFolder(file_mode, caption):
+    """
+    Displays a folder browsing dialog and returns the selected folder path.
+
+    :param file_mode: The mode of the file dialog (e.g., directory only).
+    :param caption: The title of the dialog box.
+    :return: The selected folder path as a string.
+    """
+    folder_path = pm.fileDialog2(dialogStyle=2, fileMode=file_mode, caption=caption)
+    if folder_path:
+        return folder_path[0]  # Return the first selected path
+    return ""
 
 
 # The following processes define the functions called by using the menu items
