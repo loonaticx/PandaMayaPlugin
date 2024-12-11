@@ -288,7 +288,7 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
     if eggTypeInArray == 1:
         indexNumber = -1
         # String version of array index number.
-        # This is necessary so we can verify the index number is not null/empty
+        # This is necessary, so we can verify the index number is not null/empty
         # Get the array index number of the $eggObjectType passed to this process
         # by iterating through each array item and compare them to the $eggObjectType
         for n in range(0, len(pm.melGlobals[EGG_OBJECT_TYPE_ARRAY])):
@@ -312,6 +312,9 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
         for node in selectedNodes:
             for i in range(1, 11):
                 if pm.objExists(str(node) + ".eggObjectTypes" + str(i)) == 1:
+                    # At the very moment, we set our egg tag limit to 10 per node.
+                    # There's not really a reason right now for why a user will get to this limit, but
+                    # due to some prior hard-coded values with egg object types, we are capping it at 10.
                     if i == 10:
                         MP_PY_ConfirmationDialog(
                             "Egg-Object-Type Error!",
@@ -321,14 +324,10 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
                             ],
                             "ok",
                         )
-                    # Notify user if the lmit of 3 tags are already assigned to node
-                    # Message to user that the egg-object-type limit has been reached
                 else:
                     MP_PY_SetEggObjectTypeAttribute(
                         enumerationList, eggObjectType, indexNumber, i, node
                     )
-                    # Call subprocess to check/set attribute
-                    # Set variable to exit loop
                     break
     else:
         MP_PY_ConfirmationDialog(
@@ -411,16 +410,12 @@ def MP_PY_OutputFilenameOptionsUI():
     )
     if selectedRB == "MP_PY_ChooseOriginalFilenameRB":
         print("Default Export Filename Chosen\n")
-
         pm.textField("MP_PY_CustomFilenameTF", edit = 1, text = "", enable = 0)
-
         pm.button("MP_PY_BrowseFilenameBTN", edit = 1, enable = 0)
 
     elif selectedRB == "MP_PY_ChooseCustomFilenameRB":
         print("Custom Export Filename Chosen\n")
-
         pm.textField("MP_PY_CustomFilenameTF", edit = 1, enable = 1)
-
         pm.button("MP_PY_BrowseFilenameBTN", edit = 1, enable = 1)
 
 
@@ -464,9 +459,7 @@ def MP_PY_TransformModeUI():
         )
 
 
-def MP_PY_SetEggObjectTypeAttribute(
-        enumerationList, eggObjectType, indexNumber, attributeNumber, node
-):
+def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber, attributeNumber, node):
     # Determining variable on whether we can add egg-object-type attribute to node
     # Check for any currently attached egg-object-type attribute values on the node.
     # If a current attribute matches passed egg-object-type,
@@ -1959,9 +1952,9 @@ ui_elements = {
 
 # Delete any current instances of the UI elements
 for element, ui_type in ui_elements.items():
-    if ui_type == "menu" and pm.menu(element, exists=True):
-        pm.deleteUI(element, menu=True)
-    elif ui_type == "window" and pm.window(element, exists=True):
+    if ui_type == "menu" and pm.menu(element, exists = True):
+        pm.deleteUI(element, menu = True)
+    elif ui_type == "window" and pm.window(element, exists = True):
         pm.deleteUI(element, window = True)
 # endregion
 
@@ -2265,20 +2258,20 @@ def MP_PY_Export2Bam(egg_file, export_mode):
     file_path = os.path.dirname(egg_file)
 
     # Additional options
-    raw_tex = "-rawtex " if pm.checkBox("MP_PY_RawtexCB", query=True, value=True) else ""
-    flatten = "-flatten 1 " if pm.checkBox("MP_PY_FlattenCB", query=True, value=True) else ""
+    raw_tex = "-rawtex " if pm.checkBox("MP_PY_RawtexCB", query = True, value = True) else ""
+    flatten = "-flatten 1 " if pm.checkBox("MP_PY_FlattenCB", query = True, value = True) else ""
 
     # Handle custom output and filename for export_mode 1
     if export_mode == 1:
-        custom_filename = pm.textField("MP_PY_CustomFilenameTF", query=True, text=True)
-        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query=True, text=True)
+        custom_filename = pm.textField("MP_PY_CustomFilenameTF", query = True, text = True)
+        custom_output_path = pm.textField("MP_PY_CustomOutputPathTF", query = True, text = True)
         file_name = custom_filename or file_name
         file_path = custom_output_path or file_path
 
     # Texture path options
-    tex_path_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query=True, select=True)
-    custom_bam_tex_path = pm.textField("MP_PY_CustomBamTexPathTF", query=True, text=True)
-    custom_egg_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query=True, text=True)
+    tex_path_option = pm.radioCollection("MP_PY_TexPathOptionsRC", query = True, select = True)
+    custom_bam_tex_path = pm.textField("MP_PY_CustomBamTexPathTF", query = True, text = True)
+    custom_egg_tex_path = pm.textField("MP_PY_CustomEggTexPathTF", query = True, text = True)
 
     path_store = "-ps rel " \
         if tex_path_option in {"MP_PY_ChooseCustomRefPathRB", "MP_PY_ChooseCustomTexPathRB"} \
@@ -2305,7 +2298,7 @@ def MP_PY_Export2Bam(egg_file, export_mode):
     egg2bam = MP_PY_PandaVersion("getEgg2Bam")
 
     # Overwrite mode
-    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query=True, value=True)
+    overwrite = pm.checkBox("MP_PY_ExportOverwriteCB", query = True, value = True)
     overwrite_flag = "-o " if overwrite else ""
 
     # Construct the command
@@ -2319,11 +2312,10 @@ def MP_PY_Export2Bam(egg_file, export_mode):
     print(f"Command executed:\n{cmd}")
 
     # Run Pview if selected
-    if pm.checkBox("MP_PY_ExportPviewCB", query=True, value=True):
+    if pm.checkBox("MP_PY_ExportPviewCB", query = True, value = True):
         MP_PY_Send2Pview(bam_file)
 
-    print(f"Conversion complete: .egg -> .bam\nUnit: {pm.optionMenu('MP_PY_UnitMenu', query=True, value=True)}")
-
+    print(f"Conversion complete: .egg -> .bam\nUnit: {pm.optionMenu('MP_PY_UnitMenu', query = True, value = True)}")
 
 
 def MP_PY_Send2Pview(file_path=""):
@@ -2513,7 +2505,7 @@ def MP_PY_ExportNodesToPandaFiles():
 
         # Export the node as a Maya binary file
         pm.select(node, replace = True)
-        pm.cmds.file(temp_mb_file, op="v=1", typ="mayaBinary", exportSelected=True, force=True)
+        pm.cmds.file(temp_mb_file, op = "v=1", typ = "mayaBinary", exportSelected = True, force = True)
         # Add Maya file info to results
         nodes_to_panda_files.append((maya_file_name, dest_path))
 
@@ -2546,8 +2538,6 @@ def MP_PY_ExportNodesToPandaFiles():
     # Show results if files were exported
     if files_exported > 0 and nodes_to_panda_files:
         MP_PY_NodesExportedAsPandaFilesGUI(nodes_to_panda_files)
-
-
 
 
 def MP_PY_NodesExportedAsPandaFilesGUI(nodes_to_panda_files):
