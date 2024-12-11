@@ -2589,31 +2589,33 @@ def MP_PY_BrowseForFilePreProcess(option):
 
     :param option: Specifies the type of file browsing operation.
     """
-    if option == "customFilename":
-        # File dialog configuration
-        file_mode = 0  # Any file, whether it exists or not
-        caption = "Select file name to save as"
-        file_filter = "Panda Egg (*.egg);;All Files (*.*)"
-        starting_directory = os.path.dirname(pm.sceneName()) if pm.sceneName() else os.getcwd()
+    # currently only supports customFilename
+    if option != "customFilename":
+        return
+    # File dialog configuration
+    file_mode = 0  # Any file, whether it exists or not
+    caption = "Select file name to save as"
+    file_filter = "Panda Egg (*.egg);;All Files (*.*)"
+    starting_directory = os.path.dirname(pm.sceneName()) if pm.sceneName() else os.getcwd()
 
-        # Open file dialog
-        custom_file = pm.fileDialog2(
-            dialogStyle = 2,
-            fileMode = file_mode,
-            caption = caption,
-            fileFilter = file_filter,
-            startingDirectory = starting_directory,
-        )
+    # Open file dialog
+    custom_file = pm.fileDialog2(
+        dialogStyle = 2,
+        fileMode = file_mode,
+        caption = caption,
+        fileFilter = file_filter,
+        startingDirectory = starting_directory,
+    )
 
-        if custom_file and len(custom_file) > 0:
-            # Extract file name and directory
-            file_name = os.path.splitext(os.path.basename(custom_file[0]))[0]
-            directory_name = os.path.dirname(custom_file[0])
+    if custom_file and len(custom_file) > 0:
+        # Extract file name and directory
+        file_name = os.path.splitext(os.path.basename(custom_file[0]))[0]
+        directory_name = os.path.dirname(custom_file[0])
 
-            # Update UI elements
-            pm.textField("MP_PY_CustomFilenameTF", edit = True, enable = True, text = file_name)
-            pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
-            pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = directory_name)
+        # Update UI elements
+        pm.textField("MP_PY_CustomFilenameTF", edit = True, enable = True, text = file_name)
+        pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
+        pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = directory_name)
 
 
 # The following processes define the functions called by using the menu items
