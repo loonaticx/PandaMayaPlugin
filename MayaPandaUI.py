@@ -244,7 +244,9 @@ def MP_PY_ConfirmationDialog(title, message, dialog_type):
     :param dialog_type: Type of dialog (e.g., "ok", "okcancel", "yesno", etc.).
     :returns: The value of the button pressed by the user.
     """
-    # would be nice sometime in the future to have message be a list of strings, combined together with \n separator
+    if isinstance(message, list):
+        message = "\n".join(message)
+    # would be nice sometime in the future to have message be a list of strings, combined with \n separator
     # Define button configurations based on the dialog type
     button_configs = {
         "ok": {"buttons": ["OK"], "default": "OK", "cancel": "CANCEL"},
@@ -709,8 +711,7 @@ def MP_PY_GetEggObjectTypes():
     if len(selected) < 1:
         MP_PY_ConfirmationDialog(
             "Selection Error!",
-            "Nothing is currently selected"
-            + "\nSelect at least one node and try again.",
+            ["Nothing is currently selected.", "Select at least one node and try again."],
             "ok",
         )
     # Throw a message if at least one node has not been selected.
@@ -2449,9 +2450,11 @@ def MP_PY_ExportNodesToPandaFiles():
     if not dest_path:
         output_directory_error = MP_PY_ConfirmationDialog(
             "Output Directory ERROR!",
-            "You must select a directory where the exported files will go.\n"
-            "Click \"Choose Directory\" to select the directory and continue\n"
-            "or click \"Cancel\" to exit process.",
+            [
+                "You must select a directory where the exported files will go.",
+                "Click \"Choose Directory\" to select the directory and continue",
+                "or click \"Cancel\" to exit process."
+            ],
             "selectcancel"
         )
         if output_directory_error == "SELECT":
