@@ -301,8 +301,10 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
         if len(selectedNodes) == 0:
             MP_PY_ConfirmationDialog(
                 "Selection Error!",
-                "You must first make a selection!\n"
-                "Please select at least one node, then try again.",
+                [
+                    "You must first make a selection!",
+                    "Please select at least one node, then try again."
+                ],
                 "ok",
             )
             return
@@ -313,8 +315,10 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
                     if i == 10:
                         MP_PY_ConfirmationDialog(
                             "Egg-Object-Type Error!",
-                            "Limit of 10 egg-object-types has already been reached."
-                            + "\nNo More Egg Object Types Supported for this node.",
+                            [
+                                "Limit of 10 egg-object-types has already been reached.",
+                                "No More Egg Object Types Supported for this node."
+                            ],
                             "ok",
                         )
                     # Notify user if the lmit of 3 tags are already assigned to node
@@ -329,12 +333,13 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
     else:
         MP_PY_ConfirmationDialog(
             "Egg-Object-Type Error!",
-            "The selected egg-object-type was not found in the $gMP_PY_EggObjectTypeArray"
-            + "\n"
-            + "\nPlease verify the object-type being passed and update the $gMP_PY_EggObjectTypeArray"
-            + "\nto include the egg-object-type if the type is the correct one needed."
-            + "\n\nIf you modify the $gMP_PY_EggObjectTypeArray DO NOT forget to update your PRC files."
-            + "\nto include a reference of the egg-object-type you are adding.",
+            [
+                "The selected egg-object-type was not found in the $gMP_PY_EggObjectTypeArray",
+                "Please verify the object-type being passed and update the $gMP_PY_EggObjectTypeArray",
+                "to include the egg-object-type if the type is the correct one needed.",
+                "If you modify the $gMP_PY_EggObjectTypeArray DO NOT forget to update your PRC files.",
+                "to include a reference of the egg-object-type you are adding."
+            ],
             "ok",
         )
     # Message to user that the passed egg-object-type is NOT in the $gMP_PY_EggObjectTypeArray array
@@ -471,8 +476,11 @@ def MP_PY_SetEggObjectTypeAttribute(
             if pm.getAttr((node + ".eggObjectTypes" + str(i)), asString = 1) == eggObjectType:
                 MP_PY_ConfirmationDialog(
                     "Egg-Object-Type Error!",
-                    f'egg-object-type - "{eggObjectType}"\n\n'
-                    f"Already attached on node attribute:\n{node}.eggObjectTypes{i}",
+                    [
+                        f'egg-object-type - "{eggObjectType}"',
+                        f"Already attached on node attribute:",
+                        f"{node}.eggObjectTypes{i}",
+                    ],
                     "ok",
                 )
                 return
@@ -654,7 +662,10 @@ def MP_PY_UVScrolling(option):
     if not selected_nodes:
         MP_PY_ConfirmationDialog(
             "Selection Error!",
-            "No nodes selected.\nPlease select at least one node and try again.",
+            [
+                "No nodes selected.",
+                "Please select at least one node and try again.",
+            ],
             "ok",
         )
         return
