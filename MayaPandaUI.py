@@ -881,7 +881,7 @@ def mp_py_delete_egg_object_type(node_hierarchy, index):
         confirm = MP_PY_ConfirmationDialog(
             title = "Delete Egg-Object-Type",
             message = f"Are you sure you want to delete the egg-object-type at {attribute_name}?",
-            type = "yesno"
+            dialog_type = "yesno"
         )
 
         if confirm == "YES":
@@ -895,7 +895,7 @@ def mp_py_delete_egg_object_type(node_hierarchy, index):
         MP_PY_ConfirmationDialog(
             title = "Error",
             message = f"Attribute {attribute_name} does not exist on node {node}.",
-            type = "ok"
+            dialog_type = "ok"
         )
 
 
