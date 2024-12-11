@@ -1,6 +1,11 @@
+from enum import IntEnum
+from math import ceil
+
 import pymel.core as pm
 import os
 import time
+
+from natsort import natsorted
 
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
@@ -9,6 +14,500 @@ PANDA_SDK_NOTICE = "gMP_PY_ChoosePandaFileNotice"
 ADDON_RELEASE_VERSION = "gMP_PY_ReleaseRevision"
 MAYA_VER_SHORT = "gMP_PY_MayaVersionShort"
 # endregion
+from typing import List, Set
+from dataclasses import dataclass, field
+
+
+def hex_to_rgb(hex_color):
+    """Converts a hex color code to RGB values (0-255)."""
+
+    # Remove the '#' if present
+    hex_color = hex_color.lstrip('#')
+
+    # Convert hex values to integers
+    r = int(hex_color[0:2], 16)
+    g = int(hex_color[2:4], 16)
+    b = int(hex_color[4:6], 16)
+
+    return (r, g, b)
+
+
+def hex_to_rgb_normalized(hex_color):
+    """Converts a hex color code to normalized RGB values (0-1)."""
+
+    r, g, b = hex_to_rgb(hex_color)
+    return (r / 255, g / 255, b / 255)
+
+
+class OTCategory(IntEnum):
+    NoCategory = 0
+    EmptyAttr = 100
+    CollisionAttr = 200
+    TriggerAttr = 250
+    AlphaBlendAttr = 300
+    AlphaOpAttr = 350
+    DCSAttr = 400
+    TagAttr = 500
+    SeqAttr = 600
+    BinAttr = 700
+    BillboardAttr = 800
+    ToontownAttr = 900  # specific to toontown
+
+
+@dataclass
+class ObjectTypeCategoryDefinition:
+    name: str
+    type_id: OTCategory
+    friendly_name: str
+    color: str
+    text_color: str = "white"
+    children: List["ObjectTypeDefinition"] = field(default_factory = lambda: list())
+
+
+NoCategory = ObjectTypeCategoryDefinition("none", OTCategory.NoCategory, "No Category", "#514e52")
+CollideCategory = ObjectTypeCategoryDefinition("Collide", OTCategory.CollisionAttr, "Collision", "#8786de")
+TriggerCategory = ObjectTypeCategoryDefinition("Trigger", OTCategory.TriggerAttr, "Trigger", "#de6470")
+AlphaBlendModeCategory = ObjectTypeCategoryDefinition("AlphaBlend", OTCategory.AlphaBlendAttr, "Alpha Blend", "#9dd0ff")
+AlphaOperationCategory = ObjectTypeCategoryDefinition("AlphaOp", OTCategory.AlphaOpAttr, "Alpha Op", "#8b13ff")
+DCSCategory = ObjectTypeCategoryDefinition("DCS", OTCategory.DCSAttr, "DCS", "#f0ff73")
+SequenceCategory = ObjectTypeCategoryDefinition("Sequence", OTCategory.SeqAttr, "Sequence", "#ffb380")
+BinCategory = ObjectTypeCategoryDefinition("Bin", OTCategory.BinAttr, "Bin", "#555eff")
+BillboardCategory = ObjectTypeCategoryDefinition("Billboard", OTCategory.BillboardAttr, "Billboard", "#ff94e2")
+TagCategory = ObjectTypeCategoryDefinition("Tag", OTCategory.TagAttr, "Tag", "#a9ffb6")
+ToontownCategory = ObjectTypeCategoryDefinition("Toontown", OTCategory.ToontownAttr, "Toontown", "#ffb31f")
+
+
+@dataclass
+class ObjectTypeDefinition:
+    name: str
+    description: List[str] = field(default_factory = lambda: list())
+    flags: List[str] = field(default_factory = lambda: list())
+    category: ObjectTypeCategoryDefinition = NoCategory
+    mel_id = -1  # todo? meant to be stored as the internal enum value when defined into a mel global attr
+    friendly_name: str = ""
+
+
+###
+
+
+OT_NEW = [
+    ObjectTypeDefinition(
+        name = "barrier",
+        description = [
+            'Creates a barrier that other objects cannot pass through.',
+            'The collision is active on the "Normals" side of the object(s)'
+        ],
+        category = CollideCategory,
+        flags = ['<Collide> { Polyset descend }']
+    ),
+    ObjectTypeDefinition(
+        name = "barrier-no-mask",
+        description = [],
+        category = CollideCategory,
+        flags = ['<Collide> { Polyset descend }']
+    ),
+    ObjectTypeDefinition(
+        name = "floor",
+        description = [
+            'Creates a collision from the object(s) that "Avatars" can walk on.',
+            'If the surface is angled, the Avatar will not slide down it.',
+            'The collision is active on the "Normals" side of the object(s)'
+        ],
+        category = CollideCategory,
+        flags = ['<Scalar> collide-mask { 0x02 }', '<Collide> { Polyset descend level }']
+    ),
+    ObjectTypeDefinition(
+        name = "floor-collide",
+        description = [],
+        category = CollideCategory,
+        flags = ['<Scalar> collide-mask { 0x06 }']
+    ),
+    ObjectTypeDefinition(
+        name = "shadow",
+        description = [
+            'Define a "shadow" object type, so we can render all shadows in their own bin '
+            'and have them not fight with other transparent geometry.'
+        ],
+        flags = ['<Scalar> bin { shadow }', '<Scalar> alpha { blend-no-occlude }'],
+        category = BinCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "shadow-cast",
+        description = [
+            'Gives the selected object(s) the required attributes so that an "Avatar\'s" shadow can be cast over it.',
+            'Commonly used for casting an "Avatar\'s" shadow onto floors.'
+        ],
+        flags = ['<Tag> cam { shground }', '<Scalar> draw-order { 0 }', '<Scalar> bin { ground }'],
+        category = BinCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "bin-fixed",
+        flags = ['<Scalar> bin { fixed }'],
+        category = BinCategory,
+        friendly_name = "Fixed"
+    ),
+    ObjectTypeDefinition(
+        name = "bin-gui-popup",
+        flags = ['<Scalar> bin { gui-popup }'],
+        category = BinCategory,
+        friendly_name = "GUI Popup"
+    ),
+    ObjectTypeDefinition(
+        name = "bin-unsorted",
+        flags = ['<Scalar> bin { unsorted }'],
+        category = BinCategory,
+        friendly_name = "Unsorted"
+    ),
+    ObjectTypeDefinition(
+        name = "bin-opaque",
+        flags = ['<Scalar> bin { opaque }'],
+        category = BinCategory,
+        friendly_name = "Opaque"
+    ),
+    ObjectTypeDefinition(
+        name = "bin-background",
+        flags = ['<Scalar> bin { background }'],
+        category = BinCategory,
+        friendly_name = "Background"
+    ),
+    ObjectTypeDefinition(
+        name = "bin-transparent",
+        flags = ['<Scalar> bin { transparent }'],
+        category = BinCategory,
+        friendly_name = "Transparent"
+    ),
+    ObjectTypeDefinition(
+        name = "dupefloor",
+        description = [
+            'This type first creates a duplicate of the selected object(s).',
+            'Then, creates a floor collision from the duplicate object(s) that "Avatars" can walk on.',
+            'If the surface is angled, the Avatar will not slide down it.',
+            'The collision is active on the "Normals" side of the object(s)'
+        ],
+        category = CollideCategory,
+        flags = ['<Collide> { Polyset keep descend level }']
+    ),
+    ObjectTypeDefinition(
+        name = "smooth-floors",
+        description = ['Makes floors smooth for the "Avatars" to walk and stand on.'],
+        flags = [
+            '<Collide> { Polyset descend }',
+            '<Scalar> from-collide-mask { 0x000fffff }',
+            '<Scalar> into-collide-mask { 0x00000002 }'
+        ],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "camera-collide",
+        description = ['Allows only the camera to collide with the geometry.'],
+        flags = [
+            '<Scalar> collide-mask { 0x04 }',
+            '<Collide> { Polyset descend }'
+        ],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "sphere",
+        description = [
+            'Creates a "minimum-sized" sphere collision around the selected object(s), '
+            'that other objects cannot enter into.'
+        ],
+        flags = ['<Collide> { Sphere descend }'],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "tube",
+        description = [
+            'Creates a "minimum-sized" tube collision around the selected object(s), '
+            'that other objects cannot enter into.'
+        ],
+        flags = ['<Collide> { Tube descend }'],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "trigger",
+        description = [
+            'Creates a collision that can be used as a "Trigger", which can be used to activate, or deactivate, '
+            'specific processes.',
+            'The collision is active on the "Normals" side of the object(s)'
+        ],
+        flags = ['<Collide> { Polyset descend intangible }'],
+        category = TriggerCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "trigger-sphere",
+        description = [
+            'Creates a "minimum-sized" sphere collision that can be used as a "Trigger", which can be used to activate,'
+            ' or deactivate, specific processes.',
+            'The collision is active on the "Normals" side of the object(s)'
+        ],
+        flags = ['<Collide> { Sphere descend intangible }'],
+        category = TriggerCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "invsphere",
+        description = [
+            'Creates a "minimum-sized" inverse-sphere collision around the selected object(s). '
+            'Any object inside the sphere will be prevented from exiting the sphere.'
+        ],
+        flags = ['<Collide> { InvSphere descend }'],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "bubble",
+        description = [
+            '"bubble" puts a Sphere collision around the geometry, but does not otherwise remove the geometry.'
+        ],
+        flags = ['<Collide> { Sphere keep descend }'],
+        category = CollideCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "dual",
+        description = [
+            'Normally attached to polygons that have transparency, '
+            'that are in the scene by themselves, such as a Tree or Flower.'
+        ],
+        flags = ['<Scalar> alpha { dual }'],
+        category = AlphaBlendModeCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "multisample",
+        flags = ['<Scalar> alpha { ms }'],
+        category = AlphaBlendModeCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "blend",
+        flags = ['<Scalar> alpha { blend }'],
+        category = AlphaBlendModeCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "decal",
+        flags = ['<Scalar> decal { 1 }']
+    ),
+    ObjectTypeDefinition(
+        name = "ghost",
+        description = [
+            '"ghost" turns off the normal collide bit that is set on visible geometry by default, '
+            'so that if you are using visible geometry for collisions, '
+            'this particular geometry will not be part of those collisions--'
+            'it is ghostlike. Characters will pass through it.'
+        ],
+        flags = ['<Scalar> collide-mask { 0 }']
+    ),
+    ObjectTypeDefinition(
+        name = "glass",
+        flags = ['<Scalar> alpha { blend_no_occlude }'],
+        category = AlphaBlendModeCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "glow",
+        description = [
+            '"glow" is useful for halo effects and things of that ilk. It renders the object in add mode instead '
+            'of the normal opaque mode.'
+        ],
+        flags = ['<Scalar> blend { add }'],
+        friendly_name = "Add",
+        category = AlphaOperationCategory
+    ),
+    ObjectTypeDefinition(
+        name = "binary",
+        description = [
+            'This mode of alpha sets transparency pixels to either on or off. No blending is used.'
+        ],
+        flags = ['<Scalar> alpha { binary }'],
+        category = AlphaBlendModeCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "indexed",
+        flags = ['<Scalar> indexed { 1 }']
+    ),
+    ObjectTypeDefinition(
+        name = "model",
+        description = [
+            'This creates a ModelNode at the corresponding level, which is guaranteed not to be removed by any '
+            'flatten operation. However, its transform might still be changed.'
+        ],
+        flags = ['<Model> { 1 }']
+    ),
+    ObjectTypeDefinition(
+        name = "dcs",
+        description = [
+            'Indicates the node should not be flattened out of the hierarchy during conversion. '
+            'The node\'s transform is important and should be preserved.'
+        ],
+        flags = ['<DCS> { 1 }'],
+        category = DCSCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "netdcs",
+        flags = ['<DCS> { net }'],
+        category = DCSCategory,
+        friendly_name = "Net"
+
+    ),
+    ObjectTypeDefinition(
+        name = "localdcs",
+        flags = ['<DCS> { local }'],
+        category = DCSCategory,
+        friendly_name = "Local"
+
+    ),
+    ObjectTypeDefinition(
+        name = "notouch",
+        description = [
+            'Indicates the node, and below, should not be flattened out of the hierarchy during the conversion process.'
+        ],
+        flags = ['<DCS> { no-touch }'],
+        category = DCSCategory,
+
+    ),
+    ObjectTypeDefinition(
+        name = "double-sided",
+        description = [
+            'Defines whether the polygon will be rendered double-sided (i.e., its back face will be visible).'
+        ],
+        flags = ['<BFace> { 1 }']
+    ),
+    ObjectTypeDefinition(
+        name = "billboard",
+        description = [
+            'Rotates the geometry to always face the camera. Geometry will rotate on its local axis.'
+        ],
+        flags = ['<Billboard> { axis }'],
+        friendly_name = "BB-Axis",
+        category = BillboardCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq2",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 2 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 2 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq4",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 4 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 4 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq6",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 6 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 6 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq8",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 8 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 8 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq10",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 10 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 10 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq12",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 12 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 12 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "seq24",
+        description = [
+            'Indicates a series of animation frames that should be consecutively displayed at 24 fps.'
+        ],
+        flags = ['<Switch> { 1 }', '<Scalar> fps { 24 }'],
+        category = SequenceCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "ground",
+        flags = ['<Scalar> bin { ground }'],
+        category = BinCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "invisible",
+        flags = []
+    ),
+    ObjectTypeDefinition(
+        name = "catch-grab",
+        flags = ['<Scalar> collide-mask { 0x08 }'],
+        description = ['Things the magnet can pick up in the Cashbot CFO battle (same as CatchGameBitmask)'],
+        category = ToontownCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "pet",
+        flags = ['<Scalar> collide-mask { 0x10 }'],
+        description = ['Pets avoid this'],
+        category = ToontownCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "furniture-side",
+        flags = ['<Scalar> collide-mask { 0x20 }'],
+        category = ToontownCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "furniture-top",
+        flags = ['<Scalar> collide-mask { 0x40 }'],
+        category = ToontownCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "furniture-drag",
+        flags = ['<Scalar> collide-mask { 0x80 }'],
+        category = ToontownCategory,
+    ),
+    ObjectTypeDefinition(
+        name = "pie",
+        flags = ['<Scalar> collide-mask { 0x100 }'],
+        category = ToontownCategory,
+        description = ['Things we can throw a pie at.'],
+    ),
+]
+
+
+def getOTNames(sortby=None):
+    names = [ot.name for ot in OT_NEW]
+    if sortby == "alphabetical":
+        names = natsorted(names)
+    elif sortby == "category":
+        def sorting_key(item):
+            category_id = item.category.type_id if item.category is not None else 9999  # High value for uncategorized
+            name_lower = item.name.lower()  # Case-insensitive name comparison
+            return category_id, name_lower
+
+        names = [ot.name for ot in natsorted(OT_NEW, key = sorting_key)]
+    return names
+
+
+Names2Definition = {ot.name: ot for ot in OT_NEW}
+FriendlyNames = {ot.name: ot.friendly_name for ot in OT_NEW}
+
+# Populates categories with children
+for OTEntry in OT_NEW:
+    OTEntry.category.children.append(OTEntry)
 
 OT_ENTRIES = {
     "barrier": (
@@ -481,6 +980,7 @@ def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber,
         # Message to user that the egg-object-type is already assigned to node
         # Since attribute already exists on node, set our determining variable to 0 to skip adding it again
 
+    defObj = Names2Definition[eggObjectType]
     pm.addAttr(
         node,
         ln = ("eggObjectTypes" + str(attributeNumber)),
