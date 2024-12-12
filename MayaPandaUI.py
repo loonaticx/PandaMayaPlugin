@@ -6,6 +6,8 @@ import os
 import time
 
 from natsort import natsorted
+from typing import List, Set
+from dataclasses import dataclass, field
 
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
@@ -13,9 +15,9 @@ PANDA_FILE_VERSIONS = "gMP_PY_PandaFileVersions"
 PANDA_SDK_NOTICE = "gMP_PY_ChoosePandaFileNotice"
 ADDON_RELEASE_VERSION = "gMP_PY_ReleaseRevision"
 MAYA_VER_SHORT = "gMP_PY_MayaVersionShort"
+
+
 # endregion
-from typing import List, Set
-from dataclasses import dataclass, field
 
 
 def hex_to_rgb(hex_color):
@@ -508,203 +510,6 @@ FriendlyNames = {ot.name: ot.friendly_name for ot in OT_NEW}
 # Populates categories with children
 for OTEntry in OT_NEW:
     OTEntry.category.children.append(OTEntry)
-
-OT_ENTRIES = {
-    "barrier": (
-        "<Collide> { Polyset descend }"
-        "\n\nCreates a barrier that other objects cannot pass through."
-        '\nThe collision is active on the "Normals" side of the object(s)'
-    ),
-    "barrier-no-mask": "<Collide> { Polyset descend }",
-    "floor": (
-        "<Scalar> collide-mask { 0x02 }"
-        "\n<Collide> { Polyset descend level }"
-        "\n\nCreates a collision from the object(s) that 'Avatars' can walk on."
-        "\nIf the surface is angled, the Avatar will not slide down it."
-        '\nThe collision is active on the "Normals" side of the object(s)'
-    ),
-    "floor-collide": "<Scalar> collide-mask { 0x06 }",
-    "shadow": (
-        "<Scalar> bin { shadow } <Scalar> alpha { blend-no-occlude }"
-        '\n\nDefine a "shadow" object type, so we can render all shadows in '
-        "their own bin and have them not fight with each other (or with other "
-        "transparent geometry)."
-    ),
-    "shadow-cast": (
-        "<Tag> cam { shground }"
-        "\n<Scalar> draw-order { 0 }"
-        "\n<Scalar> bin { ground }"
-        "\n\nGives the selected object(s) the required attributes so that an "
-        '"Avatar\'s" shadow can be cast over it. Commonly used for casting an '
-        '"Avatar\'s" shadow onto floors.'
-    ),
-    "dupefloor": (
-        "<Collide> { Polyset keep descend level }"
-        "\n\nThis type first creates a duplicate of the selected object(s)."
-        "\nThen, creates a floor collision from the duplicate object(s) that "
-        '"Avatars" can walk on.'
-        "\nIf the surface is angled, the Avatar will not slide down it."
-        '\nThe collision is active on the "Normals" side of the object(s)'
-    ),
-    "smooth-floors": (
-        "<Collide> { Polyset descend }"
-        "\n<Scalar> from-collide-mask { 0x000fffff }"
-        "\n<Scalar> into-collide-mask { 0x00000002 }"
-        '\n\nMakes floors smooth for the "Avatars" to walk and stand on.'
-    ),
-    "camera-collide": (
-        "<Scalar> collide-mask { 0x04 }"
-        "\n<Collide> { Polyset descend }"
-        "\n\nAllows only the camera to collide with the geometry."
-    ),
-    "sphere": (
-        "<Collide> { Sphere descend }"
-        '\n\nCreates a "minimum-sized" sphere collision around the selected '
-        "object(s), that other objects cannot enter into."
-    ),
-    "tube": (
-        "<Collide> { Tube descend }"
-        '\n\nCreates a "minimum-sized" tube collision around the selected '
-        "object(s), that other objects cannot enter into."
-    ),
-    "trigger": (
-        "<Collide> { Polyset descend intangible }"
-        "\n\nCreates a collision that can be used as a 'Trigger', which can be "
-        "used to activate, or deactivate, specific processes."
-        '\nThe collision is active on the "Normals" side of the object(s)'
-    ),
-    "trigger-sphere": (
-        "<Collide> { Sphere descend intangible }"
-        '\n\nCreates a "minimum-sized" sphere collision that can be used as a '
-        '"Trigger", which can be used to activate, or deactivate, specific processes.'
-        '\nThe collision is active on the "Normals" side of the object(s)'
-    ),
-    "invsphere": (
-        "<Collide> { InvSphere descend }"
-        '\n\nCreates a "minimum-sized" inverse-sphere collision around the '
-        "selected object(s). Any object inside the sphere will be prevented from "
-        "exiting the sphere."
-    ),
-    "bubble": (
-        "<Collide> { Sphere keep descend }"
-        '\n\n"bubble" puts a Sphere collision around the geometry, but does not '
-        "otherwise remove the geometry."
-    ),
-    "dual": (
-        "<Scalar> alpha { dual }"
-        "\n\nNormally attached to polygons that have transparency, that are in "
-        "the scene by themselves, such as a Tree or Flower."
-    ),
-    "multisample": "<Scalar> alpha { ms }",
-    "blend": "<Scalar> alpha { blend }",
-    "decal": "<Scalar> decal { 1 }",
-    "ghost": (
-        "<Scalar> collide-mask { 0 }"
-        '\n\n"ghost" turns off the normal collide bit that is set on visible '
-        "geometry by default, so that if you are using visible geometry for "
-        "collisions, this particular geometry will not be part of those collisions--"
-        "it is ghostlike. Characters will pass through it."
-    ),
-    "glass": "<Scalar> alpha { blend_no_occlude }",
-    "glow": (
-        "<Scalar> blend { add }"
-        '\n\n"glow" is useful for halo effects and things of that ilk. It renders '
-        "the object in add mode instead of the normal opaque mode."
-    ),
-    "binary": (
-        "<Scalar> alpha { binary }"
-        "\n\nThis mode of alpha sets transparency pixels to either on or off. No "
-        "blending is used."
-    ),
-    "indexed": "<Scalar> indexed { 1 }",
-    "model": (
-        "<Model> { 1 }"
-        "\n\nThis creates a ModelNode at the corresponding level, which is "
-        "guaranteed not to be removed by any flatten operation. However, its "
-        "transform might still be changed."
-    ),
-    "dcs": (
-        "<DCS> { 1 }"
-        "\n\nIndicates the node should not be flattened out of the hierarchy during "
-        "conversion. The node's transform is important and should be preserved."
-    ),
-    "netdcs": "<DCS> { Net }",
-    "localdcs": "<DCS> { Local }",
-    "notouch": (
-        "<DCS> { no-touch }"
-        "\n\nIndicates the node, and below, should not be flattened out of the "
-        "hierarchy during the conversion process."
-    ),
-    "double-sided": (
-        "<BFace> { 1 }"
-        "\n\nDefines whether the polygon will be rendered double-sided (i.e., its "
-        "back face will be visible)."
-    ),
-    "billboard": (
-        "<Billboard> { axis }"
-        "\n\nRotates the geometry to always face the camera. Geometry will rotate "
-        "on its local axis."
-    ),
-    "seq2": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 2 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 2 fps."
-    ),
-    "seq4": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 4 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 4 fps."
-    ),
-    "seq6": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 6 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 6 fps."
-    ),
-    "seq8": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 8 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 8 fps."
-    ),
-    "seq10": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 10 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 10 fps."
-    ),
-    "seq12": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 12 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 12 fps."
-    ),
-    "seq24": (
-        "<Switch> { 1 }"
-        "\n<Scalar> fps { 24 }"
-        "\n\nIndicates a series of animation frames that should be consecutively "
-        "displayed at 24 fps."
-    ),
-    "ground": (
-        ""
-    ),
-    "invisible": "",
-    "catch-grab": "",
-    "pie": "",
-    "safety-gate": "",
-    "safety-net": "",
-    "draw1": "",
-    "draw0": "",
-    "shground": "",
-    "camtransbarrier": "",
-    "camtransparent": "",
-    "cambarrier-sphere": "",
-    "camera-barrier": "",
-    "camera-collide-sphere": "",
-    "backstage": "",
-}
 
 
 def MP_PY_PandaVersion(option):
@@ -1729,15 +1534,6 @@ def MP_PY_GetObjectTypeAnnotationNEW(object_type: ObjectTypeDefinition):
     return f"{desc}\n\nFlags:\n{flags}"
 
 
-def MP_PY_GetObjectTypeAnnotation(objectType):
-    """
-    Returns the egg-object-type button annotation text of defined types as a string for GUI.
-    """
-    return OT_ENTRIES.get(
-        objectType, f"Adds the {objectType} egg-object-type to selected geometry."
-    )
-
-
 def MP_PY_Globals():
     """
     Contains MP_PY_PandaVersion and egg-object-type arrays
@@ -1811,7 +1607,6 @@ def MP_PY_Globals():
     #        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
 
-    # pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted(OT_ENTRIES.keys())
     pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = getOTNames("category")
 
     # todo: maybe add option to type own number for seqX
