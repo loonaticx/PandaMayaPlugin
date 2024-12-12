@@ -1839,711 +1839,736 @@ def MP_PY_CreatePandaExporterWindow():
         visible = 0,
         retain = 1,
     )
+
+    # This inits the left and right cols
     pm.rowLayout(
         numberOfColumns = 2, rowAttach = [(1, "top", 0), (2, "top", 0), (3, "top", 0)]
     )
     # region  Construct LEFT Column
-    pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
-    pm.frameLayout(width = 200, height = 65, label = "Export File Type")
-    pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
-    pm.radioCollection("MP_PY_ExportOptionsRC")
-    pm.rowLayout(numberOfColumns = 3)
-    pm.radioButton(
-        "MP_PY_ChooseActorRB",
-        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
-        collection = "MP_PY_ExportOptionsRC",
-        label = "Actor",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseAnimationRB",
-        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
-        collection = "MP_PY_ExportOptionsRC",
-        label = "Animation",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseBothRB",
-        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
-        collection = "MP_PY_ExportOptionsRC",
-        label = "Both",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 2)
-    pm.radioButton(
-        "MP_PY_ChooseMeshRB",
-        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
-        select = 1,
-        collection = "MP_PY_ExportOptionsRC",
-        label = "Mesh",
-    )
-    pm.radioButton(
-        "MP_PY_ChoosePoseRB",
-        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
-        collection = "MP_PY_ExportOptionsRC",
-        label = "Pose",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.frameLayout(width = 200, height = 65, label = "Transforms To Save:")
-    pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
-    pm.radioCollection("MP_PY_TransformModeRC")
-    pm.rowLayout(numberOfColumns = 3)
-    pm.radioButton(
-        "MP_PY_ChooseTransformNoneRB",
-        onCommand = lambda *args: MP_PY_TransformModeUI(),
-        collection = "MP_PY_TransformModeRC",
-        label = "None",
-    )
-    pm.separator(width = 28, style = "none")
-    pm.radioButton(
-        "MP_PY_ChooseTransformAllRB",
-        onCommand = lambda *args: MP_PY_TransformModeUI(),
-        collection = "MP_PY_TransformModeRC",
-        label = "All",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 3)
-    pm.radioButton(
-        "MP_PY_ChooseTransformDCSRB",
-        onCommand = lambda *args: MP_PY_TransformModeUI(),
-        collection = "MP_PY_TransformModeRC",
-        label = "DCS Flag",
-    )
-    pm.separator(width = 10, style = "none")
-    pm.radioButton(
-        "MP_PY_ChooseTransformModelRB",
-        onCommand = lambda *args: MP_PY_TransformModeUI(),
-        select = 1,
-        collection = "MP_PY_TransformModeRC",
-        label = "Model/DCS flag",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.frameLayout(width = 200, height = 215, label = "Export Options")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.checkBox(
-        "MP_PY_ExportSelectedCB",
-        annotation = "Will export only the selected scene nodes",
-        value = 0,
-        label = "Export only selected objects ",
-    )
-    pm.checkBox(
-        "MP_PY_ExportBfaceCB",
-        annotation = (
-                "If this flag is not specified,the default is to"
-                + "\ntreat all polygons as single-sided,unless an"
-                + '\negg object type of "double-sided" is set.'
-        ),
-        value = 0,
-        label = "Double sided faces",
-    )
-    pm.checkBox(
-        "MP_PY_ExportOverwriteCB",
-        annotation = "Will overwrite file if it already exists",
-        value = 1,
-        label = "Overwrite existing files",
-    )
-    pm.checkBox(
-        "MP_PY_ExportPviewCB",
-        annotation = (
-            "When exporting, it runs the final file, e.g. egg or bam, against pview command"
-        ),
-        value = 0,
-        label = "Run PView after export",
-    )
-    pm.checkBox(
-        "MP_PY_ExportLegacyShadersCB",
-        annotation = (
-            "Use this flag to turn off modern (Phong) shader generation \n"
-            "and treat shaders as if they were Lamberts (legacy)"
-        ),
-        value = 0,
-        label = "Only legacy shaders",
-    )
-    pm.checkBox(
-        "MP_PY_ExportKeepUvsCB",
-        annotation = (
-            "Convert all UV sets on all vertices, even those that do \n"
-            "not appear to be referenced by any textures."
-        ),
-        value = 1,
-        label = "Keep all UV's",
-    )
-    pm.checkBox(
-        "MP_PY_ExportRoundUvsCB",
-        annotation = (
-            "Round up uv coordinates to the nearest 1/100th. i.e.\n"
-            "-0.001 becomes0.0; 0.444 becomes 0.44; 0.778 becomes 0.78"
-        ),
-        value = 1,
-        label = "Round UV's",
-    )
-    pm.checkBox(
-        "MP_PY_ExportTbnallCB",
-        annotation = (
-                "Compute tangent and binormal for all texture coordinate sets"
-                + '\nThis is equivalent to -tbn "*"'
-        ),
-        value = 1,
-        label = "Tangents+Binormals for all UV sets",
-    )
-    pm.checkBox(
-        "MP_PY_ExportLightsCB",
-        annotation = (
-            "Convert all light nodes to locators. Will preserve position and rotation"
-        ),
-        enable = 1,
-        changeCommand = lambda *args: MP_PY_LightsSelectedUI(),
-        value = 0,
-        label = "Convert Lights",
-    )
-    pm.checkBox(
-        "MP_PY_ExportCamerasCB",
-        annotation = (
-            "Convert all camera nodes to locators. Will preserve position and rotation"
-        ),
-        enable = 1,
-        changeCommand = lambda *args: MP_PY_CamerasSelectedUI(),
-        value = 0,
-        label = "Convert Cameras",
-    )
-    pm.checkBox(
-        "MP_PY_RemoveGroundPlaneCB",
-        annotation = (
-            'Removes the "groundPlane_transform" node from the exported EGG file(s).\n'
-            "Currently, this is only supported for Mesh exporting.\n\n"
-            "NOTE: Ensure the node is EMPTY before enabling this option.\n"
-            "This feature allows for the removal of an empty node from the EGG file during the maya2egg export process."
-        ),
-        enable = 1,
-        changeCommand = lambda *args: MP_PY_RemoveGroundPlaneUI(),
-        value = 1,
-        label = "Remove groundPlane_transform",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.frameLayout(width = 200, height = 85, label = "Bam Specific Options")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.rowLayout(numberOfColumns = 3)
-    pm.optionMenu(
-        "MP_PY_BamVersionOptionMenu",
-        width = 100,
-        annotation = (
-            "Bam file version to use for creating the bam file. "
-            "These can be added to the $gMP_PY_PandaFileVersions Array as needed"
-        ),
-    )
+    with pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0):
+        with pm.frameLayout(width = 200, height = 65, label = "Export File Type"):
+            with pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0):
+                pm.radioCollection("MP_PY_ExportOptionsRC")
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.radioButton(
+                        "MP_PY_ChooseActorRB",
+                        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
+                        collection = "MP_PY_ExportOptionsRC",
+                        label = "Actor",
+                    )
+                    pm.radioButton(
+                        "MP_PY_ChooseAnimationRB",
+                        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
+                        collection = "MP_PY_ExportOptionsRC",
+                        label = "Animation",
+                    )
+                    pm.radioButton(
+                        "MP_PY_ChooseBothRB",
+                        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
+                        collection = "MP_PY_ExportOptionsRC",
+                        label = "Both",
+                    )
+                    pm.setParent(upLevel = 1)
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.radioButton(
+                        "MP_PY_ChooseMeshRB",
+                        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
+                        select = 1,
+                        collection = "MP_PY_ExportOptionsRC",
+                        label = "Mesh",
+                    )
+                    pm.radioButton(
+                        "MP_PY_ChoosePoseRB",
+                        onCommand = lambda *args: MP_PY_ExportOptionsUI(),
+                        collection = "MP_PY_ExportOptionsRC",
+                        label = "Pose",
+                    )
+                    pm.setParent(upLevel = 1)
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        with pm.frameLayout(width = 200, height = 65, label = "Transforms To Save:"):
+            with pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0):
+                pm.radioCollection("MP_PY_TransformModeRC")
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.radioButton(
+                        "MP_PY_ChooseTransformNoneRB",
+                        onCommand = lambda *args: MP_PY_TransformModeUI(),
+                        collection = "MP_PY_TransformModeRC",
+                        label = "None",
+                    )
+                    pm.separator(width = 28, style = "none")
+                    pm.radioButton(
+                        "MP_PY_ChooseTransformAllRB",
+                        onCommand = lambda *args: MP_PY_TransformModeUI(),
+                        collection = "MP_PY_TransformModeRC",
+                        label = "All",
+                    )
+                    pm.setParent(upLevel = 1)
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.radioButton(
+                        "MP_PY_ChooseTransformDCSRB",
+                        onCommand = lambda *args: MP_PY_TransformModeUI(),
+                        collection = "MP_PY_TransformModeRC",
+                        label = "DCS Flag",
+                    )
+                    pm.separator(width = 10, style = "none")
+                    pm.radioButton(
+                        "MP_PY_ChooseTransformModelRB",
+                        onCommand = lambda *args: MP_PY_TransformModeUI(),
+                        select = 1,
+                        collection = "MP_PY_TransformModeRC",
+                        label = "Model/DCS flag",
+                    )
+                    pm.setParent(upLevel = 1)
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        with pm.frameLayout(width = 200, height = 215, label = "Export Options"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                pm.checkBox(
+                    "MP_PY_ExportSelectedCB",
+                    annotation = "Will export only the selected scene nodes",
+                    value = 0,
+                    label = "Export only selected objects ",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportBfaceCB",
+                    annotation = (
+                            "If this flag is not specified,the default is to"
+                            + "\ntreat all polygons as single-sided,unless an"
+                            + '\negg object type of "double-sided" is set.'
+                    ),
+                    value = 0,
+                    label = "Double sided faces",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportOverwriteCB",
+                    annotation = "Will overwrite file if it already exists",
+                    value = 1,
+                    label = "Overwrite existing files",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportPviewCB",
+                    annotation = (
+                        "When exporting, it runs the final file, e.g. egg or bam, against pview command"
+                    ),
+                    value = 0,
+                    label = "Run PView after export",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportLegacyShadersCB",
+                    annotation = (
+                        "Use this flag to turn off modern (Phong) shader generation \n"
+                        "and treat shaders as if they were Lamberts (legacy)"
+                    ),
+                    value = 0,
+                    label = "Only legacy shaders",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportKeepUvsCB",
+                    annotation = (
+                        "Convert all UV sets on all vertices, even those that do \n"
+                        "not appear to be referenced by any textures."
+                    ),
+                    value = 1,
+                    label = "Keep all UV's",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportRoundUvsCB",
+                    annotation = (
+                        "Round up uv coordinates to the nearest 1/100th. i.e.\n"
+                        "-0.001 becomes0.0; 0.444 becomes 0.44; 0.778 becomes 0.78"
+                    ),
+                    value = 1,
+                    label = "Round UV's",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportTbnallCB",
+                    annotation = (
+                            "Compute tangent and binormal for all texture coordinate sets"
+                            + '\nThis is equivalent to -tbn "*"'
+                    ),
+                    value = 1,
+                    label = "Tangents+Binormals for all UV sets",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportLightsCB",
+                    annotation = (
+                        "Convert all light nodes to locators. Will preserve position and rotation"
+                    ),
+                    enable = 1,
+                    changeCommand = lambda *args: MP_PY_LightsSelectedUI(),
+                    value = 0,
+                    label = "Convert Lights",
+                )
+                pm.checkBox(
+                    "MP_PY_ExportCamerasCB",
+                    annotation = (
+                        "Convert all camera nodes to locators. Will preserve position and rotation"
+                    ),
+                    enable = 1,
+                    changeCommand = lambda *args: MP_PY_CamerasSelectedUI(),
+                    value = 0,
+                    label = "Convert Cameras",
+                )
+                pm.checkBox(
+                    "MP_PY_RemoveGroundPlaneCB",
+                    annotation = (
+                        'Removes the "groundPlane_transform" node from the exported EGG file(s).\n'
+                        "Currently, this is only supported for Mesh exporting.\n\n"
+                        "NOTE: Ensure the node is EMPTY before enabling this option.\n"
+                        "This feature allows for the removal of an empty node from the EGG file during the maya2egg "
+                        "export process."
+                    ),
+                    enable = 1,
+                    changeCommand = lambda *args: MP_PY_RemoveGroundPlaneUI(),
+                    value = 1,
+                    label = "Remove groundPlane_transform",
+                )
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        with pm.frameLayout(width = 200, height = 85, label = "Bam Specific Options"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.optionMenu(
+                        "MP_PY_BamVersionOptionMenu",
+                        width = 100,
+                        annotation = (
+                            "Bam file version to use for creating the bam file. "
+                            "These can be added to the $gMP_PY_PandaFileVersions Array as needed"
+                        ),
+                    )
 
-    # Construct the Bam Version Option Menu
-    for i in range(0, len(pm.melGlobals[PANDA_FILE_VERSIONS])):
-        pm.menuItem(label = pm.melGlobals[PANDA_FILE_VERSIONS][i])
-        # Generate menu item
-        # Increase counter by number of units between each version entry
-        i = i + 3
+                    # Construct the Bam Version Option Menu
+                    for i in range(0, len(pm.melGlobals[PANDA_FILE_VERSIONS])):
+                        pm.menuItem(label = pm.melGlobals[PANDA_FILE_VERSIONS][i])
+                        # Generate menu item
+                        # Increase counter by number of units between each version entry
+                        i = i + 3
 
-    pm.separator(width = 5, style = "none")
-    pm.text("Bam Version")
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 2)
-    # region rawtex
-    pm.checkBox("MP_PY_RawtexCB", value = 0, label = "Pack Textures into Bam (-rawtex)")
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 2)
-    # endregion
-    # region flatten
-    pm.checkBox("MP_PY_FlattenCB", value = 0, label = "Flatten (-flatten 1)")
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-    # region convert units from
-    pm.frameLayout(width = 200, height = 50, label = "Convert Units From")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.optionMenu("MP_PY_UnitMenu")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "mm")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "cm")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "m")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "km")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "in")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "ft")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "yd")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "nmi")
-    pm.menuItem(collection = "MP_PY_UnitMenu", label = "mi")
-    pm.optionMenu("MP_PY_UnitMenu", edit = 1, value = "cm")
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-    # region output filetype
-    pm.frameLayout(width = 200, height = 70, label = "Output File Type:")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.radioCollection("MP_PY_OutputPandaFileTypeRC")
-    pm.radioButton(
-        "MP_PY_ChooseEggRB",
-        onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
-        select = 1,
-        collection = "MP_PY_OutputPandaFileTypeRC",
-        label = "EGG (ASCII) Only",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseEggBamRB",
-        onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
-        collection = "MP_PY_OutputPandaFileTypeRC",
-        label = "EGG(ASCII)   and   BAM(Binary)",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-    pm.frameLayout(width = 200, height = 50, label = "Egg-Object-Types:")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.rowLayout(numberOfColumns = 2)
-    pm.button(
-        "MP_PY_AddEggTypeBTN",
-        width = 90,
-        height = 20,
-        command = lambda *args: MP_PY_AddEggObjectTypesGUI(),
-        annotation = (
-                "Displays the Egg-Object-Type window in which"
-                + "\nthe user selects tags to add to selected "
-                  "nodes."
-        ),
-        label = "Add Egg Tags",
-    )
-    pm.button(
-        "MP_PY_DeleteEggTypeBTN",
-        width = 90,
-        height = 20,
-        command = lambda *args: MP_PY_GetEggObjectTypes(),
-        annotation = (
-                "Displays an Egg-Object-Type window in which"
-                + "\nthe user can select tags to delete from "
-                  "selected nodes."
-        ),
-        label = "Delete Egg Tags",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
+                    pm.separator(width = 5, style = "none")
+                    pm.text("Bam Version")
+                    pm.setParent(upLevel = 1)
+                # region rawtex
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.checkBox("MP_PY_RawtexCB", value = 0, label = "Pack Textures into Bam (-rawtex)")
+                    pm.setParent(upLevel = 1)
+                # endregion
+                # region flatten
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.checkBox("MP_PY_FlattenCB", value = 0, label = "Flatten (-flatten 1)")
+                    pm.setParent(upLevel = 1)
+                # endregion
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        # region convert units from
+        with pm.frameLayout(width = 200, height = 50, label = "Convert Units From"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                pm.optionMenu("MP_PY_UnitMenu")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "mm")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "cm")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "m")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "km")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "in")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "ft")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "yd")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "nmi")
+                pm.menuItem(collection = "MP_PY_UnitMenu", label = "mi")
+                pm.optionMenu("MP_PY_UnitMenu", edit = 1, value = "cm")
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        # endregion
+        # region output filetype
+        pm.frameLayout(width = 200, height = 70, label = "Output File Type:")
+        pm.columnLayout(columnAttach = ("left", 0))
+        pm.radioCollection("MP_PY_OutputPandaFileTypeRC")
+        pm.radioButton(
+            "MP_PY_ChooseEggRB",
+            onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
+            select = 1,
+            collection = "MP_PY_OutputPandaFileTypeRC",
+            label = "EGG (ASCII) Only",
+        )
+        pm.radioButton(
+            "MP_PY_ChooseEggBamRB",
+            onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
+            collection = "MP_PY_OutputPandaFileTypeRC",
+            label = "EGG(ASCII)   and   BAM(Binary)",
+        )
+        pm.setParent(upLevel = 1)
+        pm.setParent(upLevel = 1)
+        # endregion
+        with pm.frameLayout(width = 200, height = 50, label = "Egg-Object-Types:"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.button(
+                        "MP_PY_AddEggTypeBTN",
+                        width = 90,
+                        height = 20,
+                        command = lambda *args: MP_PY_AddEggObjectTypesGUI(),
+                        annotation = (
+                                "Displays the Egg-Object-Type window in which"
+                                + "\nthe user selects tags to add to selected "
+                                  "nodes."
+                        ),
+                        label = "Add Egg Tags",
+                    )
+                    pm.button(
+                        "MP_PY_DeleteEggTypeBTN",
+                        width = 90,
+                        height = 20,
+                        command = lambda *args: MP_PY_GetEggObjectTypes(),
+                        annotation = (
+                                "Displays an Egg-Object-Type window in which"
+                                + "\nthe user can select tags to delete from "
+                                  "selected nodes."
+                        ),
+                        label = "Delete Egg Tags",
+                    )
+                    pm.setParent(upLevel = 1)
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        pm.setParent(upLevel = 1)
     # endregion
 
     # region Construct RIGHT Column
-    pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0)
-    pm.frameLayout(width = 270, height = 320, label = "Output Path & Name Options:")
-    pm.columnLayout(columnAttach = ("left", 0))
+    with pm.columnLayout(columnAttach = ("left", 0), rowSpacing = 0):
+        with pm.frameLayout(width = 270, height = 320, label = "Output Path & Name Options:"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                # region Texture path options
+                pm.text(fn = "boldLabelFont", label = "Texture Path Options:")
+                pm.radioCollection("MP_PY_TexPathOptionsRC")
+                pm.radioButton(
+                    "MP_PY_ChooseDefaultTexPathRB",
+                    annotation = "Reference textures relative to maya file (default)",
+                    onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
+                    collection = "MP_PY_TexPathOptionsRC",
+                    select = 1,
+                    label = "Reference textures relative to maya file (default)",
+                )
+                pm.radioButton(
+                    "MP_PY_ChooseCustomRefPathRB",
+                    onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
+                    annotation = (
+                        "References textures relative to the specified path.\n"
+                        "NOTE: If exporting both BAM and EGG files:\n"
+                        "- EGG file textures are referenced relative to the Maya file.\n"
+                        "- BAM file textures are referenced to the specified directory."
+                    ),
+                    collection = "MP_PY_TexPathOptionsRC",
+                    label = "Reference textures relative to specified path",
+                )
+                pm.radioButton(
+                    "MP_PY_ChooseCustomTexPathRB",
+                    onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
+                    annotation = (
+                        "Copies textures and makes them relative to the selected specified path.\n"
+                        "NOTE: If exporting both BAM and EGG files:\n"
+                        "- Textures are copied to the 'Egg File Texture Ref Directory'.\n"
+                        "- The BAM file reference directory defaults to this path but can be modified.\n"
+                        "- If modified, the new path MUST start with the copied-to directory path."
+                    ),
+                    collection = "MP_PY_TexPathOptionsRC",
+                    label = "Copy textures and make relative to specified path",
+                )
+                pm.text(label = "Egg File Texture Ref Path:")
+                with pm.rowLayout(numberOfColumns = 3, rowAttach = (1, "top", 0)):
+                    pm.textField(
+                        "MP_PY_CustomEggTexPathTF",
+                        width = 215,
+                        enable = 0,
+                        annotation = (
+                            "Egg File custom texture reference path.\n\n"
+                            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
+                            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further "
+                            "modified below."
+                        ),
+                    )
+                    pm.button(
+                        "MP_PY_BrowseEggTexPathBTN",
+                        enable = 0,
+                        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
+                            "customRelativeEggTexturePath"
+                        ),
+                        annotation = (
+                            "Browse for the Egg File custom texture reference path.\n\n"
+                            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
+                            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further "
+                            "modified below."
+                        ),
+                        label = "Browse",
+                    )
+                    pm.setParent(u = 1)
 
-    # region Texture path options
-    pm.text(fn = "boldLabelFont", label = "Texture Path Options:")
-    pm.radioCollection("MP_PY_TexPathOptionsRC")
-    pm.radioButton(
-        "MP_PY_ChooseDefaultTexPathRB",
-        annotation = "Reference textures relative to maya file (default)",
-        onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
-        collection = "MP_PY_TexPathOptionsRC",
-        select = 1,
-        label = "Reference textures relative to maya file (default)",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseCustomRefPathRB",
-        onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
-        annotation = (
-            "References textures relative to the specified path.\n"
-            "NOTE: If exporting both BAM and EGG files:\n"
-            "- EGG file textures are referenced relative to the Maya file.\n"
-            "- BAM file textures are referenced to the specified directory."
-        ),
-        collection = "MP_PY_TexPathOptionsRC",
-        label = "Reference textures relative to specified path",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseCustomTexPathRB",
-        onCommand = lambda *args: MP_PY_TexPathOptionsUI(),
-        annotation = (
-            "Copies textures and makes them relative to the selected specified path.\n"
-            "NOTE: If exporting both BAM and EGG files:\n"
-            "- Textures are copied to the 'Egg File Texture Ref Directory'.\n"
-            "- The BAM file reference directory defaults to this path but can be modified.\n"
-            "- If modified, the new path MUST start with the copied-to directory path."
-        ),
-        collection = "MP_PY_TexPathOptionsRC",
-        label = "Copy textures and make relative to specified path",
-    )
-    pm.text(label = "Egg File Texture Ref Path:")
-    pm.rowLayout(numberOfColumns = 3, rowAttach = (1, "top", 0))
-    pm.textField(
-        "MP_PY_CustomEggTexPathTF",
-        width = 215,
-        enable = 0,
-        annotation = (
-            "Egg File custom texture reference path.\n\n"
-            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
-            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further modified below."
-        ),
-    )
-    pm.button(
-        "MP_PY_BrowseEggTexPathBTN",
-        enable = 0,
-        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
-            "customRelativeEggTexturePath"
-        ),
-        annotation = (
-            "Browse for the Egg File custom texture reference path.\n\n"
-            "NOTE: If using the copy-to option for textures, this will be the copied-to directory.\n"
-            "If exporting both an EGG and BAM file, the BAM file texture referencing can be further modified below."
-        ),
-        label = "Browse",
-    )
-    pm.setParent(u = 1)
-    pm.text(label = "Bam File Texture Ref Path:")
-    pm.rowLayout(numberOfColumns = 3, rowAttach = (1, "top", 0))
-    pm.textField(
-        "MP_PY_CustomBamTexPathTF",
-        width = 215,
-        enable = 0,
-        annotation = (
-                "Bam File custom texture reference path"
-                + "\n"
-                + "\nNOTE:"
-                + "\nIf just referencing textures and exporting both an Egg and Bam file,"
-                + "\nThe Egg file is referenced to Maya file."
-                + "\nThe Bam file will be referenced to specified path."
-                + "\nThe Bam file reference path MUST start with the path to where textures are located."
-                + "\n"
-                + "\nIf copying textures, this path MUST start with the copied-to directory path"
-                + '\ndefined in the "Egg file texture Ref Directory" above'
-        ),
-    )
-    pm.button(
-        "MP_PY_BrowseBamTexPathBTN",
-        enable = 0,
-        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
-            "customRelativeBamTexturePath"
-        ),
-        annotation = (
-            "Browse for the BAM File custom texture reference path.\n\n"
-            "NOTE:\n"
-            "If referencing textures and exporting both an EGG and BAM file:\n"
-            "- The EGG file is referenced relative to the Maya file.\n"
-            "- The BAM file is referenced to the specified path.\n\n"
-            "If copying textures, this path MUST start with the copied-to directory path\n"
-            'defined in the "Egg file texture Ref Directory" above.'
-        ),
-        label = "Browse",
-    )
-    pm.setParent(u = 1)
-    pm.separator(style = "none", height = 5)
+                pm.text(label = "Bam File Texture Ref Path:")
+                with pm.rowLayout(numberOfColumns = 3, rowAttach = (1, "top", 0)):
+                    pm.textField(
+                        "MP_PY_CustomBamTexPathTF",
+                        width = 215,
+                        enable = 0,
+                        annotation = (
+                                "Bam File custom texture reference path"
+                                + "\n"
+                                + "\nNOTE:"
+                                + "\nIf just referencing textures and exporting both an Egg and Bam file,"
+                                + "\nThe Egg file is referenced to Maya file."
+                                + "\nThe Bam file will be referenced to specified path."
+                                + "\nThe Bam file reference path MUST start with the path to where textures are "
+                                  "located."
+                                + "\n"
+                                + "\nIf copying textures, this path MUST start with the copied-to directory path"
+                                + '\ndefined in the "Egg file texture Ref Directory" above'
+                        ),
+                    )
+                    pm.button(
+                        "MP_PY_BrowseBamTexPathBTN",
+                        enable = 0,
+                        command = lambda *args: MP_PY_BrowseForFolderPreProcess(
+                            "customRelativeBamTexturePath"
+                        ),
+                        annotation = (
+                            "Browse for the BAM File custom texture reference path.\n\n"
+                            "NOTE:\n"
+                            "If referencing textures and exporting both an EGG and BAM file:\n"
+                            "- The EGG file is referenced relative to the Maya file.\n"
+                            "- The BAM file is referenced to the specified path.\n\n"
+                            "If copying textures, this path MUST start with the copied-to directory path\n"
+                            'defined in the "Egg file texture Ref Directory" above.'
+                        ),
+                        label = "Browse",
+                    )
+                    pm.setParent(u = 1)
+                pm.separator(style = "none", height = 5)
+                # endregion
+
+                # region Output filepath options
+                pm.text(fn = "boldLabelFont", label = "Output File Path:")
+                pm.radioCollection("MP_PY_OutputPathOptionsRC")
+                pm.radioButton(
+                    "MP_PY_ChooseDefaultOutputPathRB",
+                    onCommand = lambda *args: MP_PY_OutputPathOptionsUI(),
+                    collection = "MP_PY_OutputPathOptionsRC",
+                    select = 1,
+                    label = "Export to root directory of source file (default)",
+                )
+                pm.radioButton(
+                    "MP_PY_ChooseCustomOutputPathRB",
+                    onCommand = lambda *args: MP_PY_OutputPathOptionsUI(),
+                    collection = "MP_PY_OutputPathOptionsRC",
+                    label = "Export to other directory:",
+                )
+
+                with pm.rowLayout(numberOfColumns = 2, rowAttach = (1, "top", 0)):
+                    pm.textField("MP_PY_CustomOutputPathTF", width = 215, enable = 0)
+                    pm.button(
+                        "MP_PY_BrowseOutputPathBTN",
+                        enable = 0,
+                        command = lambda *args: MP_PY_BrowseForFolderPreProcess("customOutputPath"),
+                        label = "Browse",
+                    )
+                    pm.setParent(u = 1)
+
+                pm.separator(style = "none", height = 5)
+                pm.text(fn = "boldLabelFont", label = "Output File Name:")
+                pm.radioCollection("MP_PY_OutputFilenameOptionsRC")
+
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.radioButton(
+                        "MP_PY_ChooseOriginalFilenameRB",
+                        onCommand = lambda *args: MP_PY_OutputFilenameOptionsUI(),
+                        collection = "MP_PY_OutputFilenameOptionsRC",
+                        select = 1,
+                        label = "Original filename",
+                    )
+                    pm.radioButton(
+                        "MP_PY_ChooseCustomFilenameRB",
+                        onCommand = lambda *args: MP_PY_OutputFilenameOptionsUI(),
+                        collection = "MP_PY_OutputFilenameOptionsRC",
+                        label = "Alternate filename",
+                    )
+                    pm.setParent(upLevel = 1)
+
+                with pm.rowLayout(rowAttach = (1, "top", 0), nc = 3):
+                    pm.textField(
+                        "MP_PY_CustomFilenameTF",
+                        text = "",
+                        enable = 0,
+                        annotation = "Browse to select or enter custom output file name.",
+                        width = 215,
+                    )
+                    pm.button(
+                        "MP_PY_BrowseFilenameBTN",
+                        enable = 0,
+                        command = lambda *args: MP_PY_BrowseForFilePreProcess("customFilename"),
+                        annotation = "Browse to select or enter custom output file name.",
+                        label = "Browse",
+                    )
+                    pm.setParent(u = 1)
+
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+
+        # region Animation options
+        with pm.frameLayout(width = 270, height = 120, label = "Animation Options"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.text(
+                        "MP_PY_CharacterNameLabel",
+                        enable = 0,
+                        annotation = (
+                                "Character name associated with Model/Animation set"
+                                + "\nAny spaces will be replaced with an underscore!"
+                        ),
+                        label = "Character Name",
+                    )
+                    pm.textField(
+                        "MP_PY_CharacterNameTF",
+                        text = "",
+                        enable = 0,
+                        annotation = (
+                                "Character name associated with Model/Animation set"
+                                + "\nAny spaces will be replaced with an underscore!"
+                        ),
+                        width = 170,
+                    )
+                    pm.setParent(upLevel = 1)
+
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.text(
+                        "MP_PY_ForceJointLabel",
+                        enable = 0,
+                        annotation = "Separate multiple node names with a space",
+                        label = "Force Joint",
+                    )
+                    pm.textField(
+                        "MP_PY_ForceJointTF",
+                        text = "",
+                        enable = 0,
+                        annotation = "Separate multiple node names with a space",
+                        width = 170,
+                    )
+                    pm.setParent(upLevel = 1)
+
+                pm.radioCollection("MP_PY_AnimationOptionsRC")
+
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.radioButton(
+                        "MP_PY_chooseFullAnimationRangeRB",
+                        onCommand = lambda *args: MP_PY_AnimationOptionsUI("animationMode", ""),
+                        enable = 0,
+                        collection = "MP_PY_AnimationOptionsRC",
+                        select = 1,
+                        label = "Full Frames    ",
+                    )
+                    pm.radioButton(
+                        "MP_PY_chooseCustomAnimationRangeRB",
+                        onCommand = lambda *args: MP_PY_AnimationOptionsUI("animationMode", ""),
+                        enable = 0,
+                        collection = "MP_PY_AnimationOptionsRC",
+                        label = "Custom Frames",
+                    )
+                    pm.setParent(upLevel = 1)
+
+                with pm.rowLayout(numberOfColumns = 6):
+                    pm.text(
+                        "MP_PY_AnimationStartFrameLabel",
+                        enable = 0,
+                        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
+                        label = "Start Frame",
+                    )
+                    pm.intField(
+                        "MP_PY_AnimationStartFrameIF",
+                        enable = 0,
+                        min = 0,
+                        max = 10000,
+                        value = 0,
+                        height = 20,
+                        width = 40,
+                        step = 1,
+                        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues",
+                                                                               "startFrameIFChanged"),
+                        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
+                        noBackground = False,
+                    )
+                    pm.intScrollBar(
+                        "MP_PY_AnimationStartFrameSlider",
+                        enable = 0,
+                        min = 0,
+                        max = 10000,
+                        value = 0,
+                        height = 18,
+                        width = 33,
+                        step = 1,
+                        dragCommand = lambda *args: MP_PY_AnimationOptionsUI(
+                            "updateFrameValues", "startFrameSliderMoved"
+                        ),
+                        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
+                            "updateFrameValues", "startFrameSliderMoved"
+                        ),
+                        horizontal = True,
+                        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
+                    )
+                    pm.text(
+                        "MP_PY_AnimationEndFrameLabel",
+                        enable = 0,
+                        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
+                        label = "End Frame",
+                    )
+                    pm.intField(
+                        "MP_PY_AnimationEndFrameIF",
+                        enable = 0,
+                        min = 0,
+                        max = 10000,
+                        value = 48,
+                        height = 20,
+                        width = 40,
+                        step = 1,
+                        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues",
+                                                                               "endFrameIFChanged"),
+                        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
+                        noBackground = False,
+                    )
+                    pm.intScrollBar(
+                        "MP_PY_AnimationEndFrameSlider",
+                        enable = 0,
+                        min = 0,
+                        max = 10000,
+                        value = 48,
+                        height = 18,
+                        width = 33,
+                        step = 1,
+                        dragCommand = lambda *args: MP_PY_AnimationOptionsUI(
+                            "updateFrameValues", "endFrameSliderMoved"
+                        ),
+                        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
+                            "updateFrameValues", "endFrameSliderMoved"
+                        ),
+                        horizontal = True,
+                        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
+                    )
+
+                    pm.setParent(upLevel = 1)
+
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        # endregion
+        # region Export scene/nodes options
+        with pm.frameLayout(width = 270, height = 80, label = "Export Scene or Export Nodes:"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                with pm.rowLayout(numberOfColumns = 2):
+                    pm.button(
+                        "MP_PY_ExportSceneBTN",
+                        width = 110,
+                        height = 20,
+                        command = lambda *args: MP_PY_StartSceneExport(),
+                        annotation = (
+                            "Creates a Panda Egg file (and a BAM file if both are chosen) "
+                            "by first exporting the scene as a Maya file.\n"
+                            "It then runs maya2egg[version] on the Maya file using the selected export options.\n\n"
+                            "If both EGG and BAM files are chosen, it will run the selected version of egg2bam on the "
+                            "EGG "
+                            "file, "
+                            "applying the selected BAM-specific options."
+                        ),
+                        label = "Export Current Scene",
+                    )
+                    # region send to pview
+                    pm.button(
+                        "MP_PY_Send2PviewBTN",
+                        width = 80,
+                        height = 20,
+                        command = lambda *args: MP_PY_Send2Pview(""),
+                        annotation = (
+                            "Sends either the selected nodes or the entire scene (if nothing is selected) to the "
+                            "libmayapview plugin, "
+                            "if it is installed and loaded.\n"
+                            "If the plugin is not installed or loaded, it prompts for a file to view instead."
+                        ),
+                        label = "Sent To Pview",
+                    )
+                    pm.setParent(upLevel = 1)
+
+                with pm.rowLayout(numberOfColumns = 3):
+                    # endregion
+                    # region convert nodes to panda
+                    pm.button(
+                        "MP_PY_ConvertNodesToPandaBTN",
+                        width = 135,
+                        height = 20,
+                        command = lambda *args: MP_PY_ExportNodesToPandaFiles(),
+                        annotation = (
+                            "Converts the selected node(s) to Panda files, supporting multiple selections.\n"
+                            "Each node is exported as its own set of files. "
+                            "By default, this includes a Maya binary file (.mb) and an EGG file.\n"
+                            "If the '[EGG(ASCII) and BAM(Binary)]' option is selected, it will generate:\n"
+                            "- A Maya binary file (.mb)\n"
+                            "- A BAM file (.bam)\n"
+                            "- An EGG file (.egg)\n"
+                            "All files are saved in the chosen output directory. "
+                            "File names default to node names unless a custom name is provided."
+                        ),
+                        label = "Convert Nodes To Panda",
+                    )
+                    pm.setParent(upLevel = 1)
+
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        # endregion
+        # region convert files
+        with pm.frameLayout(width = 270, height = 80, label = "Convert Files:"):
+            with pm.columnLayout(columnAttach = ("left", 0)):
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.button(
+                        "MP_PY_GetMayaFile2EggBTN",
+                        width = 85,
+                        height = 20,
+                        command = lambda *args: MP_PY_GetMayaFile2Egg(),
+                        annotation = (
+                                "Creates a Panda Egg file by running"
+                                + "\nmaya2egg[version] on the selected Maya file(s)"
+                        ),
+                        label = "Maya File 2 Egg",
+                    )
+                    pm.button(
+                        "MP_PY_GetEggFile2BamBTN",
+                        width = 80,
+                        height = 20,
+                        command = lambda *args: MP_PY_GetEggFile2Bam(),
+                        annotation = (
+                            "Creates a Panda Bam file by running the selected version"
+                            "\nof egg2bam and the currently chosen export options"
+                            "\non the selected egg file(s)."
+                        ),
+                        label = "Egg File 2 Bam",
+                    )
+                    pm.button(
+                        "MP_PY_GetBamFile2EggBTN",
+                        width = 80,
+                        height = 20,
+                        command = lambda *args: MP_PY_GetBamFile2Egg(),
+                        annotation = "Runs bam2egg on the selected bam file(s)",
+                        label = "Bam File 2 Egg",
+                    )
+                    pm.setParent(upLevel = 1)
+                # endregion
+                with pm.rowLayout(numberOfColumns = 3):
+                    pm.button(
+                        "MP_PY_ImportPandaFileBTN",
+                        width = 100,
+                        height = 20,
+                        command = lambda *args: MP_PY_ImportPandaFile(),
+                        annotation = "Imports selected Panda Bam or Egg file(s).",
+                        label = "Import Panda File",
+                    )
+                    pm.setParent(upLevel = 1)
+                pm.setParent(upLevel = 1)
+            pm.setParent(upLevel = 1)
+        # endregion
+        # endregion
+        pm.setParent(upLevel = 1)
     # endregion
 
-    # region Output filepath options
-    pm.text(fn = "boldLabelFont", label = "Output File Path:")
-    pm.radioCollection("MP_PY_OutputPathOptionsRC")
-    pm.radioButton(
-        "MP_PY_ChooseDefaultOutputPathRB",
-        onCommand = lambda *args: MP_PY_OutputPathOptionsUI(),
-        collection = "MP_PY_OutputPathOptionsRC",
-        select = 1,
-        label = "Export to root directory of source file (default)",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseCustomOutputPathRB",
-        onCommand = lambda *args: MP_PY_OutputPathOptionsUI(),
-        collection = "MP_PY_OutputPathOptionsRC",
-        label = "Export to other directory:",
-    )
-    pm.rowLayout(numberOfColumns = 2, rowAttach = (1, "top", 0))
-    pm.textField("MP_PY_CustomOutputPathTF", width = 215, enable = 0)
-    pm.button(
-        "MP_PY_BrowseOutputPathBTN",
-        enable = 0,
-        command = lambda *args: MP_PY_BrowseForFolderPreProcess("customOutputPath"),
-        label = "Browse",
-    )
-    pm.setParent(u = 1)
-    pm.separator(style = "none", height = 5)
-    pm.text(fn = "boldLabelFont", label = "Output File Name:")
-    pm.radioCollection("MP_PY_OutputFilenameOptionsRC")
-    pm.rowLayout(numberOfColumns = 2)
-    pm.radioButton(
-        "MP_PY_ChooseOriginalFilenameRB",
-        onCommand = lambda *args: MP_PY_OutputFilenameOptionsUI(),
-        collection = "MP_PY_OutputFilenameOptionsRC",
-        select = 1,
-        label = "Original filename",
-    )
-    pm.radioButton(
-        "MP_PY_ChooseCustomFilenameRB",
-        onCommand = lambda *args: MP_PY_OutputFilenameOptionsUI(),
-        collection = "MP_PY_OutputFilenameOptionsRC",
-        label = "Alternate filename",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(rowAttach = (1, "top", 0), nc = 3)
-    pm.textField(
-        "MP_PY_CustomFilenameTF",
-        text = "",
-        enable = 0,
-        annotation = "Browse to select or enter custom output file name.",
-        width = 215,
-    )
-    pm.button(
-        "MP_PY_BrowseFilenameBTN",
-        enable = 0,
-        command = lambda *args: MP_PY_BrowseForFilePreProcess("customFilename"),
-        annotation = "Browse to select or enter custom output file name.",
-        label = "Browse",
-    )
-    pm.setParent(u = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-
-    # region Animation options
-    pm.frameLayout(width = 270, height = 120, label = "Animation Options")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.rowLayout(numberOfColumns = 2)
-    pm.text(
-        "MP_PY_CharacterNameLabel",
-        enable = 0,
-        annotation = (
-                "Character name associated with Model/Animation set"
-                + "\nAny spaces will be replaced with an underscore!"
-        ),
-        label = "Character Name",
-    )
-    pm.textField(
-        "MP_PY_CharacterNameTF",
-        text = "",
-        enable = 0,
-        annotation = (
-                "Character name associated with Model/Animation set"
-                + "\nAny spaces will be replaced with an underscore!"
-        ),
-        width = 170,
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 2)
-    pm.text(
-        "MP_PY_ForceJointLabel",
-        enable = 0,
-        annotation = "Separate multiple node names with a space",
-        label = "Force Joint",
-    )
-    pm.textField(
-        "MP_PY_ForceJointTF",
-        text = "",
-        enable = 0,
-        annotation = "Separate multiple node names with a space",
-        width = 170,
-    )
-    pm.setParent(upLevel = 1)
-    pm.radioCollection("MP_PY_AnimationOptionsRC")
-    pm.rowLayout(numberOfColumns = 2)
-    pm.radioButton(
-        "MP_PY_chooseFullAnimationRangeRB",
-        onCommand = lambda *args: MP_PY_AnimationOptionsUI("animationMode", ""),
-        enable = 0,
-        collection = "MP_PY_AnimationOptionsRC",
-        select = 1,
-        label = "Full Frames    ",
-    )
-    pm.radioButton(
-        "MP_PY_chooseCustomAnimationRangeRB",
-        onCommand = lambda *args: MP_PY_AnimationOptionsUI("animationMode", ""),
-        enable = 0,
-        collection = "MP_PY_AnimationOptionsRC",
-        label = "Custom Frames",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 6)
-    pm.text(
-        "MP_PY_AnimationStartFrameLabel",
-        enable = 0,
-        annotation = ("Set the animation start frame: Default is 0" + "\nRange is 0 to 10,000"),
-        label = "Start Frame",
-    )
-    pm.intField(
-        "MP_PY_AnimationStartFrameIF",
-        enable = 0,
-        min = 0,
-        max = 10000,
-        value = 0,
-        height = 20,
-        width = 40,
-        step = 1,
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "startFrameIFChanged"),
-        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
-        noBackground = False,
-    )
-    pm.intScrollBar(
-        "MP_PY_AnimationStartFrameSlider",
-        enable = 0,
-        min = 0,
-        max = 10000,
-        value = 0,
-        height = 18,
-        width = 33,
-        step = 1,
-        dragCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "startFrameSliderMoved"
-        ),
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "startFrameSliderMoved"
-        ),
-        horizontal = True,
-        annotation = "Set the animation start frame: Default is 0\nRange is 0 to 10,000",
-    )
-    pm.text(
-        "MP_PY_AnimationEndFrameLabel",
-        enable = 0,
-        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
-        label = "End Frame",
-    )
-    pm.intField(
-        "MP_PY_AnimationEndFrameIF",
-        enable = 0,
-        min = 0,
-        max = 10000,
-        value = 48,
-        height = 20,
-        width = 40,
-        step = 1,
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI("updateFrameValues", "endFrameIFChanged"),
-        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
-        noBackground = False,
-    )
-    pm.intScrollBar(
-        "MP_PY_AnimationEndFrameSlider",
-        enable = 0,
-        min = 0,
-        max = 10000,
-        value = 48,
-        height = 18,
-        width = 33,
-        step = 1,
-        dragCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "endFrameSliderMoved"
-        ),
-        changeCommand = lambda *args: MP_PY_AnimationOptionsUI(
-            "updateFrameValues", "endFrameSliderMoved"
-        ),
-        horizontal = True,
-        annotation = "Set the animation end frame: Default is 48\nRange is 0 to 10,000",
-    )
-
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-    # region Export scene/nodes options
-    pm.frameLayout(width = 270, height = 80, label = "Export Scene or Export Nodes:")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.rowLayout(numberOfColumns = 2)
-    pm.button(
-        "MP_PY_ExportSceneBTN",
-        width = 110,
-        height = 20,
-        command = lambda *args: MP_PY_StartSceneExport(),
-        annotation = (
-            "Creates a Panda Egg file (and a BAM file if both are chosen) "
-            "by first exporting the scene as a Maya file.\n"
-            "It then runs maya2egg[version] on the Maya file using the selected export options.\n\n"
-            "If both EGG and BAM files are chosen, it will run the selected version of egg2bam on the EGG file, "
-            "applying the selected BAM-specific options."
-        ),
-        label = "Export Current Scene",
-    )
-    # region send to pview
-    pm.button(
-        "MP_PY_Send2PviewBTN",
-        width = 80,
-        height = 20,
-        command = lambda *args: MP_PY_Send2Pview(""),
-        annotation = (
-            "Sends either the selected nodes or the entire scene (if nothing is selected) to the libmayapview plugin, "
-            "if it is installed and loaded.\n"
-            "If the plugin is not installed or loaded, it prompts for a file to view instead."
-        ),
-        label = "Sent To Pview",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 3)
-    # endregion
-    # region convert nodes to panda
-    pm.button(
-        "MP_PY_ConvertNodesToPandaBTN",
-        width = 135,
-        height = 20,
-        command = lambda *args: MP_PY_ExportNodesToPandaFiles(),
-        annotation = (
-            "Converts the selected node(s) to Panda files, supporting multiple selections.\n"
-            "Each node is exported as its own set of files. "
-            "By default, this includes a Maya binary file (.mb) and an EGG file.\n"
-            "If the '[EGG(ASCII) and BAM(Binary)]' option is selected, it will generate:\n"
-            "- A Maya binary file (.mb)\n"
-            "- A BAM file (.bam)\n"
-            "- An EGG file (.egg)\n"
-            "All files are saved in the chosen output directory. "
-            "File names default to node names unless a custom name is provided."
-        ),
-        label = "Convert Nodes To Panda",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
-    # region convert files
-    pm.frameLayout(width = 270, height = 80, label = "Convert Files:")
-    pm.columnLayout(columnAttach = ("left", 0))
-    pm.rowLayout(numberOfColumns = 3)
-    pm.button(
-        "MP_PY_GetMayaFile2EggBTN",
-        width = 85,
-        height = 20,
-        command = lambda *args: MP_PY_GetMayaFile2Egg(),
-        annotation = (
-                "Creates a Panda Egg file by running"
-                + "\nmaya2egg[version] on the selected Maya file(s)"
-        ),
-        label = "Maya File 2 Egg",
-    )
-    pm.button(
-        "MP_PY_GetEggFile2BamBTN",
-        width = 80,
-        height = 20,
-        command = lambda *args: MP_PY_GetEggFile2Bam(),
-        annotation = (
-            "Creates a Panda Bam file by running the selected version"
-            "\nof egg2bam and the currently chosen export options"
-            "\non the selected egg file(s)."
-        ),
-        label = "Egg File 2 Bam",
-    )
-    pm.button(
-        "MP_PY_GetBamFile2EggBTN",
-        width = 80,
-        height = 20,
-        command = lambda *args: MP_PY_GetBamFile2Egg(),
-        annotation = "Runs bam2egg on the selected bam file(s)",
-        label = "Bam File 2 Egg",
-    )
-    pm.setParent(upLevel = 1)
-    pm.rowLayout(numberOfColumns = 3)
-    # endregion
-    pm.button(
-        "MP_PY_ImportPandaFileBTN",
-        width = 100,
-        height = 20,
-        command = lambda *args: MP_PY_ImportPandaFile(),
-        annotation = "Imports selected Panda Bam or Egg file(s).",
-        label = "Import Panda File",
-    )
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    pm.setParent(upLevel = 1)
-    # endregion
+    # Go back to the top
     pm.setParent(top = 1)
-    # endregion
 
 
 pm.melGlobals.initVar("string", "gMainWindow")
