@@ -1017,120 +1017,231 @@ def MP_PY_AddEggObjectTypesGUI():
         resizeToFitChildren = True,
         title = "Panda Exporter - Add Egg-Object-Types",
     )
-    pm.columnLayout(adjustableColumn = True, columnAttach = ("left", 0), rowSpacing = 0)
-    pm.frameLayout(
-        font = "obliqueLabelFont",
-        collapsable = False,
-        backgroundColor = (0.50, 0.60, 0.20),
-        label = "Add Egg-Object-Type Tags to Selected Nodes",
-    )
 
-    def create_button_callback(obj_name):
-        # hack: need this function otherwise it will pass True/False
-        return lambda *args: MP_PY_AddEggObjectFlags(obj_name)
+    # region Add OT Tags
+    def createOTTagsSection():
+        pm.columnLayout(adjustableColumn = True, columnAttach = ("left", 0), rowSpacing = 0)
+        with pm.frameLayout(
+                font = "obliqueLabelFont",
+                collapsable = False,
+                backgroundColor = hex_to_rgb_normalized("#809933"),
+                label = "Add Egg-Object-Type Tags to Selected Nodes",
+        ):
 
-    dataStore = {}
-    # Add Egg-Type Tags
-    pm.columnLayout(adjustableColumn = True)
-    count = 0
-    for n in range(0, int((len(pm.melGlobals[EGG_OBJECT_TYPE_ARRAY]) + 1) / 4)):
-        pm.rowLayout(nc = 6)
-        for i in range(0, 5):
-            eggObjectType = pm.melGlobals[EGG_OBJECT_TYPE_ARRAY][count]
-            # 5 rows per col
-            if eggObjectType != "":
-                annotation = str(MP_PY_GetObjectTypeAnnotation(eggObjectType))
-                objName = stupid(eggObjectType)
-                dataStore[int(count)] = objName
-                # Get the defined annotation for egg-object-type
-                pm.button(
-                    f"MP_PY_AttEggATTR_{objName}",
-                    width = 100,
-                    height = 17,
-                    command = create_button_callback(objName),  # Pass the current objName
-                    annotation = annotation,
-                    label = f"{objName}",
-                )
-                count += 1
+            def create_button_callback(obj_name):
+                # hack: need this function otherwise it will pass True/False
+                return lambda *args: MP_PY_AddEggObjectFlags(obj_name)
+
+            # Add Egg-Type Tags
+            with pm.columnLayout(adjustableColumn = True):
+                count = 0
+                entriesPerRow = 5
+                # To find how many rows we need to allocate, we
+                # divide the total number of entries by how many per row
+                totalEntries = len(pm.melGlobals[EGG_OBJECT_TYPE_ARRAY])
+                for n in range(max(1, ceil((totalEntries / entriesPerRow)))):
+                    with pm.rowLayout(nc = entriesPerRow):
+                        for _ in range(entriesPerRow):
+                            if count >= totalEntries:
+                                break
+                            eggObjectType = pm.melGlobals[EGG_OBJECT_TYPE_ARRAY][count]
+                            ot = Names2Definition[eggObjectType]
+                            annotation = str(MP_PY_GetObjectTypeAnnotationNEW(ot))
+                            # This is what adds new egg object type entries into the add menu.
+                            # Get the defined annotation for egg-object-type
+                            labelName = FriendlyNames[eggObjectType] if FriendlyNames[eggObjectType] else eggObjectType
+                            pm.button(
+                                f"MP_PY_AttEggATTR_{eggObjectType}",
+                                width = 100,
+                                height = 17,
+                                command = create_button_callback(eggObjectType),  # Pass the current objName
+                                annotation = annotation,
+                                label = labelName,
+                                backgroundColor = hex_to_rgb_normalized(ot.category.color)
+                            )
+                            count += 1
+                        pm.setParent(u = 1)
+                pm.setParent(u = 1)
+
+            pm.setParent(u = 1)
+
+    createOTTagsSection()
+
+    # endregion
+
+    # region OT Information Label
+    def createOTInformationLabel():
+        pm.separator(style = "none", height = 5)
+        with pm.rowLayout(nc = 1, columnAttach = (1, "left", 100)):
+            pm.text(
+                bgc = hex_to_rgb_normalized("#59D1F2"),
+                label = (
+                        "Object types added to nodes can be edited by selecting the node"
+                        + "\n and viewing the attributes in the "
+                          "channels box of the node."
+                ),
+            )
+            pm.setParent(u = 1)
         pm.setParent(u = 1)
 
-    pm.separator(style = "none", height = 5)
-    pm.rowLayout(nc = 1, columnAttach = (1, "left", 100))
-    pm.text(
-        bgc = (0.350, 0.820, 0.950),
-        label = (
-                "Object types added to nodes can be edited by selecting the node"
-                + "\n and viewing the attributes in the "
-                  "channels box of the node."
-        ),
-    )
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    UVScrollFrameHeight = 125
-    pm.frameLayout(
-        font = "obliqueLabelFont",
-        collapsable = False,
-        label = "Set Texture UV Scrolling",
-        backgroundColor = (0.50, 0.60, 0.20),
-        height = UVScrollFrameHeight,
-    )
-    pm.columnLayout(columnAttach = ("left", 15), rowSpacing = 0)
-    # ----- UV Scrolling
-    pm.rowLayout(nc = 1)
-    # ----- UV Scrolling set speed Comment
-    pm.text(
-        font = "smallBoldLabelFont",
-        label = "Can use [float] or -[float] to set speed and direction of scrolling",
-    )
-    pm.setParent(u = 1)
-    pm.rowLayout(nc = 6)
-    # ----- UV Scrolling Labels
-    pm.text(font = "smallBoldLabelFont", label = "scroll 'U(X)'")
-    pm.separator(width = 5, style = "none")
-    pm.text(font = "smallBoldLabelFont", label = "scroll 'V(Y)'")
-    pm.separator(width = 5, style = "none")
-    pm.text(font = "smallBoldLabelFont", label = "scroll 'R(Z)'")
-    pm.setParent(u = 1)
-    pm.rowLayout(nc = 6)
-    # ----- UV Scrolling TextFields
-    pm.floatField("scrollUFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
-    pm.separator(width = 12, style = "none")
-    pm.floatField("scrollVFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
-    pm.separator(width = 12, style = "none")
-    pm.floatField("scrollRFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
-    pm.setParent(u = 1)
-    pm.rowLayout(nc = 8)
-    # ----- UV Scrolling Buttons
-    pm.button(
-        "SetCurrentUVScroll",
-        width = 80,
-        height = 17,
-        command = lambda *args: MP_PY_UVScrolling("set"),
-        annotation = "Set or Update the scroll values of selected node.",
-        label = "Set/Update",
-    )
-    pm.button(
-        "GetCurrentUVScroll",
-        width = 80,
-        height = 17,
-        command = lambda *args: MP_PY_UVScrolling("get"),
-        annotation = "Get the current UVScroll values of the selected node.",
-        label = "Get Current",
-    )
-    pm.button(
-        "deleteCurrentUVScroll",
-        width = 80,
-        height = 17,
-        command = lambda *args: MP_PY_UVScrolling("delete"),
-        annotation = "Remove the scroll values of selected node.",
-        label = "Delete",
-    )
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
+    createOTInformationLabel()
+
+    # endregion
+
+    # region Create OT Tags
+    def createOTTagGeneratorSection():
+        with pm.frameLayout(
+                font = "obliqueLabelFont",
+                collapsable = True,
+                label = "OT Tag Creator",
+                backgroundColor = hex_to_rgb_normalized("#809933"),
+        ):
+            with pm.columnLayout(columnAttach = ("left", 15), rowSpacing = 0):
+                with pm.rowLayout(nc = 1):
+                    pm.text(
+                        font = "smallBoldLabelFont",
+                        label = "Can use [float] or -[float] to set speed and direction of scrolling",
+                    )
+                    pm.setParent(u = 1)
+
+                with pm.columnLayout(rowSpacing = 0):
+                    pm.text(font = "smallBoldLabelFont", label = "Object Type Name")
+                    otName = pm.textField()
+                    otName.setWidth(200)
+                    pm.setParent(u = 1)
+
+                # TODO: make this dynamic where the user can add as many key-value pairs as they want
+                def addKVs():
+                    with pm.rowLayout(nc = 3, adjustableColumn = True):
+                        with pm.columnLayout(rowSpacing = 0):
+                            pm.text(font = "smallBoldLabelFont", label = "<Type>")
+                            otType = pm.textField()
+                            pm.setParent(u = 1)
+                        with pm.columnLayout(rowSpacing = 0):
+                            pm.text(font = "smallBoldLabelFont", label = "key")
+                            otKey = pm.textField()
+                            pm.setParent(u = 1)
+                        with pm.columnLayout(rowSpacing = 0):
+                            pm.text(font = "smallBoldLabelFont", label = "{ value }")
+                            otValue = pm.textField()
+                            pm.setParent(u = 1)
+                        pm.textField(otType, edit = True, enterCommand = ('pm.setFocus(\"' + otKey + '\")'))
+                        pm.textField(otKey, edit = True, enterCommand = ('pm.setFocus(\"' + otValue + '\")'))
+                        pm.setParent(u = 1)
+
+                def addOTDefPanel():
+                    with pm.rowLayout(nc = 1):
+                        with pm.columnLayout(rowSpacing = 0):
+                            pm.text(font = "smallBoldLabelFont", label = "Object Type Definition")
+                            otDef = pm.scrollField(
+                                editable = True,
+                                wordWrap = False,
+                                annotation = 'Editable with no word wrap'
+                            )
+                            otDef.setHeight(50)
+                            otDef.setWidth(475)
+                            pm.setParent(u = 1)
+                        pm.setParent(u = 1)
+
+                addOTDefPanel()
+
+                with pm.rowLayout(nc = 1, adjustableColumn = True):
+                    with pm.columnLayout(rowSpacing = 0):
+                        pm.text(font = "smallBoldLabelFont", label = "Description")
+                        otDesc = pm.scrollField(
+                            editable = True,
+                            wordWrap = True,
+                            annotation = 'Editable with no word wrap'
+                        )
+                        otDesc.setHeight(50)
+                        otDesc.setWidth(475)
+                        pm.setParent(u = 1)
+                    pm.setParent(u = 1)
+
+                with pm.rowLayout(nc = 6):
+                    pm.separator(width = 12, style = "none")
+                    pm.setParent(u = 1)
+                with pm.rowLayout(nc = 8):
+                    pm.setParent(u = 1)
+                pm.setParent(u = 1)
+            pm.setParent(u = 1)
+
+    createOTTagGeneratorSection()
+
+    # endregion
+
+    # region UV Scroll Section
+    def createUVScrollSection():
+        UVScrollFrameHeight = 125
+        pm.frameLayout(
+            font = "obliqueLabelFont",
+            collapsable = False,
+            label = "Set Texture UV Scrolling",
+            backgroundColor = hex_to_rgb_normalized("#809933"),
+            height = UVScrollFrameHeight,
+        )
+        pm.columnLayout(columnAttach = ("left", 15), rowSpacing = 0)
+        # ----- UV Scrolling
+        pm.rowLayout(nc = 1)
+        # ----- UV Scrolling set speed Comment
+        pm.text(
+            font = "smallBoldLabelFont",
+            label = "Can use [float] or -[float] to set speed and direction of scrolling",
+        )
+        pm.setParent(u = 1)
+        pm.rowLayout(nc = 6)
+        # ----- UV Scrolling Labels
+        pm.text(font = "smallBoldLabelFont", label = "scroll 'U(X)'")
+        pm.separator(width = 5, style = "none")
+        pm.text(font = "smallBoldLabelFont", label = "scroll 'V(Y)'")
+        pm.separator(width = 5, style = "none")
+        pm.text(font = "smallBoldLabelFont", label = "scroll 'R(Z)'")
+        pm.setParent(u = 1)
+        pm.rowLayout(nc = 6)
+        # ----- UV Scrolling TextFields
+        pm.floatField("scrollUFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
+        pm.separator(width = 12, style = "none")
+        pm.floatField("scrollVFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
+        pm.separator(width = 12, style = "none")
+        pm.floatField("scrollRFF", width = 40, enable = 1, nbg = False, precision = 3, value = 0)
+        pm.setParent(u = 1)
+        pm.rowLayout(nc = 8)
+        # ----- UV Scrolling Buttons
+        pm.button(
+            "SetCurrentUVScroll",
+            width = 80,
+            height = 17,
+            command = lambda *args: MP_PY_UVScrolling("set"),
+            annotation = "Set or Update the scroll values of selected node.",
+            label = "Set/Update",
+        )
+        pm.button(
+            "GetCurrentUVScroll",
+            width = 80,
+            height = 17,
+            command = lambda *args: MP_PY_UVScrolling("get"),
+            annotation = "Get the current UVScroll values of the selected node.",
+            label = "Get Current",
+        )
+        pm.button(
+            "deleteCurrentUVScroll",
+            width = 80,
+            height = 17,
+            command = lambda *args: MP_PY_UVScrolling("delete"),
+            annotation = "Remove the scroll values of selected node.",
+            label = "Delete",
+        )
+        pm.setParent(u = 1)
+        pm.setParent(u = 1)
+        pm.setParent(u = 1)
+        pm.setParent(u = 1)
+
+    createUVScrollSection()
+    # endregion
+
     pm.showWindow("MP_PY_AddEggObjectTypesWindow")
+    n = 0
+    UVScrollFrameHeight = 125
     # Set window height: base height 10 + 19 per button row
     buttonFrameHeight = int((((n + 1) * 19) + 10))
     pm.window(
@@ -1199,54 +1310,39 @@ def MP_PY_UVScrolling(option):
 
 def MP_PY_GetEggObjectTypes():
     """
-    Retreives egg-object-types from selected node
+    Retrieves egg-object-types from selected nodes and passes them to the GUI
+    for deletion in a user-friendly manner.
     """
-    currentObjectTypesArray = []
-    """
-    Generate an array from any egg-object-types that are currently attached to the selected node.
-    It then passes this array onto the MP_PY_DeleteEggObjectTypesGUI process,
-    to which it then displays them in button style in a separate window
-    making it easier for a user to delete them from the selected node.
-    """
-    currentObjectTypesArray = []
-    # Record the currently selected nodes
-    selected = pm.ls(l = 1, sl = 1)
-    # Verify user has selected at least one node.
-    if len(selected) < 1:
+    attribute_name = "eggObjectTypes"
+    current_object_types = []
+
+    # Get the currently selected nodes
+    selected_nodes = pm.ls(long = True, selection = True)
+
+    # Validate the selection
+    if not selected_nodes:
         MP_PY_ConfirmationDialog(
             "Selection Error!",
             ["Nothing is currently selected.", "Select at least one node and try again."],
             "ok",
         )
-    # Throw a message if at least one node has not been selected.
+        return
 
-    else:
-        # Loop through each selected node to check for and gather any egg-object-type attributes
-        for selection in selected:
-            attributeName = "eggObjectTypes"
-            # Attribute name we are checking for
-            # Insert current selected node hierarchy into array
-            currentObjectTypesArray.insert(len(currentObjectTypesArray), selection)
-            for i in range(1, 4):
-                if pm.mel.attributeExists((attributeName + str(i)), selection) == 1:
-                    currentObjectTypesArray.insert(
-                        len(currentObjectTypesArray) + 2,
-                        pm.getAttr(
-                            (str(selection) + "." + attributeName + str(i)), asString = 1
-                        ),
-                    )
-                # Check for attributes. If present, insert contents into array
-                # If not, insert dummy placeholder values
-                # Insert attribute value into array.
-                # Value is used for button label
+    # Loop through each selected node
+    for node in selected_nodes:
+        # Add the node to the list
+        current_object_types.append(node)
 
-                else:
-                    currentObjectTypesArray.insert(
-                        len(currentObjectTypesArray) + 2, "NONE"
-                    )
-        # Insert 'NONE' attribute value into array
+        # Check and add egg-object-type attributes
+        for i in range(1, 4):
+            attribute = f"{attribute_name}{i}"
+            if pm.attributeQuery(attribute, node = node, exists = True):
+                current_object_types.append(pm.getAttr(f"{node}.{attribute}", asString = True))
+            else:
+                current_object_types.append("NONE")
 
-        MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray)
+    # Pass the gathered data to the GUI
+    MP_PY_DeleteEggObjectTypesGUI(current_object_types)
 
 
 def MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray):
@@ -1262,44 +1358,45 @@ def MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray):
     pm.frameLayout(
         font = "obliqueLabelFont",
         collapsable = False,
-        backgroundColor = (0.50, 0.60, 0.20),
+        backgroundColor = hex_to_rgb_normalized("#809933"),
         label = "Egg-Object-Type Tags of selected nodes",
     )
-    pm.columnLayout(adjustableColumn = False, rowSpacing = 0)
-    pm.rowLayout(rowAttach = (1, "top", 0), nc = 1)
-    pm.button(
-        "MP_PY_RefreshEggTypesWindowButton",
-        width = 110,
-        height = 20,
-        command = lambda *args: MP_PY_GetEggObjectTypes(),
-        annotation = (
-                "Refreshes the window with information on selected nodes"
-                + "\nUsed if new nodes are selected "
-                  "while window is visible"
-        ),
-        label = "Update Window",
-    )
-    pm.setParent(u = 1)
-    pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0)], nc = 2)
-    pm.columnLayout("nodeColumn", width = 150, adjustableColumn = False, rowSpacing = 0)
-    pm.rowLayout(columnOffset1 = 15, rowAttach = (1, "top", 0), nc = 1, columnAttach1 = "left")
-    pm.text(bgc = (0.350, 0.820, 0.950), label = "Node Name")
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.columnLayout("rowColumn", width = 350, adjustableColumn = False)
-    pm.rowLayout(
-        rowAttach = [(1, "top", 0), (2, "top", 0), (3, "top", 0)],
-        nc = 3,
-        columnAttach3 = ("left", "left", "left"),
-        columnOffset3 = (30, 65, 65),
-    )
-    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 1")
-    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 2")
-    pm.text(bgc = (0.350, 0.820, 0.950), label = "Egg Tag 3")
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
-    pm.setParent(u = 1)
+
+    with pm.columnLayout(adjustableColumn = False, rowSpacing = 0):
+        with pm.rowLayout(rowAttach = (1, "top", 0), nc = 1):
+            pm.button(
+                "MP_PY_RefreshEggTypesWindowButton",
+                width = 110,
+                height = 20,
+                command = lambda *args: MP_PY_GetEggObjectTypes(),
+                annotation = (
+                        "Refreshes the window with information on selected nodes"
+                        + "\nUsed if new nodes are selected "
+                          "while window is visible"
+                ),
+                label = "Update Window",
+            )
+            pm.setParent(u = 1)
+        with pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0)], nc = 2):
+            with pm.columnLayout("nodeColumn", width = 150, adjustableColumn = False, rowSpacing = 0):
+                with pm.rowLayout(columnOffset1 = 15, rowAttach = (1, "top", 0), nc = 1, columnAttach1 = "left"):
+                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Node Name")
+                    pm.setParent(u = 1)
+                pm.setParent(u = 1)
+
+            with pm.columnLayout("rowColumn", width = 350, adjustableColumn = False):
+                with pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0), (3, "top", 0)],
+                                  nc = 3,
+                                  columnAttach3 = ("left", "left", "left"),
+                                  columnOffset3 = (30, 65, 65)):
+                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 1")
+                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 2")
+                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 3")
+                    pm.setParent(u = 1)
+                pm.setParent(u = 1)
+            pm.setParent(u = 1)
+        pm.setParent(u = 1)
+
     pm.setParent(u = 1)
     pm.showWindow("MP_PY_DeleteEggObjectTypesWindow")
 
@@ -1623,6 +1720,15 @@ def handle_error(message):
     return "failed"
 
 
+def MP_PY_GetObjectTypeAnnotationNEW(object_type: ObjectTypeDefinition):
+    """
+    Returns the egg-object-type button annotation text of defined types as a string for GUI.
+    """
+    desc = "\n".join(object_type.description)
+    flags = "\n".join(object_type.flags)
+    return f"{desc}\n\nFlags:\n{flags}"
+
+
 def MP_PY_GetObjectTypeAnnotation(objectType):
     """
     Returns the egg-object-type button annotation text of defined types as a string for GUI.
@@ -1704,7 +1810,10 @@ def MP_PY_Globals():
     # NOTICE: Each egg-object-type that is added into the array MUST ALSO be referenced in a user Panda3D PRC file!!!
     #        This is necessary otherwise egg2bam will error if it cannot relate an egg-object-type.
     pm.melGlobals.initVar("string[]", EGG_OBJECT_TYPE_ARRAY)
-    pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted(OT_ENTRIES.keys())
+
+    # pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = sorted(OT_ENTRIES.keys())
+    pm.melGlobals[EGG_OBJECT_TYPE_ARRAY] = getOTNames("category")
+
     # todo: maybe add option to type own number for seqX
     # Global variable that keeps track of whether user has seen the import Panda file notification.
     # It is designed so that the user only sees the notification once during session.
