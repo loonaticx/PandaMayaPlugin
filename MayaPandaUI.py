@@ -614,6 +614,16 @@ def MP_PY_ConfirmationDialog(title, message, dialog_type):
     )
 
 
+def MP_PY_PlaceholderFunc(*args, **kwargs):
+    return MP_PY_ConfirmationDialog(
+        "Not implemented!",
+        [
+            "Sorry, this feature is not implemented yet.",
+        ],
+        "ok",
+    )
+
+
 def MP_PY_AddEggObjectFlags(eggObjectType):
     """
     Add an egg-object-type to poly
@@ -1768,7 +1778,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "Convert all light nodes to locators. Will preserve position and rotation"
                     ),
                     enable = 1,
-                    changeCommand = lambda *args: MP_PY_LightsSelectedUI(),
+                    changeCommand = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_LightsSelectedUI
                     value = 0,
                     label = "Convert Lights",
                 )
@@ -1778,7 +1788,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "Convert all camera nodes to locators. Will preserve position and rotation"
                     ),
                     enable = 1,
-                    changeCommand = lambda *args: MP_PY_CamerasSelectedUI(),
+                    changeCommand = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_CamerasSelectedUI
                     value = 0,
                     label = "Convert Cameras",
                 )
@@ -1792,7 +1802,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "export process."
                     ),
                     enable = 1,
-                    changeCommand = lambda *args: MP_PY_RemoveGroundPlaneUI(),
+                    changeCommand = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_RemoveGroundPlaneUI
                     value = 1,
                     label = "Remove groundPlane_transform",
                 )
@@ -1855,14 +1865,14 @@ def MP_PY_CreatePandaExporterWindow():
         pm.radioCollection("MP_PY_OutputPandaFileTypeRC")
         pm.radioButton(
             "MP_PY_ChooseEggRB",
-            onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
+            onCommand = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_OutputPandaFileTypeUI
             select = 1,
             collection = "MP_PY_OutputPandaFileTypeRC",
             label = "EGG (ASCII) Only",
         )
         pm.radioButton(
             "MP_PY_ChooseEggBamRB",
-            onCommand = lambda *args: MP_PY_OutputPandaFileTypeUI(),
+            onCommand = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_OutputPandaFileTypeUI
             collection = "MP_PY_OutputPandaFileTypeRC",
             label = "EGG(ASCII)   and   BAM(Binary)",
         )
@@ -2293,7 +2303,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "MP_PY_GetMayaFile2EggBTN",
                         width = 85,
                         height = 20,
-                        command = lambda *args: MP_PY_GetMayaFile2Egg(),
+                        command = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_GetMayaFile2Egg
                         annotation = (
                                 "Creates a Panda Egg file by running"
                                 + "\nmaya2egg[version] on the selected Maya file(s)"
@@ -2304,7 +2314,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "MP_PY_GetEggFile2BamBTN",
                         width = 80,
                         height = 20,
-                        command = lambda *args: MP_PY_GetEggFile2Bam(),
+                        command = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_GetEggFile2Bam
                         annotation = (
                             "Creates a Panda Bam file by running the selected version"
                             "\nof egg2bam and the currently chosen export options"
@@ -2316,7 +2326,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "MP_PY_GetBamFile2EggBTN",
                         width = 80,
                         height = 20,
-                        command = lambda *args: MP_PY_GetBamFile2Egg(),
+                        command = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_GetBamFile2Egg
                         annotation = "Runs bam2egg on the selected bam file(s)",
                         label = "Bam File 2 Egg",
                     )
@@ -2327,7 +2337,7 @@ def MP_PY_CreatePandaExporterWindow():
                         "MP_PY_ImportPandaFileBTN",
                         width = 100,
                         height = 20,
-                        command = lambda *args: MP_PY_ImportPandaFile(),
+                        command = lambda *args: MP_PY_PlaceholderFunc(),  # MP_PY_ImportPandaFile
                         annotation = "Imports selected Panda Bam or Egg file(s).",
                         label = "Import Panda File",
                     )
