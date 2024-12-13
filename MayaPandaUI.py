@@ -1,13 +1,20 @@
+"""
+Python converted version of MayaPandaUI by Loonatic (Created December 2024)
+
+Tested on Maya 2022
+You will need to run pip install natsort on your mayapy.exe in order to use this!
+"""
+
 from enum import IntEnum
-from math import ceil
 
 import pymel.core as pm
 import os
 import time
 
 from natsort import natsorted
-from typing import List, Set
+from typing import List
 from dataclasses import dataclass, field
+from functools import partial
 
 # region GLOBALS
 EGG_OBJECT_TYPE_ARRAY = "gMP_PY_EggObjectTypeArray"
@@ -23,6 +30,8 @@ https://help.autodesk.com/cloudhelp/2023/CHS/Maya-Tech-Docs/PyMel/generated/func
 .windows.button.html?highlight=button#pymel.core.windows.button
 """
 
+
+# region Color utils
 
 def hex_to_rgb(hex_color):
     """Converts a hex color code to RGB values (0-255)."""
@@ -43,6 +52,19 @@ def hex_to_rgb_normalized(hex_color):
 
     r, g, b = hex_to_rgb(hex_color)
     return r / 255, g / 255, b / 255
+
+
+# endregion
+
+
+# region Object Type Category Definitions
+
+"""
+Categories are meant to make it easier to find certain object types by context.
+Each ObjectType can only be assigned to one category.
+
+In the add object type UI, the categories are displayed as collapsible sections.
+"""
 
 
 class OTCategory(IntEnum):
@@ -77,11 +99,13 @@ class ObjectTypeCategoryDefinition:
         return natsorted(self.children, key = lambda x: x.name.lower())
 
 
+## Define custom categories ##
+
 NoCategory = ObjectTypeCategoryDefinition("none", OTCategory.NoCategory, "No Category", "#514e52")
 CollideCategory = ObjectTypeCategoryDefinition("Collide", OTCategory.CollisionAttr, "Collision", "#ac4a78")
 TriggerCategory = ObjectTypeCategoryDefinition("Trigger", OTCategory.TriggerAttr, "Trigger", "#ac2e37", "#482526")
 AlphaBlendModeCategory = ObjectTypeCategoryDefinition("AlphaBlend", OTCategory.AlphaBlendAttr, "Alpha Blend", "#2f4e79")
-AlphaOperationCategory = ObjectTypeCategoryDefinition("AlphaOp", OTCategory.AlphaOpAttr, "Alpha Op", "#433d79")
+AlphaOperationCategory = ObjectTypeCategoryDefinition("AlphaOp", OTCategory.AlphaOpAttr, "Alpha Operation", "#433d79")
 DCSCategory = ObjectTypeCategoryDefinition("DCS", OTCategory.DCSAttr, "DCS", "#244a14", "#354638")
 SequenceCategory = ObjectTypeCategoryDefinition("Sequence", OTCategory.SeqAttr, "Sequence", "#7e4a1f")
 BinCategory = ObjectTypeCategoryDefinition("Bin", OTCategory.BinAttr, "Bin", "#555eff", "#3d4351")
@@ -91,6 +115,7 @@ BillboardCategory = ObjectTypeCategoryDefinition(
 TagCategory = ObjectTypeCategoryDefinition("Tag", OTCategory.TagAttr, "Tag", "#a9ffb6")
 ToontownCategory = ObjectTypeCategoryDefinition("Toontown", OTCategory.ToontownAttr, "Toontown", "#baa05e", "#ffb31f")
 
+# Add custom categories here so that they can be presented in the UI
 CategoryDefs = {
     OTCategory.NoCategory: NoCategory,
     OTCategory.CollisionAttr: CollideCategory,
@@ -106,11 +131,15 @@ CategoryDefs = {
 }
 
 
+# endregion
+
+# region Object-Type Definitions
+
 @dataclass
 class ObjectTypeDefinition:
     name: str
-    description: List[str] = field(default_factory = lambda: list())
-    flags: List[str] = field(default_factory = lambda: list())
+    description: List[str] = field(default_factory = lambda: list())  # Newlines separated list of strings
+    flags: List[str] = field(default_factory = lambda: list())  # ['<Header> Key { Value }'] ; etc
     category: ObjectTypeCategoryDefinition = NoCategory
     friendly_name: str = ""
     text_color: str = ""
@@ -123,7 +152,7 @@ class ObjectTypeDefinition:
 
     # Maya controllers
     mel_id = -1  # todo? meant to be stored as the internal enum value when defined into a mel global attr
-    Button = None
+    Button = None  # Used in the add ot window to store the button object
 
 
 ###
@@ -546,6 +575,8 @@ for OTEntry in OT_NEW:
     OTEntry.category.children.append(OTEntry)
 
 
+# endregion
+
 # region Main Functions
 def MP_PY_PandaVersion(option):
     """
@@ -845,12 +876,10 @@ def MP_PY_InspectEggObjectType(object_type: ObjectTypeDefinition):
     pm.scrollField("MP_PY_OTGEN_DESCINPUT", edit = True, text = '\n'.join(object_type.description))
     pm.textField("MP_PY_OTGEN_ATTRDEFTXT", edit = True, text = generate_objtype_syntax(object_type))
 
-    print(pm.optionMenu("MP_PY_OTGEN_CATMENU", q = True, ils = True))
     idlist = pm.optionMenu("MP_PY_OTGEN_CATMENU", query = True, ils = True)
     objIndex = idlist.index(f"MP_PY_OTGEN_CATMENU_ITEM_{object_type.category.name}")
     pm.optionMenu("MP_PY_OTGEN_CATMENU", edit = True, select = objIndex + 1)
     # print(idlist[pm.optionMenu("MP_PY_OTGEN_CATMENU", query=True, select=True, value=True) - 1])
-    print(f"eggu -> {object_type}")
 
 
 def MP_PY_AddEggObjectTypesGUI():
@@ -939,7 +968,7 @@ def MP_PY_AddEggObjectTypesGUI():
     # region OT Information Label
     def createOTInformationLabel():
         pm.separator(style = "none", height = 5)
-        with pm.rowLayout(nc = 2, columnAttach = (1, "both", 100),  adjustableColumn = True):
+        with pm.rowLayout(nc = 2, columnAttach = (1, "both", 100), adjustableColumn = True):
             pm.text(
                 bgc = hex_to_rgb_normalized("#59D1F2"),
                 label = (
@@ -964,13 +993,13 @@ def MP_PY_AddEggObjectTypesGUI():
                 backgroundColor = hex_to_rgb_normalized("#30991b"),
         ):
             with pm.columnLayout(columnAttach = ("both", 15), rowSpacing = 0, adjustableColumn = True):
-                with pm.rowLayout(nc = 3,adjustableColumn = True):
+                with pm.rowLayout(nc = 3, adjustableColumn = True):
                     pm.text(
                         font = "smallBoldLabelFont",
                         label = "Create and define custom ObjectTypes here. Press 'CREATE' to generate.",
                     )
                     pm.separator(width = 5, style = "none")
-                    pm.button(label="Reset Values")
+                    pm.button(label = "Reset Values")
                     pm.setParent(u = 1)
 
                 with pm.columnLayout(rowSpacing = 0, adjustableColumn = True):
@@ -980,9 +1009,9 @@ def MP_PY_AddEggObjectTypesGUI():
                         pm.text(font = "smallBoldLabelFont", label = "Category")
                         pm.setParent(u = 1)
                     with pm.rowLayout(nc = 2, adjustableColumn = True, columnAttach = (1, "both", 0)):
-                        otName = pm.textField("MP_PY_OTGEN_NAMEINPUT", w=200)
+                        otName = pm.textField("MP_PY_OTGEN_NAMEINPUT", w = 200)
                         # pm.separator(width = 1, style = "none")
-                        pm.optionMenu("MP_PY_OTGEN_CATMENU", w=200)
+                        pm.optionMenu("MP_PY_OTGEN_CATMENU", w = 200)
                         # pm.separator(width = 200, style = "none")
                         for category_def in CategoryDefs.values():
                             pm.menuItem(
@@ -1060,7 +1089,7 @@ def MP_PY_AddEggObjectTypesGUI():
                 with pm.columnLayout(adjustableColumn = True):
                     pm.button(
                         label = "CREATE!",
-                        width=100,
+                        width = 100,
                     )
                     pm.setParent(u = 1)
 
@@ -2050,6 +2079,8 @@ def MP_PY_CreatePandaExporterWindow():
                     pm.setParent(u = 1)
 
                 pm.setParent(upLevel = 1)
+                # endregion
+
             pm.setParent(upLevel = 1)
 
         # region Animation options
