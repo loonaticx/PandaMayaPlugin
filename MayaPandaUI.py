@@ -18,6 +18,11 @@ MAYA_VER_SHORT = "gMP_PY_MayaVersionShort"
 
 # endregion
 
+"""
+https://help.autodesk.com/cloudhelp/2023/CHS/Maya-Tech-Docs/PyMel/generated/functions/pymel.core.windows/pymel.core
+.windows.button.html?highlight=button#pymel.core.windows.button
+"""
+
 
 def hex_to_rgb(hex_color):
     """Converts a hex color code to RGB values (0-255)."""
@@ -544,6 +549,7 @@ for OTEntry in OT_NEW:
     OTEntry.category.children.append(OTEntry)
 
 
+# region Main Functions
 def MP_PY_PandaVersion(option):
     """
     Scan each loop for the value of the selected bam file version
@@ -556,9 +562,7 @@ def MP_PY_PandaVersion(option):
     """
     pm.melGlobals.initVar("string[]", PANDA_FILE_VERSIONS)
     executableToUse = ""
-    selectedBamVersion = str(
-        pm.optionMenu("MP_PY_BamVersionOptionMenu", query = 1, value = 1)
-    )
+    selectedBamVersion = str(pm.optionMenu("MP_PY_BamVersionOptionMenu", query = 1, value = 1))
     for i in range(0, len(pm.melGlobals[PANDA_FILE_VERSIONS])):
         if selectedBamVersion == pm.melGlobals[PANDA_FILE_VERSIONS][i]:
             if option == "getBam2Egg":
@@ -635,7 +639,7 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
         # Variable to hold all currently selected nodes
         # Iterate through each selected node one-by-one
         if len(selectedNodes) == 0:
-            MP_PY_ConfirmationDialog(
+            return MP_PY_ConfirmationDialog(
                 "Selection Error!",
                 [
                     "You must first make a selection!",
@@ -643,7 +647,6 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
                 ],
                 "ok",
             )
-            return
 
         for node in selectedNodes:
             for i in range(1, 11):
@@ -661,9 +664,7 @@ def MP_PY_AddEggObjectFlags(eggObjectType):
                             "ok",
                         )
                 else:
-                    MP_PY_SetEggObjectTypeAttribute(
-                        enumerationList, eggObjectType, indexNumber, i, node
-                    )
+                    MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber, i, node)
                     break
     else:
         MP_PY_ConfirmationDialog(
@@ -724,16 +725,12 @@ def MP_PY_OutputPathOptionsUI():
     selectedRB = str(pm.radioCollection("MP_PY_OutputPathOptionsRC", query = 1, select = 1))
     if selectedRB == "MP_PY_ChooseDefaultOutputPathRB":
         print("Default Export File Path Chosen\n")
-
         pm.textField("MP_PY_CustomOutputPathTF", edit = 1, text = "", enable = 0)
-
         pm.button("MP_PY_BrowseOutputPathBTN", edit = 1, enable = 0)
 
     elif selectedRB == "MP_PY_ChooseCustomOutputPathRB":
         print("Custom Export File Path Chosen\n")
-
         pm.textField("MP_PY_CustomOutputPathTF", edit = 1, enable = 1)
-
         pm.button("MP_PY_BrowseOutputPathBTN", edit = 1, enable = 1)
 
 
@@ -799,7 +796,7 @@ def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber,
     # Determining variable on whether we can add egg-object-type attribute to node
     # Check for any currently attached egg-object-type attribute values on the node.
     # If a current attribute matches passed egg-object-type,
-    #  we skip adding it again and notify user it already exists.
+    # we skip adding it again and notify user it already exists.
     for i in range(1, 11):
         if pm.objExists(node + ".eggObjectTypes" + str(i)):
             if pm.getAttr((node + ".eggObjectTypes" + str(i)), asString = 1) == eggObjectType:
@@ -818,6 +815,7 @@ def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber,
         # Since attribute already exists on node, set our determining variable to 0 to skip adding it again
 
     defObj = Names2Definition[eggObjectType]
+    # pm.color(node, rgbColor=hex_to_rgb_normalized(defObj.category.color), ud=1)
     pm.addAttr(
         node,
         ln = ("eggObjectTypes" + str(attributeNumber)),
@@ -1269,7 +1267,7 @@ def MP_PY_GetEggObjectTypes():
         current_object_types.append(node)
 
         # Check and add egg-object-type attributes
-        for i in range(1, 4):
+        for i in range(1, 11):
             attribute = f"{attribute_name}{i}"
             if pm.attributeQuery(attribute, node = node, exists = True):
                 current_object_types.append(pm.getAttr(f"{node}.{attribute}", asString = True))
@@ -1434,9 +1432,6 @@ def mp_py_delete_egg_object_type(node_hierarchy, index):
             message = f"Attribute {attribute_name} does not exist on node {node}.",
             dialog_type = "ok"
         )
-
-
-# Send array of egg-object-types to MP_PY_DeleteEggObjectTypesGUI
 
 
 def MP_PY_ArgsBuilder(FileName):
@@ -3206,6 +3201,10 @@ def MP_PY_PandaExporterUI():
         pm.showWindow("MP_PY_PandaExporter")
     else:
         pm.showWindow("MP_PY_PandaExporter")
+
+
+# End of main
+# endregion
 
 
 MP_PY_Globals()
