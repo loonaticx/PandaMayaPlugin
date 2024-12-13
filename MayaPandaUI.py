@@ -16,7 +16,6 @@ PANDA_SDK_NOTICE = "gMP_PY_ChoosePandaFileNotice"
 ADDON_RELEASE_VERSION = "gMP_PY_ReleaseRevision"
 MAYA_VER_SHORT = "gMP_PY_MayaVersionShort"
 
-
 # endregion
 
 
@@ -31,14 +30,14 @@ def hex_to_rgb(hex_color):
     g = int(hex_color[2:4], 16)
     b = int(hex_color[4:6], 16)
 
-    return (r, g, b)
+    return r, g, b
 
 
 def hex_to_rgb_normalized(hex_color):
     """Converts a hex color code to normalized RGB values (0-1)."""
 
     r, g, b = hex_to_rgb(hex_color)
-    return (r / 255, g / 255, b / 255)
+    return r / 255, g / 255, b / 255
 
 
 class OTCategory(IntEnum):
@@ -62,21 +61,44 @@ class ObjectTypeCategoryDefinition:
     type_id: OTCategory
     friendly_name: str
     color: str
+    color_alt: str = ""
     text_color: str = "white"
     children: List["ObjectTypeDefinition"] = field(default_factory = lambda: list())
 
+    # Maya ui control holder
+    FrameLayout = None
+
+    def get_children(self):
+        return natsorted(self.children, key = lambda x: x.name.lower())
+
 
 NoCategory = ObjectTypeCategoryDefinition("none", OTCategory.NoCategory, "No Category", "#514e52")
-CollideCategory = ObjectTypeCategoryDefinition("Collide", OTCategory.CollisionAttr, "Collision", "#8786de")
-TriggerCategory = ObjectTypeCategoryDefinition("Trigger", OTCategory.TriggerAttr, "Trigger", "#de6470")
-AlphaBlendModeCategory = ObjectTypeCategoryDefinition("AlphaBlend", OTCategory.AlphaBlendAttr, "Alpha Blend", "#9dd0ff")
-AlphaOperationCategory = ObjectTypeCategoryDefinition("AlphaOp", OTCategory.AlphaOpAttr, "Alpha Op", "#8b13ff")
-DCSCategory = ObjectTypeCategoryDefinition("DCS", OTCategory.DCSAttr, "DCS", "#f0ff73")
-SequenceCategory = ObjectTypeCategoryDefinition("Sequence", OTCategory.SeqAttr, "Sequence", "#ffb380")
-BinCategory = ObjectTypeCategoryDefinition("Bin", OTCategory.BinAttr, "Bin", "#555eff")
-BillboardCategory = ObjectTypeCategoryDefinition("Billboard", OTCategory.BillboardAttr, "Billboard", "#ff94e2")
+CollideCategory = ObjectTypeCategoryDefinition("Collide", OTCategory.CollisionAttr, "Collision", "#ac4a78")
+TriggerCategory = ObjectTypeCategoryDefinition("Trigger", OTCategory.TriggerAttr, "Trigger", "#ac2e37", "#482526")
+AlphaBlendModeCategory = ObjectTypeCategoryDefinition("AlphaBlend", OTCategory.AlphaBlendAttr, "Alpha Blend", "#2f4e79")
+AlphaOperationCategory = ObjectTypeCategoryDefinition("AlphaOp", OTCategory.AlphaOpAttr, "Alpha Op", "#433d79")
+DCSCategory = ObjectTypeCategoryDefinition("DCS", OTCategory.DCSAttr, "DCS", "#244a14", "#354638")
+SequenceCategory = ObjectTypeCategoryDefinition("Sequence", OTCategory.SeqAttr, "Sequence", "#7e4a1f")
+BinCategory = ObjectTypeCategoryDefinition("Bin", OTCategory.BinAttr, "Bin", "#555eff", "#3d4351")
+BillboardCategory = ObjectTypeCategoryDefinition(
+    "Billboard", OTCategory.BillboardAttr, "Billboard", "#7a4a79", "#6e5a6a"
+)
 TagCategory = ObjectTypeCategoryDefinition("Tag", OTCategory.TagAttr, "Tag", "#a9ffb6")
-ToontownCategory = ObjectTypeCategoryDefinition("Toontown", OTCategory.ToontownAttr, "Toontown", "#ffb31f")
+ToontownCategory = ObjectTypeCategoryDefinition("Toontown", OTCategory.ToontownAttr, "Toontown", "#baa05e", "#ffb31f")
+
+CategoryDefs = {
+    OTCategory.NoCategory: NoCategory,
+    OTCategory.CollisionAttr: CollideCategory,
+    OTCategory.TriggerAttr: TriggerCategory,
+    OTCategory.AlphaBlendAttr: AlphaBlendModeCategory,
+    OTCategory.AlphaOpAttr: AlphaOperationCategory,
+    OTCategory.DCSAttr: DCSCategory,
+    # OTCategory.TagAttr: TagCategory,
+    OTCategory.SeqAttr: SequenceCategory,
+    OTCategory.BinAttr: BinCategory,
+    OTCategory.BillboardAttr: BillboardCategory,
+    OTCategory.ToontownAttr: ToontownCategory
+}
 
 
 @dataclass
@@ -85,8 +107,18 @@ class ObjectTypeDefinition:
     description: List[str] = field(default_factory = lambda: list())
     flags: List[str] = field(default_factory = lambda: list())
     category: ObjectTypeCategoryDefinition = NoCategory
-    mel_id = -1  # todo? meant to be stored as the internal enum value when defined into a mel global attr
     friendly_name: str = ""
+    text_color: str = ""
+
+    @property
+    def color(self):
+        if not self.text_color:
+            return self.category.color_alt if self.category.color_alt else self.category.color
+        return self.text_color
+
+    # Maya controllers
+    mel_id = -1  # todo? meant to be stored as the internal enum value when defined into a mel global attr
+    Button = None
 
 
 ###
@@ -496,8 +528,8 @@ def getOTNames(sortby=None):
         names = natsorted(names)
     elif sortby == "category":
         def sorting_key(item):
-            category_id = item.category.type_id if item.category is not None else 9999  # High value for uncategorized
-            name_lower = item.name.lower()  # Case-insensitive name comparison
+            category_id = item.category.type_id if item.category is not None else NoCategory.type_id
+            name_lower = item.name.lower()
             return category_id, name_lower
 
         names = [ot.name for ot in natsorted(OT_NEW, key = sorting_key)]
@@ -938,7 +970,7 @@ def MP_PY_AddEggObjectTypesGUI():
                 font = "obliqueLabelFont",
                 collapsable = True,
                 label = "OT Tag Creator",
-                backgroundColor = hex_to_rgb_normalized("#809933"),
+                backgroundColor = hex_to_rgb_normalized("#30991b"),
         ):
             with pm.columnLayout(columnAttach = ("left", 15), rowSpacing = 0):
                 with pm.rowLayout(nc = 1):
