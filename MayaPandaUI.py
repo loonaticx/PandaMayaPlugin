@@ -1246,157 +1246,9 @@ def MP_PY_GetEggObjectTypes():
     Retrieves egg-object-types from selected nodes and passes them to the GUI
     for deletion in a user-friendly manner.
     """
-    attribute_name = "eggObjectTypes"
-    current_object_types = []
-
-    # Get the currently selected nodes
-    selected_nodes = pm.ls(long = True, selection = True)
-
-    # Validate the selection
-    if not selected_nodes:
-        MP_PY_ConfirmationDialog(
-            "Selection Error!",
-            ["Nothing is currently selected.", "Select at least one node and try again."],
-            "ok",
-        )
-        return
-
-    # Loop through each selected node
-    for node in selected_nodes:
-        # Add the node to the list
-        current_object_types.append(node)
-
-        # Check and add egg-object-type attributes
-        for i in range(1, 11):
-            attribute = f"{attribute_name}{i}"
-            if pm.attributeQuery(attribute, node = node, exists = True):
-                current_object_types.append(pm.getAttr(f"{node}.{attribute}", asString = True))
-            else:
-                current_object_types.append("NONE")
-
-    # Pass the gathered data to the GUI
-    MP_PY_DeleteEggObjectTypesGUI(current_object_types)
-
-
-def MP_PY_DeleteEggObjectTypesGUI(currentObjectTypesArray):
-    pm.window(
-        "MP_PY_DeleteEggObjectTypesWindow",
-        retain = 1,
-        sizeable = 0,
-        visible = 1,
-        resizeToFitChildren = True,
-        title = "Delete Current Egg-Object-Types",
-    )
-    # Create the window layout
-    pm.frameLayout(
-        font = "obliqueLabelFont",
-        collapsable = False,
-        backgroundColor = hex_to_rgb_normalized("#809933"),
-        label = "Egg-Object-Type Tags of selected nodes",
-    )
-
-    with pm.columnLayout(adjustableColumn = False, rowSpacing = 0):
-        with pm.rowLayout(rowAttach = (1, "top", 0), nc = 1):
-            pm.button(
-                "MP_PY_RefreshEggTypesWindowButton",
-                width = 110,
-                height = 20,
-                command = lambda *args: MP_PY_GetEggObjectTypes(),
-                annotation = (
-                        "Refreshes the window with information on selected nodes"
-                        + "\nUsed if new nodes are selected "
-                          "while window is visible"
-                ),
-                label = "Update Window",
-            )
-            pm.setParent(u = 1)
-        with pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0)], nc = 2):
-            with pm.columnLayout("nodeColumn", width = 150, adjustableColumn = False, rowSpacing = 0):
-                with pm.rowLayout(columnOffset1 = 15, rowAttach = (1, "top", 0), nc = 1, columnAttach1 = "left"):
-                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Node Name")
-                    pm.setParent(u = 1)
-                pm.setParent(u = 1)
-
-            with pm.columnLayout("rowColumn", width = 350, adjustableColumn = False):
-                with pm.rowLayout(rowAttach = [(1, "top", 0), (2, "top", 0), (3, "top", 0)],
-                                  nc = 3,
-                                  columnAttach3 = ("left", "left", "left"),
-                                  columnOffset3 = (30, 65, 65)):
-                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 1")
-                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 2")
-                    pm.text(bgc = hex_to_rgb_normalized("#59D1F2"), label = "Egg Tag 3")
-                    pm.setParent(u = 1)
-                pm.setParent(u = 1)
-            pm.setParent(u = 1)
-        pm.setParent(u = 1)
-
-    pm.setParent(u = 1)
-    pm.showWindow("MP_PY_DeleteEggObjectTypesWindow")
-
-    count = 0
-    num_rows = len(currentObjectTypesArray) // 4
-
-    for n in range(num_rows):
-        # Parse out just the short node name for labeling
-        node_hierarchy = currentObjectTypesArray[count]
-
-        # Split node hierarchy into token segments
-        hierarchy_tokens = node_hierarchy.split("|")
-        node = hierarchy_tokens[-1]
-
-        # Generate the node name label
-        pm.text(
-            parent = "nodeColumn",
-            font = "boldLabelFont",
-            height = 22,
-            label = node
-        )
-
-        # Increment count
-        count += 1
-
-        # Create a new row of buttons per node
-        # One row will consist of a node name label and up to three buttons
-        row_layout = pm.rowLayout(
-            parent = "rowColumn",
-            nc = 3,
-            rowAttach = [(n + 1, "top", 0)],
-            name = f"rowLine{n}"
-        )
-
-        for i in range(3):
-            egg_type = currentObjectTypesArray[count]
-
-            if egg_type != "NONE":
-                # Create the button for a valid egg-object-type
-                pm.button(
-                    parent = row_layout,
-                    label = currentObjectTypesArray[count],
-                    width = 110,
-                    height = 20,
-                    annotation = f"Deletes the {currentObjectTypesArray[count]} egg-object-type tag from the node",
-                    command = lambda node_hierarchy=node_hierarchy, i=i: mp_py_delete_egg_object_type(node_hierarchy,
-                                                                                                      i + 1)
-                )
-            else:
-                # Create a dummy placeholder button
-                pm.button(
-                    parent = row_layout,
-                    label = egg_type,
-                    width = 110,
-                    height = 20,
-                    visible = True,
-                    enable = False,
-                    annotation = "",
-                    command = ""
-                )
-
-            # Increment count
-            count += 1
-
-    # Set window height: base height 51 + 20 per button row
-    height = 51 + ((n * 2) + ((n + 1) * 20))
-    pm.window("MP_PY_DeleteEggObjectTypesWindow", edit = 1, width = 500, height = height)
+    win = MassDeleteAttrWindow()
+    win.create()
+    win.show()
 
 
 def mp_py_delete_egg_object_type(node_hierarchy, index):
@@ -3171,6 +3023,65 @@ def MP_PY_BrowseForFilePreProcess(option):
         pm.textField("MP_PY_CustomFilenameTF", edit = True, enable = True, text = file_name)
         pm.radioButton("MP_PY_ChooseCustomOutputPathRB", edit = True, select = True)
         pm.textField("MP_PY_CustomOutputPathTF", edit = True, enable = True, text = directory_name)
+
+
+class MassDeleteAttrWindow(object):
+    # Borrowed from https://forums.cgsociety.org/t/delete-multiple-attributes/1848055/2
+    def __init__(self):
+        self.window = 'massDeleteAttrWin'
+        self.title = 'Mass Delete Attributes'
+        self.size = (600, 800)
+
+    def create(self):
+        if pm.window(self.window, exists = True):
+            pm.deleteUI(self.window, window = True)
+
+        self.window = pm.window(
+            self.window,
+            title = self.title,
+            widthHeight = self.size
+        )
+
+        self.mainForm = pm.paneLayout(configuration = 'horizontal3', ps = ((1, 100, 80), (2, 100, 10)))
+        self.uiList = pm.textScrollList(allowMultiSelection = True)
+        self.btnDelete = pm.button(label = 'Delete!', command = partial(self.doDelete))
+        self.btnRefresh = pm.button(label = 'Refresh Selection', command = partial(self.doRefresh))
+
+    def getSelection(self):
+        self.selection = pm.ls(selection = True)
+        if not self.selection:
+            self.selection = pm.ls(transforms = True, shapes = True)
+
+    def listCustomAttrs(self):
+        # todo: Also list the value of the attr (instead of just eggObjectType1 or whatever)
+        attrs = []
+        for node in self.selection:
+            customAttrs = node.listAttr(userDefined = True)
+            if customAttrs:
+                attrs.extend([attr.attrName() for attr in customAttrs])
+        return sorted(list(set(attrs)))
+
+    def doDelete(self, *args):
+        attrs = self.uiList.getSelectItem()
+        if not attrs:
+            return
+
+        for node in self.selection:
+            for attr in attrs:
+                if node.hasAttr(attr):
+                    node.deleteAttr(attr)
+
+        for attr in attrs:
+            self.uiList.removeItem(attr)
+
+    def doRefresh(self, *args):
+        self.getSelection()
+        self.uiList.removeAll()
+        self.uiList.append(self.listCustomAttrs())
+
+    def show(self):
+        pm.showWindow(self.window)
+        self.doRefresh()
 
 
 # The following processes define the functions called by using the menu items
