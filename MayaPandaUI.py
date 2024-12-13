@@ -541,9 +541,6 @@ def getOTNames(sortby=None):
     return names
 
 
-Names2Definition = {ot.name: ot for ot in OT_NEW}
-FriendlyNames = {ot.name: ot.friendly_name for ot in OT_NEW}
-
 # Populates categories with children
 for OTEntry in OT_NEW:
     OTEntry.category.children.append(OTEntry)
@@ -824,7 +821,6 @@ def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber,
         # Message to user that the egg-object-type is already assigned to node
         # Since attribute already exists on node, set our determining variable to 0 to skip adding it again
 
-    defObj = Names2Definition[eggObjectType]
     # pm.color(node, rgbColor=hex_to_rgb_normalized(defObj.category.color), ud=1)
     pm.addAttr(
         node,
@@ -900,39 +896,6 @@ def MP_PY_AddEggObjectTypesGUI():
             def callback_inspect_ot(obj_name):
                 # hack: need this function otherwise it will pass True/False
                 return lambda *args: MP_PY_InspectEggObjectType(obj_name)
-
-            def addEggTypeTags():
-                # Add Egg-Type Tags
-                with pm.columnLayout(adjustableColumn = True):
-                    count = 0
-                    entriesPerRow = 5
-                    # To find how many rows we need to allocate, we
-                    # divide the total number of entries by how many per row
-                    totalEntries = len(pm.melGlobals[EGG_OBJECT_TYPE_ARRAY])
-                    for n in range(max(1, ceil((totalEntries / entriesPerRow)))):
-                        with pm.rowLayout(nc = entriesPerRow):
-                            for _ in range(entriesPerRow):
-                                if count >= totalEntries:
-                                    break
-                                eggObjectType = pm.melGlobals[EGG_OBJECT_TYPE_ARRAY][count]
-                                ot = Names2Definition[eggObjectType]
-                                annotation = str(MP_PY_GetObjectTypeAnnotationNEW(ot))
-                                # This is what adds new egg object type entries into the add menu.
-                                # Get the defined annotation for egg-object-type
-                                labelName = FriendlyNames[eggObjectType] if FriendlyNames[
-                                    eggObjectType] else eggObjectType
-                                pm.button(
-                                    f"MP_PY_AttEggATTR_{eggObjectType}",
-                                    width = 100,
-                                    height = 17,
-                                    command = callback_add_ot(eggObjectType),  # Pass the current objName
-                                    annotation = annotation,
-                                    label = labelName,
-                                    backgroundColor = hex_to_rgb_normalized(ot.color)
-                                )
-                                count += 1
-                            pm.setParent(u = 1)
-                    pm.setParent(u = 1)
 
             def addEggTypeTagsNew():
                 for category_def in CategoryDefs.values():
