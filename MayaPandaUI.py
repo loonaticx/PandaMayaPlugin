@@ -829,6 +829,26 @@ def MP_PY_SetEggObjectTypeAttribute(enumerationList, eggObjectType, indexNumber,
     pm.setAttr((node + ".eggObjectTypes" + str(attributeNumber)), indexNumber)
 
 
+def generate_objtype_syntax(object_type):
+    # egg-object-type XXXXX
+    return f"egg-object-type-{object_type.name} " + " ".join(object_type.flags)
+
+
+def MP_PY_InspectEggObjectType(object_type: ObjectTypeDefinition):
+    # modify the inspect/creator section to show the object type information
+    pm.textField("MP_PY_OTGEN_NAMEINPUT", edit = True, text = object_type.name)
+    pm.scrollField("MP_PY_OTGEN_DEFINPUT", edit = True, text = '\n'.join(object_type.flags))
+    pm.scrollField("MP_PY_OTGEN_DESCINPUT", edit = True, text = '\n'.join(object_type.description))
+    pm.textField("MP_PY_OTGEN_ATTRDEFTXT", edit = True, text = generate_objtype_syntax(object_type))
+
+    print(pm.optionMenu("MP_PY_OTGEN_CATMENU", q = True, ils = True))
+    idlist = pm.optionMenu("MP_PY_OTGEN_CATMENU", query = True, ils = True)
+    objIndex = idlist.index(f"MP_PY_OTGEN_CATMENU_ITEM_{object_type.category.name}")
+    pm.optionMenu("MP_PY_OTGEN_CATMENU", edit = True, select = objIndex + 1)
+    # print(idlist[pm.optionMenu("MP_PY_OTGEN_CATMENU", query=True, select=True, value=True) - 1])
+    print(f"eggu -> {object_type}")
+
+
 def MP_PY_AddEggObjectTypesGUI():
     """
     Constructs and displays a GUI for adding egg-object-type tags to nodes.
@@ -948,7 +968,7 @@ def MP_PY_AddEggObjectTypesGUI():
     # region OT Information Label
     def createOTInformationLabel():
         pm.separator(style = "none", height = 5)
-        with pm.rowLayout(nc = 1, columnAttach = (1, "left", 100)):
+        with pm.rowLayout(nc = 2, columnAttach = (1, "both", 100),  adjustableColumn = True):
             pm.text(
                 bgc = hex_to_rgb_normalized("#59D1F2"),
                 label = (
@@ -972,18 +992,33 @@ def MP_PY_AddEggObjectTypesGUI():
                 label = "OT Tag Creator",
                 backgroundColor = hex_to_rgb_normalized("#30991b"),
         ):
-            with pm.columnLayout(columnAttach = ("left", 15), rowSpacing = 0):
-                with pm.rowLayout(nc = 1):
+            with pm.columnLayout(columnAttach = ("both", 15), rowSpacing = 0, adjustableColumn = True):
+                with pm.rowLayout(nc = 3,adjustableColumn = True):
                     pm.text(
                         font = "smallBoldLabelFont",
-                        label = "Can use [float] or -[float] to set speed and direction of scrolling",
+                        label = "Create and define custom ObjectTypes here. Press 'CREATE' to generate.",
                     )
+                    pm.separator(width = 5, style = "none")
+                    pm.button(label="Reset Values")
                     pm.setParent(u = 1)
 
-                with pm.columnLayout(rowSpacing = 0):
-                    pm.text(font = "smallBoldLabelFont", label = "Object Type Name")
-                    otName = pm.textField()
-                    otName.setWidth(200)
+                with pm.columnLayout(rowSpacing = 0, adjustableColumn = True):
+                    with pm.rowLayout(nc = 2, adjustableColumn = True, columnAttach = (1, "left", 0)):
+                        pm.text(font = "smallBoldLabelFont", label = "Object Type Name")
+                        # pm.separator(width = 200, style = "none")
+                        pm.text(font = "smallBoldLabelFont", label = "Category")
+                        pm.setParent(u = 1)
+                    with pm.rowLayout(nc = 2, adjustableColumn = True, columnAttach = (1, "both", 0)):
+                        otName = pm.textField("MP_PY_OTGEN_NAMEINPUT", w=200)
+                        # pm.separator(width = 1, style = "none")
+                        pm.optionMenu("MP_PY_OTGEN_CATMENU", w=200)
+                        # pm.separator(width = 200, style = "none")
+                        for category_def in CategoryDefs.values():
+                            pm.menuItem(
+                                f"MP_PY_OTGEN_CATMENU_ITEM_{category_def.name}",
+                                label = category_def.friendly_name
+                            )
+                        pm.setParent(u = 1)
                     pm.setParent(u = 1)
 
                 # TODO: make this dynamic where the user can add as many key-value pairs as they want
@@ -991,47 +1026,71 @@ def MP_PY_AddEggObjectTypesGUI():
                     with pm.rowLayout(nc = 3, adjustableColumn = True):
                         with pm.columnLayout(rowSpacing = 0):
                             pm.text(font = "smallBoldLabelFont", label = "<Type>")
-                            otType = pm.textField()
+                            otType = pm.textField("MP_PY_OTGEN_TYPEINPUT")
                             pm.setParent(u = 1)
                         with pm.columnLayout(rowSpacing = 0):
                             pm.text(font = "smallBoldLabelFont", label = "key")
-                            otKey = pm.textField()
+                            otKey = pm.textField("MP_PY_OTGEN_KEYINPUT")
                             pm.setParent(u = 1)
                         with pm.columnLayout(rowSpacing = 0):
                             pm.text(font = "smallBoldLabelFont", label = "{ value }")
-                            otValue = pm.textField()
+                            otValue = pm.textField("MP_PY_OTGEN_VALUEINPUT")
                             pm.setParent(u = 1)
                         pm.textField(otType, edit = True, enterCommand = ('pm.setFocus(\"' + otKey + '\")'))
                         pm.textField(otKey, edit = True, enterCommand = ('pm.setFocus(\"' + otValue + '\")'))
                         pm.setParent(u = 1)
 
                 def addOTDefPanel():
-                    with pm.rowLayout(nc = 1):
-                        with pm.columnLayout(rowSpacing = 0):
+                    with pm.rowLayout(nc = 1, adjustableColumn = True):
+                        with pm.columnLayout(rowSpacing = 0, adjustableColumn = True):
                             pm.text(font = "smallBoldLabelFont", label = "Object Type Definition")
                             otDef = pm.scrollField(
+                                "MP_PY_OTGEN_DEFINPUT",
                                 editable = True,
                                 wordWrap = False,
-                                annotation = 'Editable with no word wrap'
+                                text = "<Type> foo { bar }",
+                                annotation = 'Define the value of this object type. Separate entries with a newline.',
+                                # height=50,
                             )
                             otDef.setHeight(50)
-                            otDef.setWidth(475)
+                            # otDef.setWidth(475)
                             pm.setParent(u = 1)
                         pm.setParent(u = 1)
 
                 addOTDefPanel()
 
+                # region Attr Description Input
                 with pm.rowLayout(nc = 1, adjustableColumn = True):
-                    with pm.columnLayout(rowSpacing = 0):
+                    with pm.columnLayout(rowSpacing = 0, adjustableColumn = True):
                         pm.text(font = "smallBoldLabelFont", label = "Description")
                         otDesc = pm.scrollField(
+                            "MP_PY_OTGEN_DESCINPUT",
                             editable = True,
                             wordWrap = True,
-                            annotation = 'Editable with no word wrap'
+                            annotation = 'Describe the context and usage of this object type.',
                         )
                         otDesc.setHeight(50)
                         otDesc.setWidth(475)
                         pm.setParent(u = 1)
+                    pm.setParent(u = 1)
+                # endregion
+
+                # region OT Definition Previewer
+                with pm.rowLayout(nc = 1, adjustableColumn = True):
+                    pm.text(label = "Config Entry Preview", font = "smallBoldLabelFont")
+                    pm.setParent(u = 1)
+                with pm.rowLayout(nc = 1, adjustableColumn = True):
+                    pm.textField(
+                        "MP_PY_OTGEN_ATTRDEFTXT", text = "Preview", ed = False, width = 475
+                    )
+                    pm.setParent(u = 1)
+                # endregion
+
+                with pm.columnLayout(adjustableColumn = True):
+                    pm.button(
+                        label = "CREATE!",
+                        width=100,
+                    )
                     pm.setParent(u = 1)
 
                 with pm.rowLayout(nc = 6):
